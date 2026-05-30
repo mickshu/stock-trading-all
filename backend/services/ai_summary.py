@@ -1,7 +1,7 @@
 """AI 收盘总结服务。
 
-主路径：本地 Hermes Agent CLI（subprocess，自带联网/工具）。
-保留：OpenAI / Anthropic 直连 + Tavily 工具循环，作为没有 hermes 时的备选。
+主路径：本地 AI Agent CLI（subprocess，自带联网/工具）——可选 hermes/claude/codex/gemini 之一。
+保留：OpenAI / Anthropic 直连 + Tavily 工具循环，作为没有本地 CLI 时的备选。
 """
 
 from __future__ import annotations
@@ -13,7 +13,9 @@ from typing import Any
 
 import requests
 
-from backend.services.ai_agent import get_agent, run_agent
+from backend.services.ai_agent import AGENTS, get_agent, run_agent
+
+LOCAL_AGENT_NAMES = tuple(spec.name for spec in AGENTS)
 
 logger = logging.getLogger(__name__)
 
@@ -292,20 +294,22 @@ def _run_anthropic(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
     return "".join(parts).strip(), model, sources
 
 
-def _run_hermes(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
-    spec = get_agent("hermes")
+def _run_local_agent(agent_name: str, settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
+    spec = get_agent(agent_name)
     if spec is None:
-        raise RuntimeError("hermes agent 未注册")
+        raise RuntimeError(f"{agent_name} agent 未注册")
     prompt_template = (settings or {}).get("daily_summary_prompt") or DEFAULT_HERMES_PROMPT
     prompt = f"{prompt_template.strip()}\n\n{user_msg}"
-    result = run_agent("hermes", prompt, timeout=HERMES_TIMEOUT)
+    result = run_agent(agent_name, prompt, timeout=HERMES_TIMEOUT)
     if not result.get("ok"):
         stderr = (result.get("stderr") or "").strip()
-        raise RuntimeError(f"Hermes 执行失败 (exit={result.get('exit_code')})：{stderr or '无输出'}")
+        raise RuntimeError(
+            f"{spec.label} 执行失败 (exit={result.get('exit_code')})：{stderr or '无输出'}"
+        )
     output = (result.get("output") or "").strip()
     if not output:
-        raise RuntimeError("Hermes 无输出")
-    return output, "hermes", []
+        raise RuntimeError(f"{spec.label} 无输出")
+    return output, agent_name, []
 
 
 def generate_daily_summary(
@@ -316,14 +320,14 @@ def generate_daily_summary(
 ) -> dict:
     """主入口。settings 来自 AppSetting kv（已解密的明文 dict）。
 
-    优先走本地 Hermes Agent；显式 provider=openai/anthropic 时走老 LLM 直连路径。
+    provider 命中本地 Agent CLI 时走 subprocess；openai/anthropic 走 HTTP 直连。
     返回 {model, content, sources, generated_at}。
     """
     provider = (settings or {}).get("provider") or "hermes"
     user_msg = _user_context(indices, stock_flow, sector_flow)
 
-    if provider == "hermes":
-        content, model, sources = _run_hermes(settings, user_msg)
+    if provider in LOCAL_AGENT_NAMES:
+        content, model, sources = _run_local_agent(provider, settings, user_msg)
     elif provider == "anthropic":
         content, model, sources = _run_anthropic(settings, user_msg)
     else:

@@ -15,13 +15,19 @@ from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.models.models import AppSetting
+from backend.services.ai_agent import AGENTS, detect_agents
 from backend.services.ai_summary import DEFAULT_HERMES_PROMPT, probe_llm, probe_tavily
 
 router = APIRouter(prefix="/api/v1/settings", tags=["settings"])
 
 AI_KEY = "ai_config"
 SECRET_FIELDS = ("openai_api_key", "anthropic_api_key", "tavily_api_key")
-VALID_PROVIDERS = ("hermes", "openai", "anthropic")
+
+# 本地 Agent CLI 名称（与 services.ai_agent.AGENTS 保持一致）。
+LOCAL_AGENT_PROVIDERS = tuple(spec.name for spec in AGENTS)
+# 原生 API 入口。
+NATIVE_PROVIDERS = ("openai", "anthropic")
+VALID_PROVIDERS = NATIVE_PROVIDERS + LOCAL_AGENT_PROVIDERS
 DEFAULT_AI: dict[str, Any] = {
     "provider": "hermes",
     "openai_base_url": "https://api.openai.com/v1",
@@ -117,15 +123,29 @@ class AiTestIn(AiSettingsIn):
 def test_ai_settings(payload: AiTestIn):
     """对当前表单（合并已存密钥）发起最小调用，验证 LLM / Tavily 联通。
 
-    provider=hermes 时无法在此处探测（需走 /ai-agent/probe），返回明确提示。
+    provider 命中本地 Agent CLI 时不发 HTTP，仅核对该 CLI 是否已安装。
     """
     if payload.provider not in VALID_PROVIDERS:
         raise HTTPException(status_code=400, detail=f"provider must be one of {VALID_PROVIDERS}")
-    if payload.provider == "hermes":
+    if payload.provider in LOCAL_AGENT_PROVIDERS:
+        detected = {a["name"]: a for a in detect_agents()}
+        info = detected.get(payload.provider)
+        if info:
+            return {
+                "llm": {
+                    "ok": True,
+                    "provider": payload.provider,
+                    "model": info.get("version") or info.get("path") or payload.provider,
+                },
+                "search": None,
+            }
         return {
             "llm": {
                 "ok": False,
-                "error": "Hermes 走本地 CLI，无法在此探测；请在 /ai-agent/probe 查看是否检测到 hermes。",
+                "error": (
+                    f"未检测到本地 CLI：{payload.provider}。"
+                    f"已检测到：{', '.join(detected.keys()) or '无'}"
+                ),
             },
             "search": None,
         }

@@ -1,7 +1,19 @@
 import api from './client';
 
-export type AiProvider = 'hermes' | 'openai' | 'anthropic';
+export type LocalAgentProvider = 'hermes' | 'claude' | 'codex' | 'gemini';
+export type AiProvider = LocalAgentProvider | 'openai' | 'anthropic';
 export type SearchProvider = 'none' | 'tavily';
+
+export const LOCAL_AGENT_PROVIDERS: LocalAgentProvider[] = [
+  'hermes',
+  'claude',
+  'codex',
+  'gemini',
+];
+
+export function isLocalAgentProvider(p: string | undefined): p is LocalAgentProvider {
+  return !!p && (LOCAL_AGENT_PROVIDERS as string[]).includes(p);
+}
 
 export interface DailySummaryPrompt {
   prompt: string;

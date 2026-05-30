@@ -23,8 +23,11 @@ def _build_ta_config(depth: int, online_tools: bool) -> dict[str, Any]:
     ai = get_ai_settings_dict()
     cfg: dict[str, Any] = dict(DEFAULT_CONFIG)
 
+    from backend.services.ai_summary import LOCAL_AGENT_NAMES
     provider = (ai.get("provider") or "openai").lower()
-    if provider in ("hermes", "openai"):
+    # 本地 CLI 模式（hermes/claude/codex/gemini）不直接驱动 TradingAgents；
+    # 这里复用 OpenAI-compat 路径，让用户在「多智能体」段落显式给 base_url+key。
+    if provider in LOCAL_AGENT_NAMES or provider == "openai":
         cfg["llm_provider"] = "openai"
         cfg["backend_url"] = (
             ai.get("ta_backend_url")

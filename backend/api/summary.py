@@ -44,13 +44,20 @@ def _generate_and_cache(force: bool = False) -> dict[str, Any]:
                     pass
         settings = get_ai_settings_dict()
         provider = settings.get("provider") or "hermes"
-        if provider == "hermes":
-            from backend.services.ai_agent import get_agent as _get_agent, _resolve_binary as _which
-            spec = _get_agent("hermes")
+        from backend.services.ai_summary import LOCAL_AGENT_NAMES
+        if provider in LOCAL_AGENT_NAMES:
+            from backend.services.ai_agent import (
+                get_agent as _get_agent,
+                _resolve_binary as _which,
+            )
+            spec = _get_agent(provider)
             if spec is None or not _which(spec):
                 raise HTTPException(
                     status_code=400,
-                    detail="未检测到本地 hermes CLI，请安装后再生成；或在设置 → AI 配置切换 provider",
+                    detail=(
+                        f"未检测到本地 {provider} CLI，请安装后再生成；"
+                        f"或在设置 → AI 配置切换 provider"
+                    ),
                 )
         else:
             key_field = "openai_api_key" if provider == "openai" else "anthropic_api_key"

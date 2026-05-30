@@ -7,6 +7,7 @@ import {
   Input,
   InputNumber,
   Radio,
+  Select,
   Space,
   Spin,
   Tabs,
@@ -19,14 +20,24 @@ import {
   fetchAiSettings,
   saveAiSettings,
   testAiSettings,
+  isLocalAgentProvider,
+  LOCAL_AGENT_PROVIDERS,
   type AiProvider,
   type AiSettings,
   type AiTestResult,
+  type LocalAgentProvider,
   type SearchProvider,
 } from '../api/settings';
 import { probeAIAgents, type AIAgentInfo } from '../api/aiAgent';
 
 type AiMode = 'native' | 'local';
+
+const LOCAL_AGENT_LABELS: Record<LocalAgentProvider, string> = {
+  hermes: 'Hermes',
+  claude: 'Claude Code',
+  codex: 'Codex CLI',
+  gemini: 'Gemini CLI',
+};
 
 const { useBreakpoint } = Grid;
 
@@ -94,21 +105,25 @@ function AiSettingsTab() {
   const [testResult, setTestResult] = useState<AiTestResult | null>(null);
   const [mode, setMode] = useState<AiMode>('native');
   const [provider, setProvider] = useState<AiProvider>('openai');
+  // 本地模式选中的 Agent；与 provider 同步保存。
+  const [localAgent, setLocalAgent] = useState<LocalAgentProvider>('hermes');
   const [searchProvider, setSearchProvider] = useState<SearchProvider>('none');
   const [agents, setAgents] = useState<AIAgentInfo[]>([]);
   const [probing, setProbing] = useState(false);
   const [probeError, setProbeError] = useState<string | null>(null);
 
-  const refreshAgents = async () => {
+  const refreshAgents = async (): Promise<AIAgentInfo[]> => {
     setProbing(true);
     setProbeError(null);
     try {
       const list = await probeAIAgents();
       setAgents(list);
+      return list;
     } catch (e) {
       const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setProbeError(detail || '探测失败');
       setAgents([]);
+      return [];
     } finally {
       setProbing(false);
     }
@@ -119,9 +134,11 @@ function AiSettingsTab() {
     fetchAiSettings()
       .then((s) => {
         form.setFieldsValue(s);
-        setProvider(s.provider === 'hermes' ? 'openai' : s.provider);
+        const isLocal = isLocalAgentProvider(s.provider);
+        setProvider(isLocal ? 'openai' : s.provider);
+        if (isLocal) setLocalAgent(s.provider as LocalAgentProvider);
         setSearchProvider(s.search_provider);
-        const initialMode: AiMode = s.provider === 'hermes' ? 'local' : 'native';
+        const initialMode: AiMode = isLocal ? 'local' : 'native';
         setMode(initialMode);
         if (initialMode === 'local') {
           refreshAgents();
@@ -135,15 +152,28 @@ function AiSettingsTab() {
     setMode(next);
     setTestResult(null);
     if (next === 'local') {
-      // 本地 Agent 模式：锁定 provider=hermes
-      form.setFieldValue('provider', 'hermes');
-      refreshAgents();
+      // 本地 Agent 模式：默认 hermes，探测后若不存在则自动切换到首个可用项。
+      form.setFieldValue('provider', localAgent);
+      refreshAgents().then((list) => {
+        if (!list.length) return;
+        const has = list.some((a) => a.name === localAgent);
+        if (!has) {
+          const first = list[0].name as LocalAgentProvider;
+          setLocalAgent(first);
+          form.setFieldValue('provider', first);
+        }
+      });
     } else {
-      // 原生 API 模式：恢复到 openai（或上次记录的 provider）
-      const restore = provider === 'hermes' ? 'openai' : provider;
+      const restore = isLocalAgentProvider(provider) ? 'openai' : provider;
       form.setFieldValue('provider', restore);
       setProvider(restore);
     }
+  };
+
+  const handleLocalAgentChange = (next: LocalAgentProvider) => {
+    setLocalAgent(next);
+    form.setFieldValue('provider', next);
+    setTestResult(null);
   };
 
   const onSave = async () => {
@@ -151,7 +181,7 @@ function AiSettingsTab() {
       const values = await form.validateFields();
       const payload: AiSettings = {
         ...values,
-        provider: mode === 'local' ? 'hermes' : (values.provider || provider),
+        provider: mode === 'local' ? localAgent : (values.provider || provider),
       };
       setSaving(true);
       const saved = await saveAiSettings(payload);
@@ -168,28 +198,26 @@ function AiSettingsTab() {
   const onTest = async () => {
     setTestResult(null);
     if (mode === 'local') {
-      // 本地 Agent：重新探测 CLI
+      // 本地 Agent：重新探测，校验当前选择的 CLI 是否安装。
       setTesting(true);
       try {
-        const list = await probeAIAgents();
-        setAgents(list);
-        setProbeError(null);
-        const hermes = list.find((a) => a.name === 'hermes');
-        if (hermes) {
+        const list = await refreshAgents();
+        const hit = list.find((a) => a.name === localAgent);
+        if (hit) {
           setTestResult({
-            llm: { ok: true, provider: 'hermes', model: hermes.version || hermes.path },
+            llm: { ok: true, provider: localAgent, model: hit.version || hit.path },
             search: null,
           });
-          message.success('检测到 hermes CLI');
+          message.success(`检测到 ${LOCAL_AGENT_LABELS[localAgent]} CLI`);
         } else if (list.length > 0) {
           setTestResult({
             llm: {
               ok: false,
-              error: `未检测到 hermes；已检测到其他 CLI：${list.map((a) => a.name).join(', ')}`,
+              error: `未检测到 ${localAgent}；已检测到其他 CLI：${list.map((a) => a.name).join(', ')}`,
             },
             search: null,
           });
-          message.warning('未检测到 hermes');
+          message.warning(`未检测到 ${localAgent}`);
         } else {
           setTestResult({
             llm: { ok: false, error: '未检测到任何本地 AI CLI' },
@@ -323,8 +351,26 @@ function AiSettingsTab() {
           <>
             <Typography.Title level={5} style={{ marginTop: 0 }}>本地 Agent CLI</Typography.Title>
             <Typography.Paragraph type="secondary" style={{ marginTop: -4, fontSize: 12 }}>
-              当前固定使用 <code>hermes</code> 作为 LLM 入口，由本地 CLI 完成调用。其他检测到的 CLI（claude / codex / gemini）可在「AI 分析」菜单内单独选择。
+              选择任一已安装的本地 Agent（hermes / claude / codex / gemini）作为 AI 分析与收盘总结的 LLM 入口。AI 分析为可选功能，未选择或未安装时不影响行情、资金流等基础展示。
             </Typography.Paragraph>
+
+            <Form.Item label="本地 Agent" style={{ marginBottom: 12 }}>
+              <Select<LocalAgentProvider>
+                style={{ minWidth: isMobile ? '100%' : 240 }}
+                value={localAgent}
+                onChange={handleLocalAgentChange}
+                options={LOCAL_AGENT_PROVIDERS.map((name) => {
+                  const detected = agents.find((a) => a.name === name);
+                  return {
+                    value: name,
+                    label: detected
+                      ? `${LOCAL_AGENT_LABELS[name]} · 已安装${detected.version ? ` (${detected.version})` : ''}`
+                      : `${LOCAL_AGENT_LABELS[name]} · 未检测到`,
+                    disabled: !detected,
+                  };
+                })}
+              />
+            </Form.Item>
 
             <Spin spinning={probing}>
               {probeError ? (
@@ -335,17 +381,17 @@ function AiSettingsTab() {
                   showIcon
                   style={{ marginBottom: 12 }}
                   message="未检测到任何本地 AI CLI"
-                  description="请确认 hermes / claude / codex / gemini 已安装并在 PATH 中。"
+                  description="请确认 hermes / claude / codex / gemini 已安装并在 PATH 中。AI 分析为可选功能，可不安装。"
                 />
               ) : (
                 <Alert
-                  type={agents.some((a) => a.name === 'hermes') ? 'success' : 'warning'}
+                  type={agents.some((a) => a.name === localAgent) ? 'success' : 'warning'}
                   showIcon
                   style={{ marginBottom: 12 }}
                   message={
-                    agents.some((a) => a.name === 'hermes')
-                      ? '已检测到 hermes CLI，可作为基础 LLM 使用'
-                      : '未检测到 hermes，但检测到其他 CLI'
+                    agents.some((a) => a.name === localAgent)
+                      ? `已选择 ${LOCAL_AGENT_LABELS[localAgent]}（已安装），将作为 LLM 入口`
+                      : `当前选择的 ${LOCAL_AGENT_LABELS[localAgent]} 未检测到，请改选已安装项或安装后重试`
                   }
                   description={
                     <Space direction="vertical" size={2} style={{ marginTop: 4 }}>
@@ -361,7 +407,7 @@ function AiSettingsTab() {
                   }
                 />
               )}
-              <Button size="small" onClick={refreshAgents} loading={probing} style={{ marginBottom: 16 }}>
+              <Button size="small" onClick={() => refreshAgents()} loading={probing} style={{ marginBottom: 16 }}>
                 重新探测
               </Button>
             </Spin>
