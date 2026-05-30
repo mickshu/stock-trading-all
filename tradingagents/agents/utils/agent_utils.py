@@ -417,3 +417,77 @@ class Toolkit:
         )
 
         return openai_fundamentals_results
+
+    # =========================================================================
+    # Chinese Market Data Tools (东方财富 via akshare)
+    # =========================================================================
+
+    @staticmethod
+    @tool
+    def get_chinese_stock_price(
+        symbol: Annotated[str, "Chinese stock ticker, e.g. '600000' for Shanghai or '000001' for Shenzhen"],
+        start_date: Annotated[str, "Start date in yyyy-mm-dd format"],
+        end_date: Annotated[str, "End date in yyyy-mm-dd format"],
+    ) -> str:
+        """
+        Retrieve daily K-line price data for Chinese A-share stocks from 东方财富 (Eastmoney).
+        Use this for stocks traded on Shanghai (600xxx) or Shenzhen (000xxx, 002xxx, 300xxx) exchanges.
+        Args:
+            symbol: Pure 6-digit Chinese stock code without exchange suffix
+            start_date: Start date in yyyy-mm-dd format
+            end_date: End date in yyyy-mm-dd format
+        Returns:
+            str: OHLCV data as CSV with columns Date, Open, High, Low, Close, Volume
+        """
+        return interface.get_chinese_stock_price(symbol, start_date, end_date)
+
+    @staticmethod
+    @tool
+    def get_chinese_financial_indicators(
+        symbol: Annotated[str, "Chinese stock ticker, e.g. '600000'"],
+        curr_date: Annotated[str, "Current date in yyyy-mm-dd format"],
+    ) -> str:
+        """
+        Retrieve financial analysis indicators (PE ratio, PB ratio, ROE, EPS, revenue/profit growth) for Chinese A-share stocks.
+        Data sourced from 东方财富 (Eastmoney).
+        Args:
+            symbol: Pure 6-digit Chinese stock code
+            curr_date: Current date in yyyy-mm-dd format
+        Returns:
+            str: Key financial metrics report in markdown table format
+        """
+        return interface.get_chinese_financial_indicators(symbol, curr_date)
+
+    @staticmethod
+    @tool
+    def get_chinese_stock_news(
+        symbol: Annotated[str, "Chinese stock ticker, e.g. '600000'"],
+        curr_date: Annotated[str, "Current date in yyyy-mm-dd format"],
+        look_back_days: Annotated[int, "How many days to look back"] = 7,
+    ) -> str:
+        """
+        Retrieve recent news and announcements for Chinese A-share stocks from 东方财富 (Eastmoney).
+        Args:
+            symbol: Pure 6-digit Chinese stock code
+            curr_date: Current date in yyyy-mm-dd format
+            look_back_days: How many days of historical news to retrieve (default 7)
+        Returns:
+            str: Markdown-formatted news report with headlines, sources, and content
+        """
+        return interface.get_chinese_stock_news(symbol, curr_date, look_back_days)
+
+    @staticmethod
+    @tool
+    def get_chinese_market_overview(
+        curr_date: Annotated[str, "Current date in yyyy-mm-dd format"],
+    ) -> str:
+        """
+        Retrieve overall Chinese A-share market overview including major indices
+        (上证指数, 深证成指, 创业板指, 科创50, 沪深300, etc.) from 东方财富.
+        Useful for macro-level Chinese market analysis before analyzing individual stocks.
+        Args:
+            curr_date: Current date in yyyy-mm-dd format
+        Returns:
+            str: Markdown table with index prices, changes, volume, and turnover
+        """
+        return interface.get_chinese_market_overview(curr_date)

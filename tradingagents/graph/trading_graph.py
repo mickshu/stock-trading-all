@@ -117,6 +117,7 @@ class TradingAgentsGraph:
                     # online tools
                     self.toolkit.get_YFin_data_online,
                     self.toolkit.get_stockstats_indicators_report_online,
+                    self.toolkit.get_chinese_stock_price,
                     # offline tools
                     self.toolkit.get_YFin_data,
                     self.toolkit.get_stockstats_indicators_report,
@@ -135,6 +136,8 @@ class TradingAgentsGraph:
                     # online tools
                     self.toolkit.get_global_news_openai,
                     self.toolkit.get_google_news,
+                    self.toolkit.get_chinese_stock_news,
+                    self.toolkit.get_chinese_market_overview,
                     # offline tools
                     self.toolkit.get_finnhub_news,
                     self.toolkit.get_reddit_news,
@@ -144,6 +147,7 @@ class TradingAgentsGraph:
                 [
                     # online tools
                     self.toolkit.get_fundamentals_openai,
+                    self.toolkit.get_chinese_financial_indicators,
                     # offline tools
                     self.toolkit.get_finnhub_company_insider_sentiment,
                     self.toolkit.get_finnhub_company_insider_transactions,

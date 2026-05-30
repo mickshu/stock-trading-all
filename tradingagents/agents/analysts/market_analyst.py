@@ -3,6 +3,11 @@ import time
 import json
 
 
+def _is_chinese_ticker(ticker: str) -> bool:
+    """Detect Chinese A-share tickers: pure 6-digit codes."""
+    return ticker.isdigit() and len(ticker) == 6
+
+
 def create_market_analyst(llm, toolkit):
 
     def market_analyst_node(state):
@@ -11,10 +16,16 @@ def create_market_analyst(llm, toolkit):
         company_name = state["company_of_interest"]
 
         if toolkit.config["online_tools"]:
-            tools = [
-                toolkit.get_YFin_data_online,
-                toolkit.get_stockstats_indicators_report_online,
-            ]
+            if _is_chinese_ticker(ticker):
+                tools = [
+                    toolkit.get_chinese_stock_price,
+                    toolkit.get_stockstats_indicators_report_online,
+                ]
+            else:
+                tools = [
+                    toolkit.get_YFin_data_online,
+                    toolkit.get_stockstats_indicators_report_online,
+                ]
         else:
             tools = [
                 toolkit.get_YFin_data,

@@ -562,6 +562,7 @@ def get_stockstats_indicator(
         str, "The current trading date you are trading on, YYYY-mm-dd"
     ],
     online: Annotated[bool, "to fetch data online or offline"],
+    data_source: Annotated[str, "data source: yfinance, akshare, tushare"] = "yfinance",
 ) -> str:
 
     curr_date = datetime.strptime(curr_date, "%Y-%m-%d")
@@ -574,6 +575,7 @@ def get_stockstats_indicator(
             curr_date,
             os.path.join(DATA_DIR, "market_data", "price_data"),
             online=online,
+            data_source=data_source,
         )
     except Exception as e:
         print(
@@ -634,7 +636,28 @@ def get_YFin_data_online(
     datetime.strptime(start_date, "%Y-%m-%d")
     datetime.strptime(end_date, "%Y-%m-%d")
 
-    # Create ticker object
+    # Try configured data source first (with fallback)
+    config = get_config()
+    data_source = config.get("data_source", "yfinance")
+
+    if data_source in ("akshare", "tushare"):
+        try:
+            from .data_source_manager import DataSourceManager
+
+            manager = DataSourceManager.get_instance()
+            df = manager.get_stock_price(symbol, start_date, end_date)
+
+            csv_string = df.to_csv(index=False)
+            header = f"# Stock data for {symbol.upper()} from {start_date} to {end_date}\n"
+            header += f"# Total records: {len(df)}\n"
+            header += f"# Data source: {data_source}\n"
+            header += f"# Data retrieved on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            return header + csv_string
+        except Exception as e:
+            # Fall through to yfinance path below
+            print(f"Data source '{data_source}' failed: {e}, falling back to yfinance")
+
+    # Original yfinance code path (also used as fallback)
     ticker = yf.Ticker(symbol.upper())
 
     # Fetch historical data for the specified date range
@@ -805,3 +828,179 @@ def get_fundamentals_openai(ticker, curr_date):
     )
 
     return response.output[1].content[0].text
+
+
+# =============================================================================
+# Chinese Market Data Functions (东方财富 via akshare)
+# =============================================================================
+
+
+def get_chinese_stock_price(
+    symbol: Annotated[str, "Chinese stock ticker, e.g. '600000' or '000001'"],
+    start_date: Annotated[str, "Start date in yyyy-mm-dd format"],
+    end_date: Annotated[str, "End date in yyyy-mm-dd format"],
+) -> str:
+    """
+    Retrieve daily K-line price data for Chinese A-share stocks from 东方财富.
+    Handles Shanghai (600xxx) and Shenzhen (000xxx, 002xxx, 300xxx) exchanges.
+    Returns OHLCV data as CSV-formatted string with standardized columns.
+    """
+    from .data_source_manager import DataSourceManager
+
+    datetime.strptime(start_date, "%Y-%m-%d")
+    datetime.strptime(end_date, "%Y-%m-%d")
+
+    try:
+        manager = DataSourceManager.get_instance()
+        df = manager.get_stock_price(symbol, start_date, end_date)
+
+        csv_string = df.to_csv(index=False)
+        header = f"# Stock data for {symbol} from {start_date} to {end_date}\n"
+        header += f"# Total records: {len(df)}\n"
+        header += f"# Data source: 东方财富 (akshare)\n"
+        header += f"# Data retrieved on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        return header + csv_string
+    except Exception as e:
+        return f"# Error fetching Chinese stock data for '{symbol}': {str(e)}\n"
+
+
+def get_chinese_financial_indicators(
+    symbol: Annotated[str, "Chinese stock ticker, e.g. '600000'"],
+    curr_date: Annotated[str, "Current date in yyyy-mm-dd format"],
+) -> str:
+    """
+    Retrieve financial analysis indicators for Chinese A-share stocks.
+    Returns key metrics: PE ratio, PB ratio, ROE, EPS, revenue/profit growth rates.
+    Data sourced from 东方财富.
+    """
+    from .data_source_manager import DataSourceManager
+
+    try:
+        manager = DataSourceManager.get_instance()
+        df = manager.get_financial_indicators(symbol)
+
+        if df is None or df.empty:
+            return f"No financial data available for '{symbol}'"
+
+        # Filter to dates before curr_date and get latest
+        if "Date" in df.columns:
+            df["Date"] = pd.to_datetime(df["Date"])
+            curr_dt = pd.to_datetime(curr_date)
+            df = df[df["Date"] <= curr_dt]
+            if df.empty:
+                return f"No financial data available for '{symbol}' before {curr_date}"
+            latest = df.loc[df["Date"].idxmax()]
+        else:
+            latest = df.iloc[-1]
+
+        # Build readable report
+        label_map = {
+            "PE": "PE (市盈率)",
+            "PB": "PB (市净率)",
+            "EPS": "EPS (每股收益)",
+            "ROE": "ROE (净资产收益率, %)",
+            "RevenueYoY": "Revenue YoY Growth (营收同比增长, %)",
+            "ProfitYoY": "Profit YoY Growth (净利润同比增长, %)",
+            "TotalRevenue": "Total Revenue (营业总收入)",
+            "NetProfit": "Net Profit (归属母公司净利润)",
+            "GrossMargin": "Gross Margin (销售毛利率, %)",
+            "BPS": "BPS (每股净资产)",
+            "ROA": "ROA (总资产净利率, %)",
+        }
+
+        result = f"## Financial Indicators for {symbol} as of {curr_date}:\n\n"
+        result += "| Metric | Value |\n|--------|-------|\n"
+        for col in latest.index:
+            if col in label_map and pd.notna(latest[col]):
+                result += f"| {label_map[col]} | {latest[col]} |\n"
+
+        result += "\n**Data source:** 东方财富 (akshare)"
+        return result
+    except Exception as e:
+        return f"# Error fetching Chinese financial data for '{symbol}': {str(e)}\n"
+
+
+def get_chinese_stock_news(
+    symbol: Annotated[str, "Chinese stock ticker, e.g. '600000'"],
+    curr_date: Annotated[str, "Current date in yyyy-mm-dd format"],
+    look_back_days: Annotated[int, "How many days to look back"] = 7,
+) -> str:
+    """
+    Retrieve recent news about Chinese A-share stocks from 东方财富.
+    Returns formatted markdown with news headlines, sources, and content.
+    """
+    from .data_source_manager import DataSourceManager
+
+    try:
+        start_date = datetime.strptime(curr_date, "%Y-%m-%d") - relativedelta(
+            days=look_back_days
+        )
+
+        manager = DataSourceManager.get_instance()
+        df = manager.get_stock_news(symbol, limit=30)
+
+        if df is None or df.empty:
+            return f"No news available for '{symbol}' from 东方财富"
+
+        # Filter by date range if datetime column exists
+        if "datetime" in df.columns:
+            df["datetime"] = pd.to_datetime(df["datetime"])
+            start_dt = pd.to_datetime(start_date)
+            end_dt = pd.to_datetime(curr_date)
+            df = df[(df["datetime"] >= start_dt) & (df["datetime"] <= end_dt)]
+
+        if df.empty:
+            return f"No news found for '{symbol}' from {start_date.strftime('%Y-%m-%d')} to {curr_date}"
+
+        news_str = f"## {symbol} News (东方财富), {start_date.strftime('%Y-%m-%d')} to {curr_date}:\n\n"
+        for _, row in df.iterrows():
+            title = row.get("title", "No title")
+            source = row.get("source", "Unknown")
+            date_str = row.get("datetime", "")
+            content = row.get("content", "")
+            news_str += f"### {title} (来源: {source}, {date_str})\n\n"
+            if content and str(content).strip():
+                content_str = str(content)
+                if len(content_str) > 500:
+                    content_str = content_str[:500] + "..."
+                news_str += f"{content_str}\n\n"
+            news_str += "---\n\n"
+
+        return news_str
+    except Exception as e:
+        return f"# Error fetching Chinese stock news for '{symbol}': {str(e)}\n"
+
+
+def get_chinese_market_overview(
+    curr_date: Annotated[str, "Current date in yyyy-mm-dd format"],
+) -> str:
+    """
+    Retrieve overall Chinese A-share market overview including major indices
+    (上证指数, 深证成指, 创业板指, 科创50, 沪深300, etc.) from 东方财富.
+    Useful for macro-level Chinese market analysis.
+    """
+    try:
+        from .akshare_utils import AkshareUtils
+
+        df = AkshareUtils.get_market_overview()
+
+        if df is None or df.empty:
+            return "No market overview data available from 东方财富"
+
+        result = f"## Chinese A-Share Market Overview ({curr_date}):\n\n"
+        result += "| Index (指数) | Price (最新价) | Change (涨跌额) | Change% (涨跌幅) | Volume (成交量) | Turnover (成交额) |\n"
+        result += "|-------------|--------------|----------------|------------------|----------------|-------------------|\n"
+
+        for _, row in df.iterrows():
+            name = row.get("name", "")
+            price = row.get("price", "")
+            change = row.get("change", "")
+            change_pct = row.get("change_pct", "")
+            volume = row.get("volume", "")
+            turnover = row.get("turnover", "")
+            result += f"| {name} | {price} | {change} | {change_pct}% | {volume} | {turnover} |\n"
+
+        result += "\n**Data source:** 东方财富 (akshare)"
+        return result
+    except Exception as e:
+        return f"# Error fetching Chinese market overview: {str(e)}\n"

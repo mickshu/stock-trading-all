@@ -3,6 +3,11 @@ import time
 import json
 
 
+def _is_chinese_ticker(ticker: str) -> bool:
+    """Detect Chinese A-share tickers: pure 6-digit codes."""
+    return ticker.isdigit() and len(ticker) == 6
+
+
 def create_fundamentals_analyst(llm, toolkit):
     def fundamentals_analyst_node(state):
         current_date = state["trade_date"]
@@ -10,7 +15,10 @@ def create_fundamentals_analyst(llm, toolkit):
         company_name = state["company_of_interest"]
 
         if toolkit.config["online_tools"]:
-            tools = [toolkit.get_fundamentals_openai]
+            if _is_chinese_ticker(ticker):
+                tools = [toolkit.get_chinese_financial_indicators]
+            else:
+                tools = [toolkit.get_fundamentals_openai]
         else:
             tools = [
                 toolkit.get_finnhub_company_insider_sentiment,

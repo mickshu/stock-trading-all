@@ -3,13 +3,25 @@ import time
 import json
 
 
+def _is_chinese_ticker(ticker: str) -> bool:
+    """Detect Chinese A-share tickers: pure 6-digit codes."""
+    return ticker.isdigit() and len(ticker) == 6
+
+
 def create_news_analyst(llm, toolkit):
     def news_analyst_node(state):
         current_date = state["trade_date"]
         ticker = state["company_of_interest"]
 
         if toolkit.config["online_tools"]:
-            tools = [toolkit.get_global_news_openai, toolkit.get_google_news]
+            if _is_chinese_ticker(ticker):
+                tools = [
+                    toolkit.get_chinese_stock_news,
+                    toolkit.get_chinese_market_overview,
+                    toolkit.get_google_news,
+                ]
+            else:
+                tools = [toolkit.get_global_news_openai, toolkit.get_google_news]
         else:
             tools = [
                 toolkit.get_finnhub_news,
