@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import {
   Card,
   Form,
-  Input,
   DatePicker,
   Slider,
   Switch,
@@ -26,6 +25,7 @@ import {
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import MarkdownView from '../components/MarkdownView';
+import StockSearchInput from '../components/StockSearchInput';
 import {
   fetchTAHealth,
   runTradingAgents,
@@ -145,7 +145,11 @@ export default function TradingAgentsPage() {
           onFinish={onFinish}
         >
           <Form.Item name="ticker" label="股票代码" rules={[{ required: true }]}>
-            <Input style={{ width: 140 }} placeholder="如 600000 / NVDA" />
+            <StockSearchInput
+              style={{ width: 260 }}
+              placeholder="输入代码 / 名称 / 拼音，如 600000 / 浦发 / pf"
+              onSelect={(s) => form.setFieldValue('ticker', s.code)}
+            />
           </Form.Item>
           <Form.Item name="trade_date" label="分析日期" rules={[{ required: true }]}>
             <DatePicker />
