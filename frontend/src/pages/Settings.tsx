@@ -24,6 +24,9 @@ import {
   type AiTestResult,
   type SearchProvider,
 } from '../api/settings';
+import { probeAIAgents, type AIAgentInfo } from '../api/aiAgent';
+
+type AiMode = 'native' | 'local';
 
 const { useBreakpoint } = Grid;
 
@@ -89,26 +92,69 @@ function AiSettingsTab() {
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<AiTestResult | null>(null);
+  const [mode, setMode] = useState<AiMode>('native');
   const [provider, setProvider] = useState<AiProvider>('openai');
   const [searchProvider, setSearchProvider] = useState<SearchProvider>('none');
+  const [agents, setAgents] = useState<AIAgentInfo[]>([]);
+  const [probing, setProbing] = useState(false);
+  const [probeError, setProbeError] = useState<string | null>(null);
+
+  const refreshAgents = async () => {
+    setProbing(true);
+    setProbeError(null);
+    try {
+      const list = await probeAIAgents();
+      setAgents(list);
+    } catch (e) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setProbeError(detail || '探测失败');
+      setAgents([]);
+    } finally {
+      setProbing(false);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
     fetchAiSettings()
       .then((s) => {
         form.setFieldsValue(s);
-        setProvider(s.provider);
+        setProvider(s.provider === 'hermes' ? 'openai' : s.provider);
         setSearchProvider(s.search_provider);
+        const initialMode: AiMode = s.provider === 'hermes' ? 'local' : 'native';
+        setMode(initialMode);
+        if (initialMode === 'local') {
+          refreshAgents();
+        }
       })
       .catch(() => message.error('加载 AI 配置失败'))
       .finally(() => setLoading(false));
   }, [form]);
 
+  const handleModeChange = (next: AiMode) => {
+    setMode(next);
+    setTestResult(null);
+    if (next === 'local') {
+      // 本地 Agent 模式：锁定 provider=hermes
+      form.setFieldValue('provider', 'hermes');
+      refreshAgents();
+    } else {
+      // 原生 API 模式：恢复到 openai（或上次记录的 provider）
+      const restore = provider === 'hermes' ? 'openai' : provider;
+      form.setFieldValue('provider', restore);
+      setProvider(restore);
+    }
+  };
+
   const onSave = async () => {
     try {
       const values = await form.validateFields();
+      const payload: AiSettings = {
+        ...values,
+        provider: mode === 'local' ? 'hermes' : (values.provider || provider),
+      };
       setSaving(true);
-      const saved = await saveAiSettings(values);
+      const saved = await saveAiSettings(payload);
       form.setFieldsValue(saved);
       message.success('已保存');
     } catch (e) {
@@ -120,10 +166,51 @@ function AiSettingsTab() {
   };
 
   const onTest = async () => {
+    setTestResult(null);
+    if (mode === 'local') {
+      // 本地 Agent：重新探测 CLI
+      setTesting(true);
+      try {
+        const list = await probeAIAgents();
+        setAgents(list);
+        setProbeError(null);
+        const hermes = list.find((a) => a.name === 'hermes');
+        if (hermes) {
+          setTestResult({
+            llm: { ok: true, provider: 'hermes', model: hermes.version || hermes.path },
+            search: null,
+          });
+          message.success('检测到 hermes CLI');
+        } else if (list.length > 0) {
+          setTestResult({
+            llm: {
+              ok: false,
+              error: `未检测到 hermes；已检测到其他 CLI：${list.map((a) => a.name).join(', ')}`,
+            },
+            search: null,
+          });
+          message.warning('未检测到 hermes');
+        } else {
+          setTestResult({
+            llm: { ok: false, error: '未检测到任何本地 AI CLI' },
+            search: null,
+          });
+          message.warning('未检测到任何本地 AI CLI');
+        }
+      } catch (e) {
+        const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+        setTestResult({
+          llm: { ok: false, error: detail || '探测失败' },
+          search: null,
+        });
+      } finally {
+        setTesting(false);
+      }
+      return;
+    }
     try {
       const values = await form.validateFields();
       setTesting(true);
-      setTestResult(null);
       const r = await testAiSettings(values);
       setTestResult(r);
       if (r.llm?.ok && (r.search === null || r.search?.ok)) {
@@ -152,57 +239,133 @@ function AiSettingsTab() {
         layout={isMobile ? 'vertical' : 'vertical'}
         initialValues={{ provider: 'openai', search_provider: 'none' }}
       >
-        <Typography.Title level={5} style={{ marginTop: 0 }}>基础 LLM</Typography.Title>
-
-        <Form.Item
-          name="provider"
-          label="LLM Provider"
-          rules={[{ required: true }]}
-        >
-          <Radio.Group onChange={(e) => setProvider(e.target.value)}>
-            <Space orientation={isMobile ? 'vertical' : 'horizontal'}>
-              <Radio value="openai">OpenAI 兼容</Radio>
-              <Radio value="anthropic">Anthropic Claude</Radio>
-            </Space>
+        <Form.Item label="配置模式" style={{ marginBottom: 16 }}>
+          <Radio.Group
+            value={mode}
+            onChange={(e) => handleModeChange(e.target.value as AiMode)}
+            optionType="button"
+            buttonStyle="solid"
+          >
+            <Radio.Button value="native">原生模型 API</Radio.Button>
+            <Radio.Button value="local">本地 Agent CLI</Radio.Button>
           </Radio.Group>
+          <Typography.Paragraph type="secondary" style={{ marginTop: 6, marginBottom: 0, fontSize: 12 }}>
+            {mode === 'native'
+              ? '通过 HTTP 调用 OpenAI / Anthropic 兼容接口。需要填写 API Key。'
+              : '调用本地安装的 AI CLI（如 hermes / claude / codex / gemini），无需 API Key。'}
+          </Typography.Paragraph>
         </Form.Item>
 
-        {provider === 'openai' ? (
+        {/* 始终保留 provider 字段在表单里，本地模式锁定为 hermes */}
+        <Form.Item name="provider" hidden>
+          <Input />
+        </Form.Item>
+
+        {mode === 'native' ? (
           <>
-            <Form.Item name="openai_base_url" label="OpenAI Base URL">
-              <Input placeholder="https://api.openai.com/v1" />
+            <Typography.Title level={5} style={{ marginTop: 0 }}>基础 LLM</Typography.Title>
+
+            <Form.Item label="LLM Provider" required>
+              <Radio.Group
+                value={provider}
+                onChange={(e) => {
+                  const v = e.target.value as AiProvider;
+                  setProvider(v);
+                  form.setFieldValue('provider', v);
+                }}
+              >
+                <Space orientation={isMobile ? 'vertical' : 'horizontal'}>
+                  <Radio value="openai">OpenAI 兼容</Radio>
+                  <Radio value="anthropic">Anthropic Claude</Radio>
+                </Space>
+              </Radio.Group>
             </Form.Item>
-            <Form.Item name="openai_api_key" label="OpenAI API Key">
-              <Input.Password autoComplete="off" placeholder="留空 = 保留原值" />
+
+            {provider === 'openai' ? (
+              <>
+                <Form.Item name="openai_base_url" label="OpenAI Base URL">
+                  <Input placeholder="https://api.openai.com/v1" />
+                </Form.Item>
+                <Form.Item name="openai_api_key" label="OpenAI API Key">
+                  <Input.Password autoComplete="off" placeholder="留空 = 保留原值" />
+                </Form.Item>
+                <Form.Item name="openai_model" label="Model">
+                  <Input placeholder="如 gpt-4o-mini、deepseek-chat" />
+                </Form.Item>
+              </>
+            ) : (
+              <>
+                <Form.Item name="anthropic_api_key" label="Anthropic API Key">
+                  <Input.Password autoComplete="off" placeholder="留空 = 保留原值" />
+                </Form.Item>
+                <Form.Item name="anthropic_model" label="Model">
+                  <Input placeholder="如 claude-sonnet-4-6" />
+                </Form.Item>
+              </>
+            )}
+
+            <Form.Item name="search_provider" label="联网搜索">
+              <Radio.Group onChange={(e) => setSearchProvider(e.target.value)}>
+                <Space orientation={isMobile ? 'vertical' : 'horizontal'}>
+                  <Radio value="none">不启用</Radio>
+                  <Radio value="tavily">Tavily</Radio>
+                </Space>
+              </Radio.Group>
             </Form.Item>
-            <Form.Item name="openai_model" label="Model">
-              <Input placeholder="如 gpt-4o-mini、deepseek-chat" />
-            </Form.Item>
+
+            {searchProvider === 'tavily' && (
+              <Form.Item name="tavily_api_key" label="Tavily API Key">
+                <Input.Password autoComplete="off" placeholder="留空 = 保留原值" />
+              </Form.Item>
+            )}
           </>
         ) : (
           <>
-            <Form.Item name="anthropic_api_key" label="Anthropic API Key">
-              <Input.Password autoComplete="off" placeholder="留空 = 保留原值" />
-            </Form.Item>
-            <Form.Item name="anthropic_model" label="Model">
-              <Input placeholder="如 claude-sonnet-4-6" />
-            </Form.Item>
+            <Typography.Title level={5} style={{ marginTop: 0 }}>本地 Agent CLI</Typography.Title>
+            <Typography.Paragraph type="secondary" style={{ marginTop: -4, fontSize: 12 }}>
+              当前固定使用 <code>hermes</code> 作为 LLM 入口，由本地 CLI 完成调用。其他检测到的 CLI（claude / codex / gemini）可在「AI 分析」菜单内单独选择。
+            </Typography.Paragraph>
+
+            <Spin spinning={probing}>
+              {probeError ? (
+                <Alert type="error" showIcon style={{ marginBottom: 12 }} title={`探测失败：${probeError}`} />
+              ) : agents.length === 0 ? (
+                <Alert
+                  type="warning"
+                  showIcon
+                  style={{ marginBottom: 12 }}
+                  title="未检测到任何本地 AI CLI"
+                  description="请确认 hermes / claude / codex / gemini 已安装并在 PATH 中。"
+                />
+              ) : (
+                <Alert
+                  type={agents.some((a) => a.name === 'hermes') ? 'success' : 'warning'}
+                  showIcon
+                  style={{ marginBottom: 12 }}
+                  title={
+                    agents.some((a) => a.name === 'hermes')
+                      ? '已检测到 hermes CLI，可作为基础 LLM 使用'
+                      : '未检测到 hermes，但检测到其他 CLI'
+                  }
+                  description={
+                    <Space direction="vertical" size={2} style={{ marginTop: 4 }}>
+                      {agents.map((a) => (
+                        <Typography.Text key={a.name} style={{ fontSize: 12 }}>
+                          <strong>{a.label}</strong>
+                          <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
+                            {a.path}{a.version ? ` · ${a.version}` : ''}
+                          </Typography.Text>
+                        </Typography.Text>
+                      ))}
+                    </Space>
+                  }
+                />
+              )}
+              <Button size="small" onClick={refreshAgents} loading={probing} style={{ marginBottom: 16 }}>
+                重新探测
+              </Button>
+            </Spin>
           </>
-        )}
-
-        <Form.Item name="search_provider" label="联网搜索">
-          <Radio.Group onChange={(e) => setSearchProvider(e.target.value)}>
-            <Space orientation={isMobile ? 'vertical' : 'horizontal'}>
-              <Radio value="none">不启用</Radio>
-              <Radio value="tavily">Tavily</Radio>
-            </Space>
-          </Radio.Group>
-        </Form.Item>
-
-        {searchProvider === 'tavily' && (
-          <Form.Item name="tavily_api_key" label="Tavily API Key">
-            <Input.Password autoComplete="off" placeholder="留空 = 保留原值" />
-          </Form.Item>
         )}
 
         <Typography.Title level={5} style={{ marginTop: 24 }}>多智能体 (TradingAgents)</Typography.Title>
@@ -254,12 +417,16 @@ function AiSettingsTab() {
           <Space orientation="vertical" style={{ width: '100%' }}>
             {testResult.llm && (
               <Alert
-                type={testResult.llm.ok ? 'success' : 'error'}
+                type={testResult.llm.ok ? 'success' : (mode === 'local' ? 'warning' : 'error')}
                 showIcon
                 title={
                   testResult.llm.ok
-                    ? `LLM 联通成功：${testResult.llm.provider} / ${testResult.llm.model}`
-                    : `LLM 联通失败：${testResult.llm.error}`
+                    ? (mode === 'local'
+                      ? `本地 CLI 可用：${testResult.llm.provider} / ${testResult.llm.model}`
+                      : `LLM 联通成功：${testResult.llm.provider} / ${testResult.llm.model}`)
+                    : (mode === 'local'
+                      ? `本地 CLI 检测：${testResult.llm.error}`
+                      : `LLM 联通失败：${testResult.llm.error}`)
                 }
               />
             )}
