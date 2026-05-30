@@ -1,13 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Spin } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
+import { Suspense, lazy } from 'react';
 import AppLayout from './components/AppLayout';
-import Dashboard from './pages/Dashboard';
-import Watchlist from './pages/Watchlist';
-import StockDetail from './pages/StockDetail';
-import Screener from './pages/Screener';
-import Settings from './pages/Settings';
-import TradingAgentsPage from './pages/TradingAgents';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Watchlist = lazy(() => import('./pages/Watchlist'));
+const StockDetail = lazy(() => import('./pages/StockDetail'));
+const Screener = lazy(() => import('./pages/Screener'));
+const Settings = lazy(() => import('./pages/Settings'));
+const TradingAgentsPage = lazy(() => import('./pages/TradingAgents'));
+
+const fallback = (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 240 }}>
+    <Spin />
+  </div>
+);
+
+const lazyRoute = (Component: React.LazyExoticComponent<React.ComponentType>) => (
+  <Suspense fallback={fallback}>
+    <Component />
+  </Suspense>
+);
 
 export default function App() {
   return (
@@ -15,13 +29,13 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AppLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="stocks" element={<Watchlist />} />
-            <Route path="stock/:code" element={<StockDetail />} />
-            <Route path="screener" element={<Screener />} />
+            <Route index element={lazyRoute(Dashboard)} />
+            <Route path="stocks" element={lazyRoute(Watchlist)} />
+            <Route path="stock/:code" element={lazyRoute(StockDetail)} />
+            <Route path="screener" element={lazyRoute(Screener)} />
             <Route path="ai" element={<Navigate to="/trading-agents" replace />} />
-            <Route path="trading-agents" element={<TradingAgentsPage />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="trading-agents" element={lazyRoute(TradingAgentsPage)} />
+            <Route path="settings" element={lazyRoute(Settings)} />
           </Route>
         </Routes>
       </BrowserRouter>

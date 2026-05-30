@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Spin,
   Alert,
@@ -13,8 +13,15 @@ import {
   Empty,
   Drawer,
   Checkbox,
+  FloatButton,
 } from 'antd';
-import { ReloadOutlined, ThunderboltOutlined, ExperimentOutlined } from '@ant-design/icons';
+import {
+  ReloadOutlined,
+  ThunderboltOutlined,
+  ExperimentOutlined,
+  ArrowLeftOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
 import KlineChart from '../components/KlineChart';
 import SignalPanel from '../components/SignalPanel';
 import SignalConfluence from '../components/SignalConfluence';
@@ -36,11 +43,32 @@ type AnalysisTabKey = 'signal' | 'ai';
 
 export default function StockDetail() {
   const { code } = useParams<{ code: string }>();
+  const navigate = useNavigate();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
   const [stockName, setStockName] = useState('');
+  const [price, setPrice] = useState<number | null>(null);
+  const [changePct, setChangePct] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<AnalysisTabKey>('signal');
   const [signalDrawerOpen, setSignalDrawerOpen] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  const handleSignalClick = (pos: number) => {
+    setHighlightPosition(pos);
+    if (isMobile && chartRef.current) {
+      chartRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  useEffect(() => {
+    const prev = document.title;
+    if (code) {
+      document.title = stockName ? `${code} ${stockName} · 股票分析` : `${code} · 股票分析`;
+    }
+    return () => {
+      document.title = prev;
+    };
+  }, [code, stockName]);
   const {
     klineData,
     signals,
@@ -68,9 +96,18 @@ export default function StockDetail() {
   }, [code, period, loadAnalysis]);
 
   useEffect(() => {
-    if (code) {
-      fetchQuote(code).then((q) => setStockName(q.name || '')).catch(() => setStockName(''));
-    }
+    if (!code) return;
+    fetchQuote(code)
+      .then((q) => {
+        setStockName(q.name || '');
+        setPrice(typeof q.price === 'number' ? q.price : null);
+        setChangePct(typeof q.change_pct === 'number' ? q.change_pct : null);
+      })
+      .catch(() => {
+        setStockName('');
+        setPrice(null);
+        setChangePct(null);
+      });
   }, [code]);
 
   if (!code) return <Alert type="error" message="未提供股票代码" />;
@@ -81,29 +118,91 @@ export default function StockDetail() {
 
   const title = stockName ? `${code} ${stockName}` : code;
 
-  return (
-    <div>
-      <Space style={{ marginBottom: isMobile ? 12 : 16 }} wrap direction={isMobile ? 'vertical' : 'horizontal'} size={8}>
-        <Space wrap size={8}>
-          <Typography.Title level={4} style={{ margin: 0 }}>
+  const changeColor =
+    changePct == null ? undefined : changePct > 0 ? '#cf1322' : changePct < 0 ? '#3f8600' : '#666';
+  const changeSign = changePct != null && changePct > 0 ? '+' : '';
+
+  const headerBar = (
+    <div
+      style={
+        isMobile
+          ? {
+              position: 'sticky',
+              top: 48,
+              zIndex: 9,
+              background: '#f5f5f5',
+              padding: '8px 0',
+              marginLeft: -12,
+              marginRight: -12,
+              paddingLeft: 12,
+              paddingRight: 12,
+              marginBottom: 8,
+              borderBottom: '1px solid #eee',
+            }
+          : { marginBottom: 16 }
+      }
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Space wrap size={8} style={{ flex: 1, minWidth: 0 }}>
+          {isMobile && (
+            <Button
+              type="text"
+              size="small"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate(-1)}
+              aria-label="返回"
+              style={{ marginLeft: -4 }}
+            />
+          )}
+          <Typography.Title level={isMobile ? 5 : 4} style={{ margin: 0 }}>
             {title}
           </Typography.Title>
+          {price != null && (
+            <Space size={4} align="baseline">
+              <Typography.Text strong style={{ fontSize: isMobile ? 16 : 18, color: changeColor }}>
+                {price.toFixed(2)}
+              </Typography.Text>
+              {changePct != null && (
+                <Typography.Text strong style={{ fontSize: isMobile ? 12 : 13, color: changeColor }}>
+                  {changeSign}
+                  {changePct.toFixed(2)}%
+                </Typography.Text>
+              )}
+            </Space>
+          )}
+        </Space>
+        <Space size={8} wrap>
           <Segmented
             options={periodOptions}
             value={period}
             onChange={(val) => setPeriod(val as Period)}
             size={isMobile ? 'small' : 'middle'}
           />
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => loadAnalysis(code, true)}
+            disabled={loading}
+            size={isMobile ? 'small' : 'middle'}
+            aria-label="刷新"
+          >
+            {isMobile ? '' : '刷新'}
+          </Button>
         </Space>
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={() => loadAnalysis(code, true)}
-          disabled={loading}
-          size={isMobile ? 'small' : 'middle'}
-        >
-          刷新
-        </Button>
-      </Space>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      {headerBar}
 
       {error && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
 
@@ -134,7 +233,7 @@ export default function StockDetail() {
                   showMACD={showMACD}
                   showKDJ={showKDJ}
                   showRSI={showRSI}
-                  onSignalClick={(pos) => setHighlightPosition(pos)}
+                  onSignalClick={handleSignalClick}
                 />
               ) : (
                 <Empty
@@ -158,16 +257,10 @@ export default function StockDetail() {
         />
       </Card>
 
+      <div ref={chartRef} style={{ scrollMarginTop: isMobile ? 132 : 0 }}>
       <Card
         size="small"
         title="K线图"
-        extra={
-          isMobile ? (
-            <Button size="small" type="link" onClick={() => setSignalDrawerOpen(true)}>
-              信号面板
-            </Button>
-          ) : null
-        }
         styles={{ body: { padding: isMobile ? 8 : 12 } }}
         style={{ marginBottom: isMobile ? 8 : 0 }}
       >
@@ -192,6 +285,7 @@ export default function StockDetail() {
           />
         </Spin>
       </Card>
+      </div>
 
       {/* Desktop: signal panel below chart */}
       {!isMobile && (
@@ -199,7 +293,7 @@ export default function StockDetail() {
           <div style={{ maxHeight: 520, overflowY: 'auto' }}>
             <SignalPanel
               signals={signals}
-              onSignalClick={(pos) => setHighlightPosition(pos)}
+              onSignalClick={handleSignalClick}
               showMA={showMA}
               showMACD={showMACD}
               showKDJ={showKDJ}
@@ -209,27 +303,40 @@ export default function StockDetail() {
         </Card>
       )}
 
-      {/* Mobile: signal panel as bottom drawer */}
+      {/* Mobile: floating action button + bottom drawer for signal panel */}
       {isMobile && (
-        <Drawer
-          title="信号列表"
-          placement="bottom"
-          size="large"
-          open={signalDrawerOpen}
-          onClose={() => setSignalDrawerOpen(false)}
-        >
-          <SignalPanel
-            signals={signals}
-            onSignalClick={(pos) => {
-              setHighlightPosition(pos);
-              setSignalDrawerOpen(false);
-            }}
-            showMA={showMA}
-            showMACD={showMACD}
-            showKDJ={showKDJ}
-            showRSI={showRSI}
+        <>
+          <FloatButton
+            icon={<UnorderedListOutlined />}
+            description="信号"
+            shape="square"
+            type="primary"
+            onClick={() => setSignalDrawerOpen(true)}
+            style={{ right: 16, bottom: 72 }}
+            aria-label="打开信号列表"
+            badge={signals.length > 0 ? { count: signals.length, overflowCount: 99 } : undefined}
           />
-        </Drawer>
+          <Drawer
+            title="信号列表"
+            placement="bottom"
+            height="80vh"
+            open={signalDrawerOpen}
+            onClose={() => setSignalDrawerOpen(false)}
+            styles={{ body: { padding: 12 } }}
+          >
+            <SignalPanel
+              signals={signals}
+              onSignalClick={(pos) => {
+                setSignalDrawerOpen(false);
+                handleSignalClick(pos);
+              }}
+              showMA={showMA}
+              showMACD={showMACD}
+              showKDJ={showKDJ}
+              showRSI={showRSI}
+            />
+          </Drawer>
+        </>
       )}
     </div>
   );

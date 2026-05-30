@@ -1,6 +1,35 @@
 import { useEffect, useRef } from 'react';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import {
+  CandlestickChart,
+  LineChart,
+  BarChart,
+  ScatterChart,
+} from 'echarts/charts';
+import {
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  DataZoomComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import type { KlineData, IndicatorData, Signal, SignalLevel } from '../types';
+
+echarts.use([
+  CandlestickChart,
+  LineChart,
+  BarChart,
+  ScatterChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  DataZoomComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
+  CanvasRenderer,
+]);
 
 interface Props {
   klineData: (KlineData & Partial<IndicatorData>)[];

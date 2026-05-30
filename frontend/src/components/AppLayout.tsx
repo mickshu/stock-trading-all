@@ -52,7 +52,7 @@ export default function AppLayout() {
           />
         </Sider>
       )}
-      <Layout style={{ paddingBottom: isMobile ? 56 : 0 }}>
+      <Layout style={{ paddingBottom: isMobile ? 'calc(56px + env(safe-area-inset-bottom))' : 0 }}>
         {isMobile && (
           <Header
             style={{
@@ -88,20 +88,21 @@ export default function AppLayout() {
       </Layout>
 
       {isMobile && (
-        <div
+        <nav
+          aria-label="主导航"
           style={{
             position: 'fixed',
             bottom: 0,
             left: 0,
             right: 0,
-            height: 56,
             background: '#fff',
             borderTop: '1px solid #f0f0f0',
             display: 'flex',
             justifyContent: 'space-around',
-            alignItems: 'center',
+            alignItems: 'stretch',
             zIndex: 100,
             boxShadow: '0 -2px 8px rgba(0,0,0,0.06)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
           {menuItems.map((item) => {
@@ -109,18 +110,30 @@ export default function AppLayout() {
             return (
               <div
                 key={item.key}
+                role="button"
+                tabIndex={0}
+                aria-label={item.label}
+                aria-current={active ? 'page' : undefined}
                 onClick={() => navigate(item.key)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate(item.key);
+                  }
+                }}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: 2,
                   cursor: 'pointer',
                   color: active ? '#1677ff' : '#999',
                   fontSize: 10,
                   flex: 1,
-                  padding: '4px 0',
+                  height: 56,
                   transition: 'color 0.2s',
+                  WebkitTapHighlightColor: 'transparent',
                 }}
               >
                 <span style={{ fontSize: 20 }}>{item.icon}</span>
@@ -128,7 +141,7 @@ export default function AppLayout() {
               </div>
             );
           })}
-        </div>
+        </nav>
       )}
     </Layout>
   );
