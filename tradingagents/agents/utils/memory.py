@@ -22,7 +22,7 @@ class FinancialSituationMemory:
             self.local_embedding_fn = None
 
         self.chroma_client = chromadb.Client(Settings(allow_reset=True))
-        self.situation_collection = self.chroma_client.create_collection(name=name)
+        self.situation_collection = self.chroma_client.get_or_create_collection(name=name)
 
     def get_embedding(self, text):
         """Get embedding for a text - uses local model for DeepSeek/Ollama, OpenAI otherwise"""

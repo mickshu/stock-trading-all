@@ -251,7 +251,7 @@ export default function Screener() {
         </Space>
       ),
       children: (
-        <Space orientation="vertical" size={isMobile ? 6 : 10} style={{ width: '100%' }}>
+        <Space direction="vertical" size={isMobile ? 6 : 10} style={{ width: '100%' }}>
           {group.rows.map(({ stock, signals }) => (
             <div
               key={`${group.date}-${stock.code}`}
@@ -334,7 +334,7 @@ export default function Screener() {
   };
 
   const filterBody = (
-    <Space orientation="vertical" size={isMobile ? 8 : 14} style={{ width: '100%' }}>
+    <Space direction="vertical" size={isMobile ? 8 : 14} style={{ width: '100%' }}>
       <div>
         <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>
           周期

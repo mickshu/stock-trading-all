@@ -73,7 +73,7 @@ export default function StockDetail() {
     }
   }, [code]);
 
-  if (!code) return <Alert type="error" title="未提供股票代码" />;
+  if (!code) return <Alert type="error" message="未提供股票代码" />;
 
   const chartHeight = isMobile
     ? 350 + ([showMACD, showKDJ, showRSI].filter(Boolean).length * 80)
@@ -83,7 +83,7 @@ export default function StockDetail() {
 
   return (
     <div>
-      <Space style={{ marginBottom: isMobile ? 12 : 16 }} wrap orientation={isMobile ? 'vertical' : 'horizontal'} size={8}>
+      <Space style={{ marginBottom: isMobile ? 12 : 16 }} wrap direction={isMobile ? 'vertical' : 'horizontal'} size={8}>
         <Space wrap size={8}>
           <Typography.Title level={4} style={{ margin: 0 }}>
             {title}
@@ -105,7 +105,7 @@ export default function StockDetail() {
         </Button>
       </Space>
 
-      {error && <Alert type="error" title={error} style={{ marginBottom: 12 }} />}
+      {error && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
 
       <FundamentalsCard code={code} />
 

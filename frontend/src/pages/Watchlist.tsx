@@ -608,7 +608,7 @@ export default function Watchlist() {
       key: 'group',
       width: 200,
       render: (_, record) => (
-        <Space orientation="vertical" size={2} style={{ width: '100%' }}>
+        <Space direction="vertical" size={2} style={{ width: '100%' }}>
           <Select
             size="small"
             style={{ width: 160 }}

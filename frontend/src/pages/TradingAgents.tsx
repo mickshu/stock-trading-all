@@ -90,7 +90,9 @@ export default function TradingAgentsPage() {
       setResult(data);
       message.success('分析完成');
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
+      let msg = e instanceof Error ? e.message : String(e);
+      const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
+      if (detail) msg = typeof detail === 'string' ? detail : JSON.stringify(detail);
       setError(msg);
       message.error('分析失败');
     } finally {

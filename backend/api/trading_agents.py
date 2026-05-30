@@ -51,5 +51,12 @@ def analyze(req: AnalyzeRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        msg = str(e)
+        if "Authentication Fails" in msg or "Incorrect API key" in msg or "invalid_api_key" in msg or "401" in msg[:80]:
+            logger.warning("trading-agents auth rejected by upstream LLM: %s", msg[:200])
+            raise HTTPException(
+                status_code=401,
+                detail="上游 LLM 鉴权失败：API Key 无效或已过期。请到「设置 → AI 配置」更新 Key 后重试。",
+            )
         logger.exception("trading-agents analyze failed: ticker=%s", req.ticker)
         raise HTTPException(status_code=500, detail=f"分析失败: {e}")

@@ -62,15 +62,15 @@ function DataSourceTab() {
 
   return (
     <Card title="数据源" loading={loading} size="small">
-      <Space orientation="vertical" style={{ width: '100%' }}>
-        <Alert type="info" showIcon title="切换上游行情数据源。已缓存的 K 线会继续复用。" />
+      <Space direction="vertical" style={{ width: '100%' }}>
+        <Alert type="info" showIcon message="切换上游行情数据源。已缓存的 K 线会继续复用。" />
         <Spin spinning={saving}>
           <Radio.Group
             value={active}
             onChange={(e) => handleSwitch(e.target.value)}
             disabled={saving}
           >
-            <Space orientation="vertical">
+            <Space direction="vertical">
               {available.map((src) => (
                 <Radio key={src} value={src}>
                   {src}
@@ -232,7 +232,7 @@ function AiSettingsTab() {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        title="API Key 仅保存在本地数据库；空着不动 = 保留原值。LLM 配置同时供「AI 分析」（多智能体）使用。"
+        message="API Key 仅保存在本地数据库；空着不动 = 保留原值。LLM 配置同时供「AI 分析」（多智能体）使用。"
       />
       <Form
         form={form}
@@ -274,7 +274,7 @@ function AiSettingsTab() {
                   form.setFieldValue('provider', v);
                 }}
               >
-                <Space orientation={isMobile ? 'vertical' : 'horizontal'}>
+                <Space direction={isMobile ? 'vertical' : 'horizontal'}>
                   <Radio value="openai">OpenAI 兼容</Radio>
                   <Radio value="anthropic">Anthropic Claude</Radio>
                 </Space>
@@ -306,7 +306,7 @@ function AiSettingsTab() {
 
             <Form.Item name="search_provider" label="联网搜索">
               <Radio.Group onChange={(e) => setSearchProvider(e.target.value)}>
-                <Space orientation={isMobile ? 'vertical' : 'horizontal'}>
+                <Space direction={isMobile ? 'vertical' : 'horizontal'}>
                   <Radio value="none">不启用</Radio>
                   <Radio value="tavily">Tavily</Radio>
                 </Space>
@@ -328,13 +328,13 @@ function AiSettingsTab() {
 
             <Spin spinning={probing}>
               {probeError ? (
-                <Alert type="error" showIcon style={{ marginBottom: 12 }} title={`探测失败：${probeError}`} />
+                <Alert type="error" showIcon style={{ marginBottom: 12 }} message={`探测失败：${probeError}`} />
               ) : agents.length === 0 ? (
                 <Alert
                   type="warning"
                   showIcon
                   style={{ marginBottom: 12 }}
-                  title="未检测到任何本地 AI CLI"
+                  message="未检测到任何本地 AI CLI"
                   description="请确认 hermes / claude / codex / gemini 已安装并在 PATH 中。"
                 />
               ) : (
@@ -342,7 +342,7 @@ function AiSettingsTab() {
                   type={agents.some((a) => a.name === 'hermes') ? 'success' : 'warning'}
                   showIcon
                   style={{ marginBottom: 12 }}
-                  title={
+                  message={
                     agents.some((a) => a.name === 'hermes')
                       ? '已检测到 hermes CLI，可作为基础 LLM 使用'
                       : '未检测到 hermes，但检测到其他 CLI'
@@ -403,7 +403,7 @@ function AiSettingsTab() {
         </Form.Item>
 
         <Form.Item>
-          <Space orientation={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : undefined }}>
+          <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : undefined }}>
             <Button type="primary" onClick={onSave} loading={saving} block={isMobile}>
               保存
             </Button>
@@ -414,12 +414,12 @@ function AiSettingsTab() {
         </Form.Item>
 
         {testResult && (
-          <Space orientation="vertical" style={{ width: '100%' }}>
+          <Space direction="vertical" style={{ width: '100%' }}>
             {testResult.llm && (
               <Alert
                 type={testResult.llm.ok ? 'success' : (mode === 'local' ? 'warning' : 'error')}
                 showIcon
-                title={
+                message={
                   testResult.llm.ok
                     ? (mode === 'local'
                       ? `本地 CLI 可用：${testResult.llm.provider} / ${testResult.llm.model}`
@@ -434,7 +434,7 @@ function AiSettingsTab() {
               <Alert
                 type={testResult.search.ok ? 'success' : 'error'}
                 showIcon
-                title={
+                message={
                   testResult.search.ok
                     ? `Tavily 联通成功（${testResult.search.results ?? 0} 条）`
                     : `Tavily 联通失败：${testResult.search.error}`
