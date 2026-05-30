@@ -35,7 +35,9 @@ Here are your past reflections on mistakes:
 
 Here is the debate:
 Debate History:
-{history}"""
+{history}
+
+**输出语言要求：请始终使用简体中文撰写完整的裁定与投资计划（包括建议、理由、行动步骤），仅保留必要的英文专有名词与交易信号关键词 Buy / Sell / Hold 不翻译。**"""
         response = llm.invoke(prompt)
 
         new_investment_debate_state = {

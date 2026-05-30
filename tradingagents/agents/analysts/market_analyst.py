@@ -59,6 +59,7 @@ Volume-Based Indicators:
 
 - Select indicators that provide diverse and complementary information. Avoid redundancy (e.g., do not select both rsi and stochrsi). Also briefly explain why they are suitable for the given market context. When you tool call, please use the exact name of the indicators provided above as they are defined parameters, otherwise your call will fail. Please make sure to call get_YFin_data first to retrieve the CSV that is needed to generate indicators. Write a very detailed and nuanced report of the trends you observe. Do not simply state the trends are mixed, provide detailed and finegrained analysis and insights that may help traders make decisions."""
             + """ Make sure to append a Markdown table at the end of the report to organize key points in the report, organized and easy to read."""
+            + """\n\n**输出语言要求：请始终使用简体中文撰写完整的分析报告（包括正文、列表、Markdown 表格、结论说明），仅保留必要的英文专有名词、股票代码与技术指标缩写（如 RSI、MACD、SMA、EMA、ATR、Bollinger 等），以及交易信号关键词 BUY / HOLD / SELL 不翻译。**"""
         )
 
         prompt = ChatPromptTemplate.from_messages(

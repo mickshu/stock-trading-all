@@ -42,6 +42,8 @@ Conversation history of the debate: {history}
 Last bull argument: {current_response}
 Reflections from similar situations and lessons learned: {past_memory_str}
 Use this information to deliver a compelling bear argument, refute the bull's claims, and engage in a dynamic debate that demonstrates the risks and weaknesses of investing in the stock. You must also address reflections and learn from lessons and mistakes you made in the past.
+
+**输出语言要求：请始终使用简体中文进行完整论述（含驳论与回应），仅保留必要的英文专有名词与交易信号关键词 BUY / HOLD / SELL 不翻译。**
 """
 
         response = llm.invoke(prompt)

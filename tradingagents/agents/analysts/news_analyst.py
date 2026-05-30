@@ -32,6 +32,7 @@ def create_news_analyst(llm, toolkit):
         system_message = (
             "You are a news researcher tasked with analyzing recent news and trends over the past week. Please write a comprehensive report of the current state of the world that is relevant for trading and macroeconomics. Look at news from EODHD, and finnhub to be comprehensive. Do not simply state the trends are mixed, provide detailed and finegrained analysis and insights that may help traders make decisions."
             + """ Make sure to append a Makrdown table at the end of the report to organize key points in the report, organized and easy to read."""
+            + """\n\n**输出语言要求：请始终使用简体中文撰写完整的新闻分析报告（包括正文、要点列表、Markdown 表格、结论），仅保留必要的英文专有名词、机构名（EODHD、Finnhub 等）与交易信号关键词 BUY / HOLD / SELL 不翻译。**"""
         )
 
         prompt = ChatPromptTemplate.from_messages(
