@@ -55,6 +55,14 @@ def _safe_daily_summary_job():
 def on_startup():
     init_db()
     try:
+        from backend.services import trading_agents_tasks as _ta_tasks
+        n = _ta_tasks.resume_pending_on_startup()
+        _ta_tasks.start_worker()
+        if n:
+            _scheduler_logger.info("Resumed %d pending TradingAgents tasks", n)
+    except Exception:
+        _scheduler_logger.exception("TradingAgents worker startup failed")
+    try:
         from apscheduler.schedulers.background import BackgroundScheduler
         from apscheduler.triggers.cron import CronTrigger
     except ImportError:

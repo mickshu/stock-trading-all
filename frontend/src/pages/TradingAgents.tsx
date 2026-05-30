@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Card,
   Form,
@@ -9,28 +9,40 @@ import {
   Space,
   Alert,
   Tag,
-  Collapse,
   Empty,
   Typography,
-  Descriptions,
   message,
-  Spin,
   Row,
   Col,
+  Tabs,
+  Table,
+  Modal,
+  Popconfirm,
+  Tooltip,
+  Badge,
 } from 'antd';
 import {
   DeploymentUnitOutlined,
-  ThunderboltOutlined,
   PlayCircleOutlined,
+  DownloadOutlined,
+  FileMarkdownOutlined,
+  ReloadOutlined,
+  DeleteOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
+import type { ColumnsType } from 'antd/es/table';
 import MarkdownView from '../components/MarkdownView';
 import StockSearchInput from '../components/StockSearchInput';
 import {
   fetchTAHealth,
-  runTradingAgents,
+  createTATask,
+  listTATasks,
+  getTATask,
+  deleteTATask,
   type TAHealth,
-  type TAResult,
+  type TATask,
+  type TATaskStatus,
 } from '../api/tradingAgents';
 
 const { Title, Text, Paragraph } = Typography;
@@ -45,7 +57,7 @@ interface FormValues {
 function DecisionTag({ decision }: { decision: string }) {
   const upper = (decision || '').toUpperCase();
   let color = 'default';
-  let label = decision || '未知';
+  let label = decision || '—';
   if (upper.includes('BUY')) {
     color = 'green';
     label = 'BUY';
@@ -56,19 +68,48 @@ function DecisionTag({ decision }: { decision: string }) {
     color = 'gold';
     label = 'HOLD';
   }
-  return (
-    <Tag color={color} style={{ fontSize: 20, padding: '6px 18px', fontWeight: 700 }}>
-      {label}
-    </Tag>
-  );
+  return <Tag color={color} style={{ fontWeight: 600 }}>{label}</Tag>;
+}
+
+function StatusBadge({ status }: { status: TATaskStatus }) {
+  const map: Record<TATaskStatus, { color: 'default' | 'processing' | 'success' | 'error' | 'warning'; text: string }> = {
+    pending: { color: 'warning', text: '排队中' },
+    running: { color: 'processing', text: '运行中' },
+    success: { color: 'success', text: '已完成' },
+    failed: { color: 'error', text: '失败' },
+  };
+  const m = map[status] || { color: 'default' as const, text: status };
+  return <Badge status={m.color} text={m.text} />;
+}
+
+function formatDuration(sec: number | null): string {
+  if (sec == null) return '-';
+  if (sec < 60) return `${sec.toFixed(1)}s`;
+  const m = Math.floor(sec / 60);
+  const s = Math.round(sec - m * 60);
+  return `${m}m${s}s`;
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) return '-';
+  try {
+    return dayjs(iso).format('MM-DD HH:mm:ss');
+  } catch {
+    return iso;
+  }
 }
 
 export default function TradingAgentsPage() {
   const [form] = Form.useForm<FormValues>();
   const [health, setHealth] = useState<TAHealth | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<TAResult | null>(null);
-  const [error, setError] = useState<string>('');
+  const [tasks, setTasks] = useState<TATask[]>([]);
+  const [loadingList, setLoadingList] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'new' | 'list'>('new');
+  const [viewTask, setViewTask] = useState<TATask | null>(null);
+  const [viewMd, setViewMd] = useState<string>('');
+  const [viewLoading, setViewLoading] = useState(false);
+  const stockNameRef = useRef<string>('');
 
   useEffect(() => {
     fetchTAHealth()
@@ -76,29 +117,176 @@ export default function TradingAgentsPage() {
       .catch(() => setHealth(null));
   }, []);
 
-  const onFinish = async (values: FormValues) => {
-    setLoading(true);
-    setError('');
-    setResult(null);
+  const refresh = useCallback(async () => {
+    setLoadingList(true);
     try {
-      const data = await runTradingAgents({
+      const items = await listTATasks();
+      setTasks(items);
+    } catch {
+      // ignore — keep last list
+    } finally {
+      setLoadingList(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  // 轮询：只要有 pending/running 任务，就每 4 秒刷一次
+  const hasActive = useMemo(
+    () => tasks.some((t) => t.status === 'pending' || t.status === 'running'),
+    [tasks],
+  );
+  useEffect(() => {
+    if (!hasActive) return;
+    const id = window.setInterval(() => {
+      refresh();
+    }, 4000);
+    return () => window.clearInterval(id);
+  }, [hasActive, refresh]);
+
+  const onFinish = async (values: FormValues) => {
+    setSubmitting(true);
+    try {
+      const t = await createTATask({
         ticker: values.ticker.trim(),
+        stock_name: stockNameRef.current || '',
         trade_date: values.trade_date.format('YYYY-MM-DD'),
         depth: values.depth,
         online_tools: values.online_tools,
       });
-      setResult(data);
-      message.success('分析完成');
+      message.success('已加入队列，可在「任务记录」查看进度');
+      setActiveTab('list');
+      setTasks((prev) => [t, ...prev.filter((x) => x.id !== t.id)]);
     } catch (e: unknown) {
       let msg = e instanceof Error ? e.message : String(e);
       const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
       if (detail) msg = typeof detail === 'string' ? detail : JSON.stringify(detail);
-      setError(msg);
-      message.error('分析失败');
+      message.error(`提交失败：${msg}`);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  const openView = async (task: TATask) => {
+    setViewTask(task);
+    setViewMd('');
+    if (task.status !== 'success') return;
+    setViewLoading(true);
+    try {
+      const full = await getTATask(task.id, true);
+      setViewMd(full.report_md || '');
+    } catch {
+      setViewMd('（加载报告内容失败）');
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const onDelete = async (task: TATask) => {
+    try {
+      await deleteTATask(task.id);
+      message.success('已删除');
+      setTasks((prev) => prev.filter((t) => t.id !== task.id));
+    } catch {
+      message.error('删除失败');
+    }
+  };
+
+  const columns: ColumnsType<TATask> = [
+    {
+      title: '股票',
+      key: 'stock',
+      width: 160,
+      render: (_, t) => (
+        <Space size={4} direction="vertical">
+          <span><Tag color="blue">{t.ticker}</Tag>{t.stock_name && <Text>{t.stock_name}</Text>}</span>
+          <Text type="secondary" style={{ fontSize: 12 }}>{t.trade_date}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 110,
+      render: (s: TATaskStatus) => <StatusBadge status={s} />,
+    },
+    {
+      title: '决策',
+      dataIndex: 'decision',
+      key: 'decision',
+      width: 90,
+      render: (d: string) => <DecisionTag decision={d} />,
+    },
+    {
+      title: '参数',
+      key: 'params',
+      width: 140,
+      render: (_, t) => (
+        <Space size={4} direction="vertical">
+          <Text style={{ fontSize: 12 }}>轮数 {t.depth}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>{t.online_tools ? '在线数据' : '离线'}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: '耗时',
+      dataIndex: 'duration_sec',
+      key: 'duration_sec',
+      width: 80,
+      render: (v) => <Text style={{ fontSize: 12 }}>{formatDuration(v)}</Text>,
+    },
+    {
+      title: '完成时间',
+      dataIndex: 'finished_at',
+      key: 'finished_at',
+      width: 130,
+      render: (v) => <Text style={{ fontSize: 12 }}>{formatTime(v)}</Text>,
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: 260,
+      render: (_, t) => (
+        <Space size={4} wrap>
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            disabled={t.status !== 'success'}
+            onClick={() => openView(t)}
+          >
+            查看
+          </Button>
+          <Tooltip title={t.report_url || '尚未生成'}>
+            <Button
+              type="link"
+              size="small"
+              icon={<DownloadOutlined />}
+              disabled={!t.report_url}
+              href={t.report_url || undefined}
+              target="_blank"
+              download={t.report_filename ? t.report_filename.split('/').pop() : undefined}
+            >
+              下载 .md
+            </Button>
+          </Tooltip>
+          <Popconfirm title="确认删除该任务？" onConfirm={() => onDelete(t)}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
+              删除
+            </Button>
+          </Popconfirm>
+          {t.status === 'failed' && t.error && (
+            <Tooltip title={t.error}>
+              <Tag color="red">错误详情</Tag>
+            </Tooltip>
+          )}
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -107,7 +295,7 @@ export default function TradingAgentsPage() {
       </Title>
       <Paragraph type="secondary">
         基于 LangGraph 编排的多智能体框架：市场 / 舆情 / 新闻 / 基本面 4 位分析师 →
-        多空研究员辩论 → 风险评估 → 最终决策。
+        多空研究员辩论 → 风险评估 → 最终决策。任务异步排队执行，离开页面也会继续。
       </Paragraph>
 
       {health && (
@@ -117,200 +305,159 @@ export default function TradingAgentsPage() {
           style={{ marginBottom: 16 }}
           message={
             <Space size="middle" wrap>
-              <span>
-                <Text strong>Provider:</Text> {health.provider}
-              </span>
-              <span>
-                <Text strong>深度模型:</Text> {health.deep_think_llm}
-              </span>
-              <span>
-                <Text strong>数据源:</Text> {health.data_source}
-              </span>
+              <span><Text strong>Provider:</Text> {health.provider}</span>
+              <span><Text strong>深度模型:</Text> {health.deep_think_llm}</span>
+              <span><Text strong>数据源:</Text> {health.data_source}</span>
               <Text type="secondary">配置可在「设置 → AI 配置」修改</Text>
             </Space>
           }
         />
       )}
 
-      <Card size="small" title="发起分析" style={{ marginBottom: 16 }}>
-        <Form
-          form={form}
-          layout="inline"
-          initialValues={{
-            ticker: '600000',
-            trade_date: dayjs(),
-            depth: 1,
-            online_tools: true,
-          }}
-          onFinish={onFinish}
-        >
-          <Form.Item name="ticker" label="股票代码" rules={[{ required: true }]}>
-            <StockSearchInput
-              style={{ width: 260 }}
-              placeholder="输入代码 / 名称 / 拼音，如 600000 / 浦发 / pf"
-              onSelect={(s) => form.setFieldValue('ticker', s.code)}
-            />
-          </Form.Item>
-          <Form.Item name="trade_date" label="分析日期" rules={[{ required: true }]}>
-            <DatePicker />
-          </Form.Item>
-          <Form.Item name="depth" label="辩论轮数" style={{ minWidth: 200 }}>
-            <Slider min={1} max={3} marks={{ 1: '快', 2: '中', 3: '深' }} />
-          </Form.Item>
-          <Form.Item name="online_tools" label="在线数据" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              icon={<PlayCircleOutlined />}
-            >
-              开始分析
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-
-      {loading && (
-        <Card style={{ marginBottom: 16, textAlign: 'center', padding: 24 }}>
-          <Spin tip="多智能体协作中，整体耗时取决于辩论轮数（通常 1-5 分钟）..." size="large">
-            <div style={{ minHeight: 60 }} />
-          </Spin>
-        </Card>
-      )}
-
-      {error && !loading && (
-        <Alert
-          type="error"
-          showIcon
-          message="分析失败"
-          description={error}
-          style={{ marginBottom: 16 }}
-        />
-      )}
-
-      {result && (
-        <>
-          <Card style={{ marginBottom: 16 }}>
-            <Row gutter={16} align="middle">
-              <Col flex="none">
-                <DecisionTag decision={result.decision} />
-              </Col>
-              <Col flex="auto">
-                <Descriptions size="small" column={2}>
-                  <Descriptions.Item label="股票">{result.ticker}</Descriptions.Item>
-                  <Descriptions.Item label="日期">{result.trade_date}</Descriptions.Item>
-                  <Descriptions.Item label="模型">
-                    {result.config.deep_think_llm}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="数据源">
-                    {result.config.data_source}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="辩论轮数">
-                    {result.config.max_debate_rounds}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="在线工具">
-                    {result.config.online_tools ? '是' : '否'}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Col>
-            </Row>
-          </Card>
-
-          <Card size="small" title="维度摘要" style={{ marginBottom: 16 }}>
-            <Descriptions size="small" column={1} bordered>
-              <Descriptions.Item label="📊 市场技术">{result.summary.market}</Descriptions.Item>
-              <Descriptions.Item label="💬 舆情社交">{result.summary.sentiment}</Descriptions.Item>
-              <Descriptions.Item label="📰 新闻宏观">{result.summary.news}</Descriptions.Item>
-              <Descriptions.Item label="📈 基本面">{result.summary.fundamentals}</Descriptions.Item>
-            </Descriptions>
-          </Card>
-
-          <Collapse
-            defaultActiveKey={['market']}
-            items={[
-              {
-                key: 'market',
-                label: '📊 市场分析报告',
-                children: result.reports.market ? (
-                  <MarkdownView content={result.reports.market} />
+      <Tabs
+        activeKey={activeTab}
+        onChange={(k) => setActiveTab(k as 'new' | 'list')}
+        items={[
+          {
+            key: 'new',
+            label: '发起分析',
+            children: (
+              <Card size="small">
+                <Form
+                  form={form}
+                  layout="inline"
+                  initialValues={{
+                    ticker: '600000',
+                    trade_date: dayjs(),
+                    depth: 1,
+                    online_tools: true,
+                  }}
+                  onFinish={onFinish}
+                >
+                  <Form.Item name="ticker" label="股票代码" rules={[{ required: true }]}>
+                    <StockSearchInput
+                      style={{ width: 260 }}
+                      placeholder="输入代码 / 名称 / 拼音，如 600000 / 浦发 / pf"
+                      onSelect={(s) => {
+                        stockNameRef.current = s.name || '';
+                        form.setFieldValue('ticker', s.code);
+                      }}
+                      onChange={() => {
+                        // 用户手动改输入即清掉缓存的中文名
+                        stockNameRef.current = '';
+                      }}
+                    />
+                  </Form.Item>
+                  <Form.Item name="trade_date" label="分析日期" rules={[{ required: true }]}>
+                    <DatePicker />
+                  </Form.Item>
+                  <Form.Item name="depth" label="辩论轮数" style={{ minWidth: 200 }}>
+                    <Slider min={1} max={3} marks={{ 1: '快', 2: '中', 3: '深' }} />
+                  </Form.Item>
+                  <Form.Item name="online_tools" label="在线数据" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={submitting}
+                      icon={<PlayCircleOutlined />}
+                    >
+                      加入队列
+                    </Button>
+                  </Form.Item>
+                </Form>
+                <Paragraph type="secondary" style={{ marginTop: 16, marginBottom: 0 }}>
+                  报告以 <Text code>日期_公司名.md</Text> 命名，保存在
+                  <Text code>data/reports/trading-agents/</Text>，可在「任务记录」标签下下载。
+                </Paragraph>
+              </Card>
+            ),
+          },
+          {
+            key: 'list',
+            label: (
+              <Space size={6}>
+                <span>任务记录</span>
+                {hasActive && <Badge status="processing" />}
+              </Space>
+            ),
+            children: (
+              <Card
+                size="small"
+                title={
+                  <Row justify="space-between" align="middle">
+                    <Col>共 {tasks.length} 条</Col>
+                    <Col>
+                      <Button icon={<ReloadOutlined />} size="small" onClick={refresh} loading={loadingList}>
+                        刷新
+                      </Button>
+                    </Col>
+                  </Row>
+                }
+              >
+                {tasks.length === 0 && !loadingList ? (
+                  <Empty description="还没有分析任务" />
                 ) : (
-                  <Empty />
-                ),
-              },
-              {
-                key: 'sentiment',
-                label: '💬 舆情分析报告',
-                children: result.reports.sentiment ? (
-                  <MarkdownView content={result.reports.sentiment} />
-                ) : (
-                  <Empty />
-                ),
-              },
-              {
-                key: 'news',
-                label: '📰 新闻分析报告',
-                children: result.reports.news ? (
-                  <MarkdownView content={result.reports.news} />
-                ) : (
-                  <Empty />
-                ),
-              },
-              {
-                key: 'fundamentals',
-                label: '📈 基本面分析报告',
-                children: result.reports.fundamentals ? (
-                  <MarkdownView content={result.reports.fundamentals} />
-                ) : (
-                  <Empty />
-                ),
-              },
-              {
-                key: 'debate',
-                label: (
-                  <span>
-                    <ThunderboltOutlined /> 多空辩论 & 评判
-                  </span>
-                ),
-                children: (
-                  <Space direction="vertical" style={{ width: '100%' }}>
-                    {result.debate.bull_history.length > 0 && (
-                      <Card type="inner" size="small" title="多头观点">
-                        <MarkdownView
-                          content={String(result.debate.bull_history.slice(-1)[0] || '')}
-                        />
-                      </Card>
-                    )}
-                    {result.debate.bear_history.length > 0 && (
-                      <Card type="inner" size="small" title="空头观点">
-                        <MarkdownView
-                          content={String(result.debate.bear_history.slice(-1)[0] || '')}
-                        />
-                      </Card>
-                    )}
-                    {result.debate.judge_decision && (
-                      <Card type="inner" size="small" title="评判">
-                        <MarkdownView content={String(result.debate.judge_decision)} />
-                      </Card>
-                    )}
-                  </Space>
-                ),
-              },
-              {
-                key: 'risk',
-                label: '🛡️ 风险评估',
-                children: result.risk.current_response ? (
-                  <MarkdownView content={String(result.risk.current_response)} />
-                ) : (
-                  <Empty />
-                ),
-              },
-            ]}
-          />
-        </>
-      )}
+                  <Table<TATask>
+                    rowKey="id"
+                    size="small"
+                    loading={loadingList}
+                    dataSource={tasks}
+                    columns={columns}
+                    pagination={{ pageSize: 20, showSizeChanger: false }}
+                    scroll={{ x: 880 }}
+                  />
+                )}
+              </Card>
+            ),
+          },
+        ]}
+      />
+
+      <Modal
+        open={!!viewTask}
+        onCancel={() => setViewTask(null)}
+        footer={
+          viewTask?.report_url ? (
+            <Space>
+              <Button
+                icon={<DownloadOutlined />}
+                href={viewTask.report_url}
+                target="_blank"
+                download={viewTask.report_filename?.split('/').pop()}
+              >
+                下载 .md
+              </Button>
+              <Button onClick={() => setViewTask(null)}>关闭</Button>
+            </Space>
+          ) : (
+            <Button onClick={() => setViewTask(null)}>关闭</Button>
+          )
+        }
+        width={900}
+        title={
+          viewTask && (
+            <Space size={8} wrap>
+              <FileMarkdownOutlined />
+              <span>
+                {viewTask.stock_name || viewTask.ticker} ({viewTask.ticker}) · {viewTask.trade_date}
+              </span>
+              <DecisionTag decision={viewTask.decision} />
+            </Space>
+          )
+        }
+        destroyOnHidden
+      >
+        {viewLoading ? (
+          <div style={{ padding: 24, textAlign: 'center' }}>加载中…</div>
+        ) : viewMd ? (
+          <MarkdownView content={viewMd} />
+        ) : (
+          <Empty description="尚无内容（任务可能未完成）" />
+        )}
+      </Modal>
     </div>
   );
 }

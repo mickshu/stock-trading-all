@@ -1,0 +1,33 @@
+"""TradingAgents 异步分析任务 ORM。"""
+
+from __future__ import annotations
+
+from datetime import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
+
+from backend.database import Base
+
+
+class TATask(Base):
+    __tablename__ = "ta_tasks"
+
+    id = Column(String(36), primary_key=True)  # uuid4
+    ticker = Column(String(16), nullable=False, index=True)
+    stock_name = Column(String(120), default="")
+    trade_date = Column(String(10), nullable=False)  # YYYY-MM-DD
+    depth = Column(Integer, nullable=False, default=1)
+    online_tools = Column(Boolean, nullable=False, default=True)
+
+    # pending | running | success | failed
+    status = Column(String(16), nullable=False, default="pending", index=True)
+    decision = Column(String(16), default="")  # BUY/SELL/HOLD
+    decision_raw = Column(Text, default="")
+    report_filename = Column(String(255), default="")  # 相对 data/reports/ 的文件名
+    report_md = Column(Text, default="")  # 也存一份方便前端直接展示
+    error = Column(Text, default="")
+
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    started_at = Column(DateTime)
+    finished_at = Column(DateTime)
+    duration_sec = Column(Float)
