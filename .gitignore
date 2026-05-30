@@ -10,7 +10,6 @@ __pycache__/
 # Data / secrets
 .env
 *.csv
-src/
 eval_results/
 eval_data/
 data/*.db
