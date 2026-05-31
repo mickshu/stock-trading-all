@@ -172,7 +172,6 @@ export default function Screener() {
   const groupOptions = useMemo(() => {
     const options: { label: string; value: GroupFilterValue }[] = [
       { label: '全部分组', value: 'all' },
-      { label: `未分组（${ungroupedCount}）`, value: 'ungrouped' },
     ];
     for (const meta of SYSTEM_TAG_META) {
       const info = systemTags.find((t) => t.key === meta.key);
@@ -183,6 +182,7 @@ export default function Screener() {
       const count = g.count ?? 0;
       options.push({ label: `${g.name}（${count}）`, value: g.id });
     }
+    options.push({ label: `未分组（${ungroupedCount}）`, value: 'ungrouped' });
     return options;
   }, [groups, ungroupedCount, systemTags]);
 
