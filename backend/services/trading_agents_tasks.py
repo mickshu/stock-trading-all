@@ -209,9 +209,20 @@ def _process(task_id: str) -> None:
     error_msg = ""
     result: dict[str, Any] | None = None
     try:
+        # 一次性刷新 import 缓存。如果上次 redeploy 刚装好依赖却没重启 uvicorn，
+        # 这一步能让本进程立即看到新装的 langchain_openai / langgraph 等包，
+        # 避免「明明 pip 装好了 worker 仍然 ModuleNotFoundError」。
+        import importlib as _il
+        _il.invalidate_caches()
         result = run_single(
             ticker=ticker, trade_date=trade_date, depth=depth, online_tools=online_tools
         )
+    except ModuleNotFoundError as e:
+        error_msg = (
+            f"缺少依赖：{e.name}。请到部署机执行 `pip install -r backend/requirements.txt` "
+            f"或调用 POST /api/updatereload 后重启后端。原始错误：{e}"
+        )
+        logger.exception("TA task %s failed: missing dep %s", task_id, e.name)
     except Exception as e:  # noqa: BLE001
         error_msg = str(e)
         logger.exception("TA task %s failed", task_id)

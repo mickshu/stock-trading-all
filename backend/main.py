@@ -1,6 +1,9 @@
 from pathlib import Path
+import importlib
+import os
 import subprocess
 import sys
+import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -120,6 +123,30 @@ async def update_and_reload():
         }
     except Exception as e:
         results["pip_install"] = {"error": str(e)}
+
+    # 刷新 import 缓存 + 校验关键依赖是否真的能 import。
+    # 没有这一步，即便 pip 装好了，长跑的 uvicorn 进程也可能因 path importer
+    # 缓存而继续报 "No module named 'langchain_openai'"。
+    verify: dict[str, str] = {}
+    try:
+        importlib.invalidate_caches()
+    except Exception as e:
+        verify["invalidate_caches"] = f"error: {e}"
+    for mod in ("langchain_openai", "langgraph", "chromadb", "tradingagents.graph.trading_graph"):
+        try:
+            importlib.import_module(mod)
+            verify[mod] = "ok"
+        except Exception as e:
+            verify[mod] = f"{type(e).__name__}: {e}"
+    results["verify"] = verify
+
+    # 触发 uvicorn --reload：碰一下 main.py 的 mtime。
+    # 如果部署没开 --reload，这一步是 no-op；开了的话能让 worker 进程清空 sys.modules。
+    try:
+        os.utime(str(Path(__file__).resolve()), (time.time(), time.time()))
+        results["touch_main"] = "ok"
+    except Exception as e:
+        results["touch_main"] = f"error: {e}"
 
     try:
         r = subprocess.run(
