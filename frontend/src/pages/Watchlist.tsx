@@ -343,7 +343,6 @@ export default function Watchlist() {
 
   const tabItems = [
     { key: ALL_KEY, label: <Space size={4}>全部 <Tag>{totalCount}</Tag></Space> },
-    { key: UNGROUPED_KEY, label: <Space size={4}>未分组 <Tag>{ungroupedCount}</Tag></Space> },
     ...SYSTEM_TAG_META.map((meta) => ({
       key: tagFilterKey(meta.key),
       label: (
@@ -357,6 +356,7 @@ export default function Watchlist() {
       key: String(g.id),
       label: <Space size={4}>{g.name} <Tag>{g.count ?? 0}</Tag></Space>,
     })),
+    { key: UNGROUPED_KEY, label: <Space size={4}>未分组 <Tag>{ungroupedCount}</Tag></Space> },
   ];
 
   const renderTabBar: TabsProps['renderTabBar'] = (tabBarProps, DefaultTabBar) => (
@@ -618,8 +618,8 @@ export default function Watchlist() {
               handleMoveStock(record.id, val === UNGROUPED_KEY ? null : (val as number))
             }
             options={[
-              { value: UNGROUPED_KEY, label: '未分组' },
               ...groups.map((g) => ({ value: g.id, label: g.name })),
+              { value: UNGROUPED_KEY, label: '未分组' },
             ]}
           />
           {renderTagToggleRow(record)}
@@ -755,8 +755,8 @@ export default function Watchlist() {
               setAddTargetGroup(val === UNGROUPED_KEY ? null : (val as number))
             }
             options={[
-              { value: UNGROUPED_KEY, label: '未分组' },
               ...groups.map((g) => ({ value: g.id, label: g.name })),
+              { value: UNGROUPED_KEY, label: '未分组' },
             ]}
           />
         </div>
