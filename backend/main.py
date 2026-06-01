@@ -1,5 +1,6 @@
 from pathlib import Path
 import subprocess
+import sys
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -103,6 +104,22 @@ async def update_and_reload():
             return {"status": "git_pull_failed", "details": results}
     except Exception as e:
         return {"status": "git_pull_error", "error": str(e)}
+
+    # 同步后端依赖：用当前解释器的 pip 装 backend/requirements.txt，
+    # 这样新加的依赖（如 langchain-openai）在 uvicorn --reload 重启后立即可用。
+    try:
+        r = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", "backend/requirements.txt"],
+            cwd=str(_PROJECT_ROOT),
+            capture_output=True, text=True, timeout=600,
+        )
+        results["pip_install"] = {
+            "exit_code": r.returncode,
+            "stdout": r.stdout.strip()[-800:],
+            "stderr": r.stderr.strip()[-800:],
+        }
+    except Exception as e:
+        results["pip_install"] = {"error": str(e)}
 
     try:
         r = subprocess.run(

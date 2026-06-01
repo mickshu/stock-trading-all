@@ -12,3 +12,18 @@ openai>=1.40.0
 anthropic>=0.40.0
 beautifulsoup4>=4.12.0
 pypinyin>=0.50.0
+
+# === TradingAgents (LangGraph 多智能体) 运行时依赖 ===
+# tradingagents 包在 import 时硬依赖以下模块，缺任一都会让 TA 任务直接失败
+# （报 "No module named 'langchain_openai'" 等）。
+langchain-openai>=0.3.0
+langchain-anthropic>=0.3.0
+langchain-google-genai>=2.1.0
+langchain-experimental>=0.3.0
+langgraph>=0.4.0
+chromadb>=1.0.0
+yfinance>=0.2.0
+stockstats>=0.6.0
+tenacity>=8.0.0
+feedparser>=6.0.0
+parsel>=1.9.0
