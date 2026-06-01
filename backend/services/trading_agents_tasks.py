@@ -8,9 +8,12 @@
 
 from __future__ import annotations
 
+import importlib
 import logging
 import queue
 import re
+import subprocess
+import sys
 import threading
 import uuid
 from datetime import datetime
@@ -189,6 +192,74 @@ def delete_task(task_id: str) -> bool:
         db.close()
 
 
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+# 半成品模块清理范围。worker 自愈时把这些命名空间从 sys.modules 里整体掀掉，
+# 让重试那次走全新的 import 栈。
+_PURGE_PREFIXES = ("tradingagents", "langchain_openai", "langchain_anthropic",
+                   "langchain_google_genai", "langchain_experimental", "langgraph")
+
+
+def _purge_modules(missing: str) -> None:
+    targets = set(_PURGE_PREFIXES)
+    if missing:
+        targets.add(missing)
+    for name in list(sys.modules):
+        if any(name == p or name.startswith(p + ".") for p in targets):
+            sys.modules.pop(name, None)
+
+
+def _retry_after_install(
+    *,
+    ticker: str,
+    trade_date: str,
+    depth: int,
+    online_tools: bool,
+    original_error: ModuleNotFoundError,
+) -> tuple[dict[str, Any] | None, str]:
+    """ModuleNotFoundError 自愈：pip install + 清缓存 + 重试一次。"""
+    pip_tail = ""
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", "backend/requirements.txt"],
+            cwd=str(_PROJECT_ROOT),
+            capture_output=True, text=True, timeout=600,
+        )
+        pip_tail = (proc.stderr or proc.stdout or "").strip()[-300:]
+        if proc.returncode != 0:
+            logger.error("self-heal pip install failed: %s", pip_tail)
+            return None, (
+                f"缺少依赖：{original_error.name}，自动 pip install 也失败了，"
+                f"请到部署机手动执行 `pip install -r backend/requirements.txt`。"
+                f"pip 输出尾部：{pip_tail}"
+            )
+    except Exception as pip_err:  # noqa: BLE001
+        logger.exception("self-heal pip install raised")
+        return None, (
+            f"缺少依赖：{original_error.name}，调用 pip 时异常：{pip_err}。"
+            f"请到部署机手动执行 `pip install -r backend/requirements.txt`。"
+        )
+
+    importlib.invalidate_caches()
+    _purge_modules(original_error.name or "")
+
+    try:
+        result = run_single(
+            ticker=ticker, trade_date=trade_date, depth=depth, online_tools=online_tools
+        )
+        logger.info("TA task self-healed after installing %s", original_error.name)
+        return result, ""
+    except ModuleNotFoundError as e2:
+        logger.exception("self-heal retry still missing %s", e2.name)
+        return None, (
+            f"缺少依赖：{e2.name}，自动 pip install 已执行但仍无法 import。"
+            f"请检查部署机的 Python 解释器与 uvicorn 是否同一 venv。"
+            f"pip 输出尾部：{pip_tail}"
+        )
+    except Exception as e2:  # noqa: BLE001
+        logger.exception("self-heal retry failed with non-ModuleNotFoundError")
+        return None, str(e2)
+
+
 def _process(task_id: str) -> None:
     db = SessionLocal()
     try:
@@ -209,20 +280,24 @@ def _process(task_id: str) -> None:
     error_msg = ""
     result: dict[str, Any] | None = None
     try:
-        # 一次性刷新 import 缓存。如果上次 redeploy 刚装好依赖却没重启 uvicorn，
-        # 这一步能让本进程立即看到新装的 langchain_openai / langgraph 等包，
-        # 避免「明明 pip 装好了 worker 仍然 ModuleNotFoundError」。
-        import importlib as _il
-        _il.invalidate_caches()
+        importlib.invalidate_caches()
         result = run_single(
             ticker=ticker, trade_date=trade_date, depth=depth, online_tools=online_tools
         )
     except ModuleNotFoundError as e:
-        error_msg = (
-            f"缺少依赖：{e.name}。请到部署机执行 `pip install -r backend/requirements.txt` "
-            f"或调用 POST /api/updatereload 后重启后端。原始错误：{e}"
+        # 长跑的 uvicorn worker 上一次 import langchain_openai 失败后，sys.modules
+        # 里残留了 tradingagents.* 的半成品模块。即便 redeploy 期间已经 pip install
+        # 过依赖，本进程内的下一次 from tradingagents.graph.trading_graph import ...
+        # 仍然会顺着旧的导入栈再次抛 ModuleNotFoundError。
+        # 这里 worker 自愈一次：自动 pip install + 清掉污染过的 sys.modules + 重试。
+        logger.warning("TA task %s missing dep %s; self-healing", task_id, e.name)
+        result, error_msg = _retry_after_install(
+            ticker=ticker,
+            trade_date=trade_date,
+            depth=depth,
+            online_tools=online_tools,
+            original_error=e,
         )
-        logger.exception("TA task %s failed: missing dep %s", task_id, e.name)
     except Exception as e:  # noqa: BLE001
         error_msg = str(e)
         logger.exception("TA task %s failed", task_id)

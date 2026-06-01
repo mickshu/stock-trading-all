@@ -110,6 +110,7 @@ async def update_and_reload():
 
     # 同步后端依赖：用当前解释器的 pip 装 backend/requirements.txt，
     # 这样新加的依赖（如 langchain-openai）在 uvicorn --reload 重启后立即可用。
+    pip_failed = False
     try:
         r = subprocess.run(
             [sys.executable, "-m", "pip", "install", "-r", "backend/requirements.txt"],
@@ -121,23 +122,34 @@ async def update_and_reload():
             "stdout": r.stdout.strip()[-800:],
             "stderr": r.stderr.strip()[-800:],
         }
+        if r.returncode != 0:
+            pip_failed = True
     except Exception as e:
         results["pip_install"] = {"error": str(e)}
+        pip_failed = True
+
+    if pip_failed:
+        # 早返回：pip 已经失败，后面的 verify / touch / npm build 没意义，且
+        # 静默继续会让运维以为 redeploy 成功，实际依赖根本没装上。
+        return {"status": "pip_install_failed", "details": results}
 
     # 刷新 import 缓存 + 校验关键依赖是否真的能 import。
     # 没有这一步，即便 pip 装好了，长跑的 uvicorn 进程也可能因 path importer
     # 缓存而继续报 "No module named 'langchain_openai'"。
     verify: dict[str, str] = {}
+    verify_failed = False
     try:
         importlib.invalidate_caches()
     except Exception as e:
         verify["invalidate_caches"] = f"error: {e}"
+        verify_failed = True
     for mod in ("langchain_openai", "langgraph", "chromadb", "tradingagents.graph.trading_graph"):
         try:
             importlib.import_module(mod)
             verify[mod] = "ok"
         except Exception as e:
             verify[mod] = f"{type(e).__name__}: {e}"
+            verify_failed = True
     results["verify"] = verify
 
     # 触发 uvicorn --reload：碰一下 main.py 的 mtime。
@@ -158,7 +170,10 @@ async def update_and_reload():
     except Exception as e:
         results["frontend_build"] = {"error": str(e)}
 
-    return {"status": "done", "details": results}
+    # verify 失败仍把构建结果一并返回，方便运维判断是「pip 装上但 import 不到」
+    # 还是「pip 没装上」——前者通常意味着 venv 不一致或 uvicorn 没重启。
+    status = "verify_failed" if verify_failed else "done"
+    return {"status": status, "details": results}
 
 
 # AI 分析报告静态目录：<repo>/data/reports/，浏览器可直接访问 /reports/xxx.md。
