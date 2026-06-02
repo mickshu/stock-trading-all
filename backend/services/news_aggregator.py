@@ -50,6 +50,8 @@ SIMILARITY_THRESHOLD = 0.55
 PER_SOURCE_LIMIT = 200
 # 个股新闻每只 ticker 拉取条数上限
 PER_STOCK_LIMIT = 30
+# 每个全市场源保留的「市场热点」条数上限（未命中自选股但仍保留，按时间降序取最新）
+MARKET_HOT_PER_SOURCE = 25
 
 # 资讯源开关：可在「设置 → 资讯」中勾选启用项。
 # 「东方财富」对应 stock_news_em（个股新闻），其余为全市场快讯接口。
@@ -266,6 +268,8 @@ def _fetch_global(source_label: str, fn_name: str, **kwargs) -> list[dict]:
             "source": source_label,
             "published_at": ts,
             "preset_codes": [],
+            # 全市场快讯候选「市场热点」：未命中自选股时也允许保留 Top N 条
+            "market_hot_candidate": True,
         })
     return out
 
@@ -281,8 +285,13 @@ def _annotate_related(
     """根据 title+summary 命中哪些自选股代码 / 公司名，写入 related_codes / related_names。
 
     preset_codes 已强制相关（个股新闻直拉路径）。
+
+    市场热点：item["market_hot_candidate"] = True 且未命中任何自选股时，
+    每个源保留最新 MARKET_HOT_PER_SOURCE 条，related_codes 留空，
+    评分时给基础分但低于自选股相关，避免淹没。
     """
     annotated: list[dict] = []
+    market_hot_pool: list[dict] = []  # 未命中自选股的市场热点候选
     name_index: list[tuple[str, str]] = []  # (公司简称, 代码)
     for code, name in code_to_name.items():
         if name:
@@ -301,11 +310,22 @@ def _annotate_related(
         for name, code in name_index:
             if name and name in text:
                 hit_codes.add(code)
-        if not hit_codes:
-            continue
-        item["related_codes"] = sorted(hit_codes)
-        item["related_names"] = sorted({code_to_name.get(c, "") for c in hit_codes if code_to_name.get(c)})
-        annotated.append(item)
+        if hit_codes:
+            item["related_codes"] = sorted(hit_codes)
+            item["related_names"] = sorted({code_to_name.get(c, "") for c in hit_codes if code_to_name.get(c)})
+            annotated.append(item)
+        elif item.get("market_hot_candidate"):
+            item["related_codes"] = []
+            item["related_names"] = []
+            market_hot_pool.append(item)
+
+    # 市场热点按源分桶，每源取最新 MARKET_HOT_PER_SOURCE 条
+    by_source: dict[str, list[dict]] = {}
+    for it in market_hot_pool:
+        by_source.setdefault(it["source"], []).append(it)
+    for src_items in by_source.values():
+        src_items.sort(key=lambda x: x["published_at"], reverse=True)
+        annotated.extend(src_items[:MARKET_HOT_PER_SOURCE])
     return annotated
 
 
@@ -353,7 +373,8 @@ def _deduplicate_and_score(items: list[dict]) -> list[NewsItem]:
             })
             cluster_tokens.append(tokens)
 
-    # 评分：源数 * 2 + 关联自选股数 + 新鲜度（最近 1h 加 5、24h 加 2、3d 加 1）
+    # 评分：源数 * 2 + 关联自选股数 * 3 + 新鲜度（最近 1h 加 5、24h 加 2、3d 加 1）
+    # 自选股相关给 +3.0 加成，确保排在「市场热点」前面；市场热点给 +1.0 基础分。
     now = datetime.now(CST)
     out: list[NewsItem] = []
     for c in clusters:
@@ -366,7 +387,12 @@ def _deduplicate_and_score(items: list[dict]) -> list[NewsItem]:
             recency = 1.0
         else:
             recency = 0.0
-        score = len(c["sources"]) * 2.0 + len(c["related_codes"]) + recency
+        related_n = len(c["related_codes"])
+        if related_n > 0:
+            relevance = 3.0 + related_n * 3.0  # 自选股相关
+        else:
+            relevance = 1.0  # 市场热点
+        score = len(c["sources"]) * 2.0 + relevance + recency
         out.append(NewsItem(
             id=_make_id(c["title"], ",".join(c["sources"]), c["published_at"]),
             title=c["title"],

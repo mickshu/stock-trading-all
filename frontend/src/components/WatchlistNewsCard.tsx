@@ -106,7 +106,7 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
       const resp = await fetchWatchlistNews({
         timeRange,
         codes,
-        limit: 80,
+        limit: 150,
       });
       setItems(resp.items);
       setStale(Boolean(resp.stale));
@@ -284,7 +284,7 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
 
   const headerHint =
     mode === 'aggregate'
-      ? '多源聚合（财联社 / 东方财富 / 同花顺 / 新浪），按热度排序'
+      ? '多源聚合（财联社 / 东方财富 / 同花顺 / 新浪），自选股相关 + 市场热点，按热度排序'
       : '基于「设置 → 资讯」的提示词与 AI 配置，让大模型联网检索并生成 markdown 简报';
 
   return (
