@@ -20,6 +20,7 @@ from backend.api.settings import router as settings_router
 from backend.api.summary import router as summary_router, _generate_and_cache
 from backend.api.ai_agent import router as ai_agent_router
 from backend.api.trading_agents import router as trading_agents_router
+from backend.api.news import router as news_router
 
 app = FastAPI(title="Stock Analysis Tool", version="0.1.0")
 
@@ -40,6 +41,7 @@ app.include_router(settings_router)
 app.include_router(summary_router)
 app.include_router(ai_agent_router)
 app.include_router(trading_agents_router)
+app.include_router(news_router)
 
 
 _scheduler_logger = logging.getLogger("backend.scheduler")

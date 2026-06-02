@@ -17,6 +17,7 @@ import {
   Empty,
 } from 'antd';
 import StockSearchInput from '../components/StockSearchInput';
+import WatchlistNewsCard from '../components/WatchlistNewsCard';
 import {
   PlusOutlined,
   EditOutlined,
@@ -130,6 +131,8 @@ export default function Watchlist() {
 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascend' | 'descend' | null>(null);
+
+  const [viewMode, setViewMode] = useState<'list' | 'news'>('list');
 
   const dragIndexRef = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -688,6 +691,18 @@ export default function Watchlist() {
         </Button>
       </div>
 
+      <Tabs
+        activeKey={viewMode}
+        onChange={(k) => setViewMode(k as 'list' | 'news')}
+        items={[
+          { key: 'list', label: '股票列表' },
+          { key: 'news', label: '重要资讯' },
+        ]}
+        size="middle"
+        type="card"
+        style={{ marginBottom: 8 }}
+      />
+
       <div
         style={{
           display: 'flex',
@@ -716,7 +731,12 @@ export default function Watchlist() {
         </Tooltip>
       </div>
 
-      {isMobile ? (
+      {viewMode === 'news' ? (
+        <WatchlistNewsCard
+          codes={sortedData.map((s) => s.code)}
+          scopeLabel={filterLabel}
+        />
+      ) : isMobile ? (
         renderMobileList()
       ) : (
         sortedData.length === 0 && !loading ? (
