@@ -9,11 +9,31 @@ import {
   Spin,
   Button,
   Tooltip,
+  Input,
+  Alert,
   message,
 } from 'antd';
-import { ReloadOutlined, FireOutlined, LinkOutlined } from '@ant-design/icons';
+import {
+  ReloadOutlined,
+  FireOutlined,
+  LinkOutlined,
+  RobotOutlined,
+  EditOutlined,
+  SaveOutlined,
+  RollbackOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { fetchWatchlistNews, type NewsItem, type NewsTimeRange } from '../api/news';
+import {
+  fetchWatchlistNews,
+  fetchNewsSettings,
+  saveNewsSettings,
+  resetNewsPrompt,
+  fetchAiDigest,
+  type NewsItem,
+  type NewsTimeRange,
+  type AiDigestResponse,
+} from '../api/news';
+import MarkdownView from './MarkdownView';
 
 interface Props {
   /** 当前筛选范围内的股票代码池；为空表示「全部自选股」由后端兜底。 */
@@ -56,11 +76,23 @@ function formatPublishedAt(iso: string): string {
   return `${mm}-${dd} ${hh}:${mi}`;
 }
 
+type NewsMode = 'aggregate' | 'ai';
+
 export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
   const navigate = useNavigate();
+  const [mode, setMode] = useState<NewsMode>('aggregate');
   const [timeRange, setTimeRange] = useState<NewsTimeRange>('today');
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // AI 检索：当前会话使用的 prompt（可能与已存默认值不同）
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [savedPrompt, setSavedPrompt] = useState('');
+  const [defaultPrompt, setDefaultPrompt] = useState('');
+  const [promptEditing, setPromptEditing] = useState(false);
+  const [promptSaving, setPromptSaving] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState<AiDigestResponse | null>(null);
 
   // codes 数组稳定化，避免每次新引用都触发 effect
   const codesKey = useMemo(() => [...codes].sort().join(','), [codes]);
@@ -82,9 +114,74 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
   };
 
   useEffect(() => {
+    if (mode !== 'aggregate') return;
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeRange, codesKey]);
+  }, [timeRange, codesKey, mode]);
+
+  // 切到 AI 模式时按需加载 prompt 配置
+  useEffect(() => {
+    if (mode !== 'ai' || savedPrompt) return;
+    fetchNewsSettings()
+      .then((s) => {
+        setSavedPrompt(s.prompt);
+        setDefaultPrompt(s.default_prompt);
+        setAiPrompt(s.prompt);
+      })
+      .catch(() => message.error('加载 AI 资讯配置失败'));
+  }, [mode, savedPrompt]);
+
+  const runAiDigest = async () => {
+    const prompt = (aiPrompt || savedPrompt).trim();
+    if (!prompt) {
+      message.warning('提示词不能为空');
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const resp = await fetchAiDigest({ codes, prompt });
+      setAiResult(resp);
+    } catch (e) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      message.error(detail || 'AI 资讯检索失败，请检查 AI 配置或稍后重试');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleSavePrompt = async () => {
+    const text = aiPrompt.trim();
+    if (!text) {
+      message.warning('提示词不能为空');
+      return;
+    }
+    setPromptSaving(true);
+    try {
+      const s = await saveNewsSettings({ prompt: text });
+      setSavedPrompt(s.prompt);
+      setAiPrompt(s.prompt);
+      setPromptEditing(false);
+      message.success('已保存为默认提示词');
+    } catch {
+      message.error('保存失败');
+    } finally {
+      setPromptSaving(false);
+    }
+  };
+
+  const handleResetPrompt = async () => {
+    setPromptSaving(true);
+    try {
+      const s = await resetNewsPrompt();
+      setSavedPrompt(s.prompt);
+      setAiPrompt(s.prompt);
+      message.success('已恢复默认提示词');
+    } catch {
+      message.error('恢复失败');
+    } finally {
+      setPromptSaving(false);
+    }
+  };
 
   const renderItem = (item: NewsItem) => {
     const isHot = item.hot_score >= 6;
@@ -159,6 +256,11 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
     );
   };
 
+  const headerHint =
+    mode === 'aggregate'
+      ? '多源聚合（财联社 / 东方财富 / 同花顺 / 新浪），按热度排序'
+      : '基于「设置 → 资讯」的提示词与 AI 配置，让大模型联网检索并生成 markdown 简报';
+
   return (
     <div
       style={{
@@ -180,47 +282,169 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
           重要资讯 · {scopeLabel}
         </Typography.Text>
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-          多源聚合（财联社 / 东方财富 / 同花顺 / 新浪），按热度排序
+          {headerHint}
         </Typography.Text>
         <div style={{ flex: 1 }} />
-        <Button
-          size="small"
-          icon={<ReloadOutlined />}
-          onClick={reload}
-          loading={loading}
-        >
-          刷新
-        </Button>
+        {mode === 'aggregate' && (
+          <Button
+            size="small"
+            icon={<ReloadOutlined />}
+            onClick={reload}
+            loading={loading}
+          >
+            刷新
+          </Button>
+        )}
       </div>
 
       <Tabs
         size="small"
-        activeKey={timeRange}
-        onChange={(k) => setTimeRange(k as NewsTimeRange)}
-        items={TIME_TABS.map((t) => ({ key: t.key, label: t.label }))}
+        activeKey={mode}
+        onChange={(k) => setMode(k as NewsMode)}
+        items={[
+          { key: 'aggregate', label: '多源聚合' },
+          { key: 'ai', label: <span><RobotOutlined /> AI 智能检索</span> },
+        ]}
         style={{ marginBottom: 4 }}
       />
 
-      {loading && items.length === 0 ? (
-        <div style={{ padding: 32, textAlign: 'center' }}>
-          <Spin />
-        </div>
-      ) : items.length === 0 ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={
-            codes.length === 0
-              ? '当前分组无自选股，先添加几只'
-              : '该时间窗口暂无相关资讯'
-          }
-        />
+      {mode === 'aggregate' ? (
+        <>
+          <Tabs
+            size="small"
+            activeKey={timeRange}
+            onChange={(k) => setTimeRange(k as NewsTimeRange)}
+            items={TIME_TABS.map((t) => ({ key: t.key, label: t.label }))}
+            style={{ marginBottom: 4 }}
+          />
+          {loading && items.length === 0 ? (
+            <div style={{ padding: 32, textAlign: 'center' }}>
+              <Spin />
+            </div>
+          ) : items.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                codes.length === 0
+                  ? '当前分组无自选股，先添加几只'
+                  : '该时间窗口暂无相关资讯'
+              }
+            />
+          ) : (
+            <List
+              dataSource={items}
+              renderItem={renderItem}
+              split
+              loading={loading && items.length > 0}
+            />
+          )}
+        </>
       ) : (
-        <List
-          dataSource={items}
-          renderItem={renderItem}
-          split
-          loading={loading && items.length > 0}
-        />
+        <div>
+          <div style={{ marginBottom: 8 }}>
+            <Space size={6} wrap>
+              <Button
+                type="primary"
+                size="small"
+                icon={<RobotOutlined />}
+                onClick={runAiDigest}
+                loading={aiLoading}
+                disabled={codes.length === 0}
+              >
+                {aiResult ? '重新检索' : '开始 AI 检索'}
+              </Button>
+              <Button
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => setPromptEditing((v) => !v)}
+              >
+                {promptEditing ? '收起提示词' : '编辑提示词'}
+              </Button>
+              {aiResult && (
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  模型：{aiResult.model} · 生成于 {aiResult.generated_at}
+                </Typography.Text>
+              )}
+            </Space>
+          </div>
+
+          {promptEditing && (
+            <div style={{ marginBottom: 12 }}>
+              <Input.TextArea
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                autoSize={{ minRows: 4, maxRows: 12 }}
+                placeholder="自定义资讯检索提示词…"
+              />
+              <Space size={6} style={{ marginTop: 6 }} wrap>
+                <Button
+                  size="small"
+                  type="primary"
+                  icon={<SaveOutlined />}
+                  loading={promptSaving}
+                  onClick={handleSavePrompt}
+                  disabled={aiPrompt.trim() === savedPrompt.trim()}
+                >
+                  保存为默认
+                </Button>
+                <Button
+                  size="small"
+                  icon={<RollbackOutlined />}
+                  loading={promptSaving}
+                  onClick={handleResetPrompt}
+                  disabled={savedPrompt.trim() === defaultPrompt.trim()}
+                >
+                  恢复默认
+                </Button>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  当前默认：{savedPrompt === defaultPrompt ? '内置默认值' : '自定义'}
+                </Typography.Text>
+              </Space>
+            </div>
+          )}
+
+          {codes.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="当前分组无自选股，先添加几只"
+            />
+          ) : aiLoading ? (
+            <div style={{ padding: 32, textAlign: 'center' }}>
+              <Spin tip="AI 联网检索中，可能需要 30 秒至几分钟…" />
+            </div>
+          ) : aiResult ? (
+            <div>
+              <MarkdownView content={aiResult.content} />
+              {aiResult.sources.length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    引用来源：
+                  </Typography.Text>
+                  <Space size={4} wrap style={{ marginTop: 4 }}>
+                    {aiResult.sources.map((u) => (
+                      <a
+                        key={u}
+                        href={u}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: 12 }}
+                      >
+                        <LinkOutlined /> {u.length > 60 ? u.slice(0, 60) + '…' : u}
+                      </a>
+                    ))}
+                  </Space>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Alert
+              type="info"
+              showIcon
+              message="点击「开始 AI 检索」让大模型联网生成自选股资讯简报"
+              description="提示词与默认数据源可在「设置 → 资讯」中调整。"
+            />
+          )}
+        </div>
       )}
     </div>
   );

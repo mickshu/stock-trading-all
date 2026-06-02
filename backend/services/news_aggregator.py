@@ -46,6 +46,17 @@ PER_SOURCE_LIMIT = 200
 # 个股新闻每只 ticker 拉取条数上限
 PER_STOCK_LIMIT = 30
 
+# 资讯源开关：可在「设置 → 资讯」中勾选启用项。
+# 「东方财富」对应 stock_news_em（个股新闻），其余为全市场快讯接口。
+AVAILABLE_SOURCES: tuple[str, ...] = (
+    "东方财富",
+    "财联社",
+    "东财快讯",
+    "同花顺",
+    "新浪",
+)
+DEFAULT_ENABLED_SOURCES: list[str] = list(AVAILABLE_SOURCES)
+
 
 @dataclass
 class NewsItem:
@@ -373,16 +384,30 @@ def fetch_news_for_watchlist(
     code_to_name: dict[str, str],
     time_range: str = "today",
     limit: int = 50,
+    enabled_sources: list[str] | None = None,
 ) -> list[dict]:
     """聚合自选股相关重要资讯。
 
-    code_to_name: {"000001": "平安银行", ...}
-    time_range:   "today" | "week" | "all"
+    code_to_name:    {"000001": "平安银行", ...}
+    time_range:      "today" | "week" | "all"
+    enabled_sources: 资讯源白名单。None = 全部启用。可选值见 AVAILABLE_SOURCES。
     """
     if not code_to_name:
         return []
 
-    cache_key = f"{','.join(sorted(code_to_name.keys()))}|{time_range}"
+    if enabled_sources is None:
+        enabled = set(AVAILABLE_SOURCES)
+    else:
+        enabled = {s for s in enabled_sources if s in AVAILABLE_SOURCES}
+        if not enabled:
+            # 容错：上层传了空集合或全部非法，等同未启用任何源 → 直接返回空
+            return []
+
+    cache_key = (
+        f"{','.join(sorted(code_to_name.keys()))}"
+        f"|{time_range}"
+        f"|{','.join(sorted(enabled))}"
+    )
     now_ts = time.time()
     with _CACHE_LOCK:
         cached = _CACHE.get(cache_key)
@@ -392,15 +417,20 @@ def fetch_news_for_watchlist(
     floor = _time_range_floor(time_range)
     raw: list[dict] = []
 
-    # 1) 个股新闻（东财，按代码各拉一次）
-    for code in code_to_name:
-        raw.extend(_fetch_em_per_stock(code))
+    # 1) 个股新闻（东财，按代码各拉一次）—— 仅当「东方财富」启用
+    if "东方财富" in enabled:
+        for code in code_to_name:
+            raw.extend(_fetch_em_per_stock(code))
 
-    # 2) 全市场快讯：财联社 / 东财快讯 / 同花顺 / 新浪
-    raw.extend(_fetch_global("财联社", "stock_info_global_cls", symbol="全部"))
-    raw.extend(_fetch_global("东财快讯", "stock_info_global_em"))
-    raw.extend(_fetch_global("同花顺", "stock_info_global_ths"))
-    raw.extend(_fetch_global("新浪", "stock_info_global_sina"))
+    # 2) 全市场快讯：按开关启用各源
+    if "财联社" in enabled:
+        raw.extend(_fetch_global("财联社", "stock_info_global_cls", symbol="全部"))
+    if "东财快讯" in enabled:
+        raw.extend(_fetch_global("东财快讯", "stock_info_global_em"))
+    if "同花顺" in enabled:
+        raw.extend(_fetch_global("同花顺", "stock_info_global_ths"))
+    if "新浪" in enabled:
+        raw.extend(_fetch_global("新浪", "stock_info_global_sina"))
     # 富途 / 金十 / 雪球 — akshare 暂无稳定 A 股资讯接口，跳过；后续接入时追加 _fetch_global 即可
 
     # 3) 时间窗口过滤

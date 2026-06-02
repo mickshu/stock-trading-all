@@ -3,6 +3,7 @@ import {
   Alert,
   Button,
   Card,
+  Checkbox,
   Form,
   Input,
   InputNumber,
@@ -28,6 +29,12 @@ import {
   type LocalAgentProvider,
   type SearchProvider,
 } from '../api/settings';
+import {
+  fetchNewsSettings,
+  saveNewsSettings,
+  resetNewsPrompt,
+  type NewsSettings,
+} from '../api/news';
 import { probeAIAgents, type AIAgentInfo } from '../api/aiAgent';
 
 type AiMode = 'native' | 'local';
@@ -494,6 +501,125 @@ function AiSettingsTab() {
   );
 }
 
+function NewsSettingsTab() {
+  const [data, setData] = useState<NewsSettings | null>(null);
+  const [prompt, setPrompt] = useState('');
+  const [sources, setSources] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const reload = async () => {
+    setLoading(true);
+    try {
+      const s = await fetchNewsSettings();
+      setData(s);
+      setPrompt(s.prompt);
+      setSources(s.sources);
+    } catch {
+      message.error('加载资讯配置失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    reload();
+  }, []);
+
+  const onSave = async () => {
+    const text = prompt.trim();
+    if (!text) {
+      message.warning('提示词不能为空');
+      return;
+    }
+    setSaving(true);
+    try {
+      const s = await saveNewsSettings({ prompt: text, sources });
+      setData(s);
+      setPrompt(s.prompt);
+      setSources(s.sources);
+      message.success('已保存');
+    } catch (e) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      message.error(detail || '保存失败');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onResetPrompt = async () => {
+    setSaving(true);
+    try {
+      const s = await resetNewsPrompt();
+      setData(s);
+      setPrompt(s.prompt);
+      message.success('已恢复默认提示词');
+    } catch {
+      message.error('恢复失败');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading || !data) {
+    return (
+      <Card title="资讯" size="small">
+        <Spin />
+      </Card>
+    );
+  }
+
+  const isPromptDefault = prompt.trim() === data.default_prompt.trim();
+
+  return (
+    <Card title="资讯" size="small">
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+        message="此处配置自选股「重要资讯」Tab 的 AI 检索提示词与数据源开关。模型与 Key 复用上方「AI 配置」。"
+      />
+
+      <Typography.Title level={5} style={{ marginTop: 0 }}>默认提示词</Typography.Title>
+      <Typography.Paragraph type="secondary" style={{ fontSize: 12, marginBottom: 8 }}>
+        AI 检索时作为 system 提示词使用。可在自选股页临时编辑或在此处长期保存。
+      </Typography.Paragraph>
+      <Input.TextArea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        autoSize={{ minRows: 6, maxRows: 16 }}
+        placeholder="输入资讯检索提示词…"
+      />
+      <div style={{ marginTop: 6 }}>
+        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          {isPromptDefault ? '当前为内置默认值' : '当前为自定义版本'}
+        </Typography.Text>
+      </div>
+
+      <Typography.Title level={5} style={{ marginTop: 24 }}>数据源（多源聚合）</Typography.Title>
+      <Typography.Paragraph type="secondary" style={{ fontSize: 12, marginBottom: 8 }}>
+        勾选启用的资讯源。关闭的源不参与「多源聚合」Tab 的拉取（不影响 AI 智能检索）。
+      </Typography.Paragraph>
+      <Checkbox.Group
+        value={sources}
+        onChange={(vals) => setSources(vals as string[])}
+        options={data.available_sources.map((s) => ({ value: s, label: s }))}
+      />
+
+      <div style={{ marginTop: 24 }}>
+        <Space wrap>
+          <Button type="primary" loading={saving} onClick={onSave}>
+            保存
+          </Button>
+          <Button loading={saving} onClick={onResetPrompt} disabled={isPromptDefault}>
+            恢复默认提示词
+          </Button>
+        </Space>
+      </div>
+    </Card>
+  );
+}
+
 export default function Settings() {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
@@ -506,6 +632,7 @@ export default function Settings() {
         items={[
           { key: 'data', label: '数据源', children: <DataSourceTab /> },
           { key: 'ai', label: 'AI 配置', children: <AiSettingsTab /> },
+          { key: 'news', label: '资讯', children: <NewsSettingsTab /> },
         ]}
       />
     </div>

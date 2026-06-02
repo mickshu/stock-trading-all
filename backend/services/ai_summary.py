@@ -210,7 +210,11 @@ def _import_anthropic():
         ) from e
 
 
-def _run_openai(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
+def _run_openai(
+    settings: dict,
+    user_msg: str,
+    system_prompt: str | None = None,
+) -> tuple[str, str, list[str]]:
     OpenAI = _import_openai()
     api_key = settings.get("openai_api_key") or ""
     if not api_key:
@@ -220,7 +224,7 @@ def _run_openai(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
     client = OpenAI(api_key=api_key, base_url=base_url, timeout=60)
 
     messages: list[dict[str, Any]] = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": system_prompt or SYSTEM_PROMPT},
         {"role": "user", "content": user_msg},
     ]
     sources: list[str] = []
@@ -262,19 +266,24 @@ def _run_openai(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
     return (resp.choices[0].message.content or "").strip(), model, sources
 
 
-def _run_anthropic(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
+def _run_anthropic(
+    settings: dict,
+    user_msg: str,
+    system_prompt: str | None = None,
+) -> tuple[str, str, list[str]]:
     anthropic = _import_anthropic()
     api_key = settings.get("anthropic_api_key") or ""
     if not api_key:
         raise RuntimeError("Anthropic API Key 未配置")
     model = settings.get("anthropic_model") or "claude-sonnet-4-6"
     client = anthropic.Anthropic(api_key=api_key, timeout=60)
+    sys_prompt = system_prompt or SYSTEM_PROMPT
 
     messages: list[dict[str, Any]] = [{"role": "user", "content": user_msg}]
     sources: list[str] = []
     for _ in range(MAX_TOOL_LOOPS):
         resp = client.messages.create(
-            model=model, max_tokens=2048, system=SYSTEM_PROMPT,
+            model=model, max_tokens=2048, system=sys_prompt,
             tools=TOOLS_CLAUDE_SCHEMA, messages=messages, temperature=0.4,
         )
         if resp.stop_reason != "tool_use":
@@ -288,17 +297,23 @@ def _run_anthropic(settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
                 tool_results.append({"type": "tool_result", "tool_use_id": b.id, "content": tool_result})
         messages.append({"role": "user", "content": tool_results})
     resp = client.messages.create(
-        model=model, max_tokens=2048, system=SYSTEM_PROMPT, messages=messages, temperature=0.4,
+        model=model, max_tokens=2048, system=sys_prompt, messages=messages, temperature=0.4,
     )
     parts = [b.text for b in resp.content if getattr(b, "type", "") == "text"]
     return "".join(parts).strip(), model, sources
 
 
-def _run_local_agent(agent_name: str, settings: dict, user_msg: str) -> tuple[str, str, list[str]]:
+def _run_local_agent(
+    agent_name: str,
+    settings: dict,
+    user_msg: str,
+    prompt_template: str | None = None,
+) -> tuple[str, str, list[str]]:
     spec = get_agent(agent_name)
     if spec is None:
         raise RuntimeError(f"{agent_name} agent 未注册")
-    prompt_template = (settings or {}).get("daily_summary_prompt") or DEFAULT_HERMES_PROMPT
+    if prompt_template is None:
+        prompt_template = (settings or {}).get("daily_summary_prompt") or DEFAULT_HERMES_PROMPT
     prompt = f"{prompt_template.strip()}\n\n{user_msg}"
     result = run_agent(agent_name, prompt, timeout=HERMES_TIMEOUT)
     if not result.get("ok"):
@@ -377,6 +392,52 @@ def probe_llm(settings: dict) -> dict:
     )
     sample = (resp.choices[0].message.content or "").strip()
     return {"ok": True, "provider": "openai", "model": model, "sample": sample, "base_url": base_url}
+
+
+def generate_news_digest(
+    code_to_name: dict[str, str],
+    prompt: str,
+    settings: dict,
+) -> dict:
+    """自选股「重要资讯」AI 检索入口。
+
+    与 generate_daily_summary 共用 LLM provider / 工具循环，但：
+    - system 提示词使用调用方传入的 prompt（来自 AppSetting.news_prompt）
+    - user 消息只塞入「自选股清单」，让 LLM 自行联网检索
+    """
+    provider = (settings or {}).get("provider") or "hermes"
+    if not code_to_name:
+        raise RuntimeError("自选股清单为空，无法生成资讯简报")
+    lines = ["## 自选股清单", ""]
+    for code, name in code_to_name.items():
+        lines.append(f"- {code} {name}".rstrip())
+    lines += [
+        "",
+        "请基于以上清单与 web_search / web_fetch 工具检索到的最新公开信息，"
+        "按系统提示词的要求输出 markdown 简报。",
+    ]
+    user_msg = "\n".join(lines)
+
+    sys_prompt = (prompt or "").strip() or SYSTEM_PROMPT
+    if provider in LOCAL_AGENT_NAMES:
+        content, model, sources = _run_local_agent(
+            provider, settings, user_msg, prompt_template=sys_prompt,
+        )
+    elif provider == "anthropic":
+        content, model, sources = _run_anthropic(settings, user_msg, system_prompt=sys_prompt)
+    else:
+        content, model, sources = _run_openai(settings, user_msg, system_prompt=sys_prompt)
+    seen, dedup = set(), []
+    for u in sources:
+        if u and u not in seen:
+            seen.add(u)
+            dedup.append(u)
+    return {
+        "model": model,
+        "content": content,
+        "sources": dedup,
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
 
 
 def probe_tavily(settings: dict) -> dict:
