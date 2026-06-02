@@ -1,8 +1,6 @@
 from pathlib import Path
-import importlib
 import os
 import subprocess
-import sys
 import time
 
 from fastapi import FastAPI, HTTPException
@@ -92,10 +90,12 @@ def health():
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
-@app.post("/api/updatereload")
+@app.api_route("/api/updatereload", methods=["GET", "POST"])
 async def update_and_reload():
-    """Webhook: git pull + 前端构建。后端因 uvicorn --reload 会自动重启。"""
+    """Git webhook: git pull + 重新部署（重启后端、构建前端）。"""
     results = {}
+
+    # Step 1: git pull
     try:
         r = subprocess.run(
             ["git", "pull"],
@@ -108,72 +108,30 @@ async def update_and_reload():
     except Exception as e:
         return {"status": "git_pull_error", "error": str(e)}
 
-    # 同步后端依赖：用当前解释器的 pip 装 backend/requirements.txt，
-    # 这样新加的依赖（如 langchain-openai）在 uvicorn --reload 重启后立即可用。
-    pip_failed = False
-    try:
-        r = subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-r", "backend/requirements.txt"],
-            cwd=str(_PROJECT_ROOT),
-            capture_output=True, text=True, timeout=600,
-        )
-        results["pip_install"] = {
-            "exit_code": r.returncode,
-            "stdout": r.stdout.strip()[-800:],
-            "stderr": r.stderr.strip()[-800:],
-        }
-        if r.returncode != 0:
-            pip_failed = True
-    except Exception as e:
-        results["pip_install"] = {"error": str(e)}
-        pip_failed = True
-
-    if pip_failed:
-        # 早返回：pip 已经失败，后面的 verify / touch / npm build 没意义，且
-        # 静默继续会让运维以为 redeploy 成功，实际依赖根本没装上。
-        return {"status": "pip_install_failed", "details": results}
-
-    # 刷新 import 缓存 + 校验关键依赖是否真的能 import。
-    # 没有这一步，即便 pip 装好了，长跑的 uvicorn 进程也可能因 path importer
-    # 缓存而继续报 "No module named 'langchain_openai'"。
-    verify: dict[str, str] = {}
-    verify_failed = False
-    try:
-        importlib.invalidate_caches()
-    except Exception as e:
-        verify["invalidate_caches"] = f"error: {e}"
-        verify_failed = True
-    for mod in ("langchain_openai", "langgraph", "chromadb", "tradingagents.graph.trading_graph"):
-        try:
-            importlib.import_module(mod)
-            verify[mod] = "ok"
-        except Exception as e:
-            verify[mod] = f"{type(e).__name__}: {e}"
-            verify_failed = True
-    results["verify"] = verify
-
-    # 触发 uvicorn --reload：碰一下 main.py 的 mtime。
-    # 如果部署没开 --reload，这一步是 no-op；开了的话能让 worker 进程清空 sys.modules。
+    # Step 2: 重新部署
+    # 2a: 重启后端 — 触发 uvicorn --reload
     try:
         os.utime(str(Path(__file__).resolve()), (time.time(), time.time()))
-        results["touch_main"] = "ok"
+        results["backend_restart"] = "ok"
     except Exception as e:
-        results["touch_main"] = f"error: {e}"
+        results["backend_restart"] = f"error: {e}"
 
+    # 2b: 构建前端
     try:
         r = subprocess.run(
             ["npm", "run", "build"],
             cwd=str(_PROJECT_ROOT / "frontend"),
             capture_output=True, text=True, timeout=300,
         )
-        results["frontend_build"] = {"exit_code": r.returncode, "stdout": r.stdout.strip()[-500:], "stderr": r.stderr.strip()[-500:]}
+        results["frontend_build"] = {
+            "exit_code": r.returncode,
+            "stdout": r.stdout.strip()[-500:],
+            "stderr": r.stderr.strip()[-500:],
+        }
     except Exception as e:
         results["frontend_build"] = {"error": str(e)}
 
-    # verify 失败仍把构建结果一并返回，方便运维判断是「pip 装上但 import 不到」
-    # 还是「pip 没装上」——前者通常意味着 venv 不一致或 uvicorn 没重启。
-    status = "verify_failed" if verify_failed else "done"
-    return {"status": status, "details": results}
+    return {"status": "done", "details": results}
 
 
 # AI 分析报告静态目录：<repo>/data/reports/，浏览器可直接访问 /reports/xxx.md。
