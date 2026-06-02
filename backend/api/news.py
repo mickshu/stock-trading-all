@@ -8,7 +8,9 @@ POST /api/v1/news/ai-digest
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from datetime import timezone, timedelta
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -22,7 +24,12 @@ from backend.api.settings import (
 from backend.database import get_db
 from backend.models.models import Watchlist
 from backend.services.ai_summary import generate_news_digest
-from backend.services.news_aggregator import fetch_news_for_watchlist
+from backend.services.news_aggregator import (
+    fetch_news_cached,
+    refresh_cache_now,
+)
+
+_CST = timezone(timedelta(hours=8))
 
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
 
@@ -52,6 +59,7 @@ def _enabled_sources_from_settings() -> list[str]:
 
 @router.get("/watchlist")
 def list_watchlist_news(
+    background_tasks: BackgroundTasks,
     time_range: str = Query("today", description="today | week | all"),
     codes: str | None = Query(None, description="逗号分隔股票代码，缺省 = 全部自选股"),
     limit: int = Query(50, ge=1, le=200),
@@ -66,18 +74,28 @@ def list_watchlist_news(
         db.close()
 
     enabled_sources = _enabled_sources_from_settings()
-    items = fetch_news_for_watchlist(
+    items, refreshed_at, stale = fetch_news_cached(
         code_to_name,
         time_range=time_range,
         limit=limit,
         enabled_sources=enabled_sources,
     )
+    # stale → 立即返回旧 payload，并在后台异步刷新；前端轮询拿到 stale=false 即可
+    if stale:
+        background_tasks.add_task(
+            refresh_cache_now, code_to_name, time_range, enabled_sources,
+        )
     return {
         "time_range": time_range,
         "codes": list(code_to_name.keys()),
         "sources": enabled_sources,
         "count": len(items),
         "items": items,
+        "stale": stale,
+        "refreshed_at": (
+            refreshed_at.replace(tzinfo=timezone.utc).astimezone(_CST).isoformat()
+            if refreshed_at else None
+        ),
     }
 
 

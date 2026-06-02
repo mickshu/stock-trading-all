@@ -22,6 +22,7 @@ import logging
 import re
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta, timezone
 from typing import Iterable
@@ -37,6 +38,10 @@ CST = timezone(timedelta(hours=8))
 _CACHE: dict[str, tuple[float, list[dict]]] = {}
 _CACHE_LOCK = threading.Lock()
 CACHE_TTL_SEC = 300
+
+# 后台刷新去重：避免并发请求触发多次相同 scope 的 akshare 拉取
+_REFRESHING: set[str] = set()
+_REFRESH_LOCK = threading.Lock()
 
 # 标题相似度阈值（Jaccard），高于此视为同一新闻
 SIMILARITY_THRESHOLD = 0.55
@@ -417,21 +422,40 @@ def fetch_news_for_watchlist(
     floor = _time_range_floor(time_range)
     raw: list[dict] = []
 
-    # 1) 个股新闻（东财，按代码各拉一次）—— 仅当「东方财富」启用
+    # 并行拉取：个股新闻（每代码一路）+ 全市场快讯（按开关）。
+    # akshare 是同步 HTTP，按 (N+4) 串行会动辄 20-60s，叠加前端 30s axios 超时直接表现为「已取消」。
+    # 用线程池并行后，整体耗时收敛到最慢的一路 ~2-5s。
+    tasks: list[tuple[str, tuple]] = []  # (kind, args)
     if "东方财富" in enabled:
         for code in code_to_name:
-            raw.extend(_fetch_em_per_stock(code))
-
-    # 2) 全市场快讯：按开关启用各源
+            tasks.append(("em_per_stock", (code,)))
     if "财联社" in enabled:
-        raw.extend(_fetch_global("财联社", "stock_info_global_cls", symbol="全部"))
+        tasks.append(("global", ("财联社", "stock_info_global_cls", {"symbol": "全部"})))
     if "东财快讯" in enabled:
-        raw.extend(_fetch_global("东财快讯", "stock_info_global_em"))
+        tasks.append(("global", ("东财快讯", "stock_info_global_em", {})))
     if "同花顺" in enabled:
-        raw.extend(_fetch_global("同花顺", "stock_info_global_ths"))
+        tasks.append(("global", ("同花顺", "stock_info_global_ths", {})))
     if "新浪" in enabled:
-        raw.extend(_fetch_global("新浪", "stock_info_global_sina"))
-    # 富途 / 金十 / 雪球 — akshare 暂无稳定 A 股资讯接口，跳过；后续接入时追加 _fetch_global 即可
+        tasks.append(("global", ("新浪", "stock_info_global_sina", {})))
+    # 富途 / 金十 / 雪球 — akshare 暂无稳定 A 股资讯接口，跳过；后续接入时追加 task 即可
+
+    def _run(kind: str, args: tuple) -> list[dict]:
+        try:
+            if kind == "em_per_stock":
+                return _fetch_em_per_stock(args[0])
+            label, fn_name, kwargs = args
+            return _fetch_global(label, fn_name, **kwargs)
+        except Exception:
+            logger.warning("news task %s %r failed", kind, args, exc_info=True)
+            return []
+
+    if tasks:
+        # 上限 12 路并发，避免对端限流；总数小则按实际任务数收敛
+        max_workers = min(12, max(1, len(tasks)))
+        with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="news-fetch") as ex:
+            futures = [ex.submit(_run, kind, args) for kind, args in tasks]
+            for fut in as_completed(futures):
+                raw.extend(fut.result())
 
     # 3) 时间窗口过滤
     raw = [r for r in raw if r["published_at"] >= floor]
@@ -447,3 +471,131 @@ def fetch_news_for_watchlist(
     with _CACHE_LOCK:
         _CACHE[cache_key] = (now_ts, payload)
     return payload[:limit]
+
+
+# -----------------------------
+# SQLite 持久化缓存 + stale-while-revalidate
+# -----------------------------
+
+def build_scope_key(
+    code_to_name: dict[str, str],
+    time_range: str,
+    enabled_sources: list[str] | None,
+) -> str:
+    """与 fetch_news_for_watchlist 内部 cache_key 完全一致的 scope_key。"""
+    if enabled_sources is None:
+        enabled = set(AVAILABLE_SOURCES)
+    else:
+        enabled = {s for s in enabled_sources if s in AVAILABLE_SOURCES}
+    return (
+        f"{','.join(sorted(code_to_name.keys()))}"
+        f"|{time_range}"
+        f"|{','.join(sorted(enabled))}"
+    )
+
+
+def _load_cache_row(scope_key: str) -> tuple[list[dict], datetime] | None:
+    """从 SQLite 读取 cached payload；不存在或解析失败返回 None。"""
+    import json
+    from backend.database import SessionLocal
+    from backend.models.news_cache import NewsCache
+
+    db = SessionLocal()
+    try:
+        row = db.query(NewsCache).filter(NewsCache.scope_key == scope_key).first()
+        if not row or not row.payload_json:
+            return None
+        try:
+            payload = json.loads(row.payload_json)
+        except Exception:
+            return None
+        return payload, row.refreshed_at
+    finally:
+        db.close()
+
+
+def _save_cache_row(scope_key: str, payload: list[dict]) -> None:
+    import json
+    from backend.database import SessionLocal
+    from backend.models.news_cache import NewsCache
+
+    db = SessionLocal()
+    try:
+        row = db.query(NewsCache).filter(NewsCache.scope_key == scope_key).first()
+        now = datetime.utcnow()
+        if row:
+            row.payload_json = json.dumps(payload, ensure_ascii=False)
+            row.items_count = len(payload)
+            row.refreshed_at = now
+        else:
+            row = NewsCache(
+                scope_key=scope_key,
+                payload_json=json.dumps(payload, ensure_ascii=False),
+                items_count=len(payload),
+                refreshed_at=now,
+            )
+            db.add(row)
+        db.commit()
+    except Exception:
+        logger.warning("news cache save failed for %s", scope_key, exc_info=True)
+        db.rollback()
+    finally:
+        db.close()
+
+
+def refresh_cache_now(
+    code_to_name: dict[str, str],
+    time_range: str,
+    enabled_sources: list[str] | None,
+) -> None:
+    """后台刷新入口：dedup + 拉数据 + 落库。"""
+    scope_key = build_scope_key(code_to_name, time_range, enabled_sources)
+    with _REFRESH_LOCK:
+        if scope_key in _REFRESHING:
+            return
+        _REFRESHING.add(scope_key)
+    try:
+        payload = fetch_news_for_watchlist(
+            code_to_name,
+            time_range=time_range,
+            limit=200,  # 始终落足量；接口侧再按 limit 裁剪
+            enabled_sources=enabled_sources,
+        )
+        _save_cache_row(scope_key, payload)
+    except Exception:
+        logger.warning("news refresh failed for %s", scope_key, exc_info=True)
+    finally:
+        with _REFRESH_LOCK:
+            _REFRESHING.discard(scope_key)
+
+
+def fetch_news_cached(
+    code_to_name: dict[str, str],
+    time_range: str,
+    limit: int,
+    enabled_sources: list[str] | None,
+) -> tuple[list[dict], datetime | None, bool]:
+    """stale-while-revalidate 读路径。
+
+    返回 (payload[:limit], refreshed_at_utc, stale)。
+      - cached 且未过期：直接返回 (cached, ts, False)
+      - cached 但已过期：返回 (cached, ts, True)，由上层用 BackgroundTasks 触发刷新
+      - 无 cached：同步拉一次（冷启动只阻塞首次）并写库，返回 (fresh, now, False)
+    """
+    if not code_to_name:
+        return [], None, False
+    scope_key = build_scope_key(code_to_name, time_range, enabled_sources)
+    row = _load_cache_row(scope_key)
+    if row is None:
+        payload = fetch_news_for_watchlist(
+            code_to_name,
+            time_range=time_range,
+            limit=200,
+            enabled_sources=enabled_sources,
+        )
+        _save_cache_row(scope_key, payload)
+        return payload[:limit], datetime.utcnow(), False
+    payload, refreshed_at = row
+    age_sec = (datetime.utcnow() - refreshed_at).total_seconds()
+    stale = age_sec >= CACHE_TTL_SEC
+    return payload[:limit], refreshed_at, stale

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Tabs,
   List,
@@ -84,6 +84,9 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
   const [timeRange, setTimeRange] = useState<NewsTimeRange>('today');
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [stale, setStale] = useState(false);
+  const [refreshedAt, setRefreshedAt] = useState<string | null>(null);
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // AI 检索：当前会话使用的 prompt（可能与已存默认值不同）
   const [aiPrompt, setAiPrompt] = useState('');
@@ -106,6 +109,19 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
         limit: 80,
       });
       setItems(resp.items);
+      setStale(Boolean(resp.stale));
+      setRefreshedAt(resp.refreshed_at ?? null);
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+      // 后端已 BackgroundTasks 异步刷新；6 秒后回拉一次取新结果。
+      if (resp.stale) {
+        pollTimerRef.current = setTimeout(() => {
+          pollTimerRef.current = null;
+          reload();
+        }, 6000);
+      }
     } catch {
       message.error('加载资讯失败，请稍后再试');
     } finally {
@@ -118,6 +134,16 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange, codesKey, mode]);
+
+  // 切走聚合模式 / 卸载时清理轮询定时器，避免重复触发
+  useEffect(() => {
+    return () => {
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+    };
+  }, []);
 
   // 切到 AI 模式时按需加载 prompt 配置
   useEffect(() => {
@@ -286,14 +312,21 @@ export default function WatchlistNewsCard({ codes, scopeLabel }: Props) {
         </Typography.Text>
         <div style={{ flex: 1 }} />
         {mode === 'aggregate' && (
-          <Button
-            size="small"
-            icon={<ReloadOutlined />}
-            onClick={reload}
-            loading={loading}
-          >
-            刷新
-          </Button>
+          <>
+            {refreshedAt && (
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                {stale ? '更新中…' : '更新于'} {formatPublishedAt(refreshedAt)}
+              </Typography.Text>
+            )}
+            <Button
+              size="small"
+              icon={<ReloadOutlined />}
+              onClick={reload}
+              loading={loading || stale}
+            >
+              刷新
+            </Button>
+          </>
         )}
       </div>
 

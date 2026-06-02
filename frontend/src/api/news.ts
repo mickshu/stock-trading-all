@@ -19,6 +19,10 @@ export interface WatchlistNewsResponse {
   codes: string[];
   count: number;
   items: NewsItem[];
+  /** true = 返回的是 stale cache，后端已异步刷新；前端宜数秒后轮询。 */
+  stale?: boolean;
+  /** ISO（含 +08:00），首次启动且无缓存时可能为 null。 */
+  refreshed_at?: string | null;
 }
 
 export async function fetchWatchlistNews(opts: {
@@ -29,7 +33,11 @@ export async function fetchWatchlistNews(opts: {
   const params: Record<string, string | number> = { time_range: opts.timeRange };
   if (opts.codes && opts.codes.length > 0) params.codes = opts.codes.join(',');
   if (opts.limit) params.limit = opts.limit;
-  const { data } = await api.get<WatchlistNewsResponse>('/news/watchlist', { params });
+  // 冷缓存场景下 akshare 多源聚合即使已并发也可能 10-30s，覆盖默认 30s 超时以避免「已取消」
+  const { data } = await api.get<WatchlistNewsResponse>('/news/watchlist', {
+    params,
+    timeout: 90000,
+  });
   return data;
 }
 

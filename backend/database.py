@@ -32,5 +32,6 @@ def init_db():
     from backend.models.models import Watchlist, WatchlistGroup, KlineCache, SignalLog  # noqa: F401
     from backend.models.ai_report import AIReport  # noqa: F401
     from backend.models.ta_task import TATask  # noqa: F401
+    from backend.models.news_cache import NewsCache  # noqa: F401
     Base.metadata.create_all(bind=engine)
     _migrate_sqlite()
