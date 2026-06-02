@@ -26,6 +26,11 @@ function fmtPct(v: number | null | undefined): { text: string; color?: string } 
   return { text: `${sign}${v.toFixed(2)}%`, color };
 }
 
+function fmtPrice(v: number | null | undefined): string {
+  if (v == null) return '—';
+  return v.toFixed(2);
+}
+
 function makeStockColumns(isMobile: boolean): ColumnsType<FundFlowStockItem> {
   return [
     {
@@ -49,10 +54,20 @@ function makeStockColumns(isMobile: boolean): ColumnsType<FundFlowStockItem> {
         return (
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, minWidth: 0 }}>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0 }}>{name}</span>
+            <span style={{ color: '#555', fontSize: 11, flexShrink: 0 }}>{fmtPrice(record.price)}</span>
             <span style={{ color, fontSize: 11, flexShrink: 0 }}>{text}</span>
           </div>
         );
       },
+    },
+    {
+      title: '最新价',
+      dataIndex: 'price',
+      key: 'price',
+      align: 'right',
+      width: isMobile ? undefined : 90,
+      responsive: ['md'],
+      render: (v: number | null) => <Typography.Text>{fmtPrice(v)}</Typography.Text>,
     },
     {
       title: '主力净额',

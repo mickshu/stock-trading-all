@@ -39,10 +39,22 @@ export default function AppLayout() {
         >
           <Typography.Title
             level={5}
-            style={{ color: 'white', textAlign: 'center', margin: '16px 0' }}
+            style={{ color: 'white', textAlign: 'center', margin: '16px 0 2px' }}
           >
             {collapsed ? 'AI' : 'AI 股票分析'}
           </Typography.Title>
+          {!collapsed && (
+            <div
+              style={{
+                color: 'rgba(255,255,255,0.45)',
+                fontSize: 11,
+                textAlign: 'center',
+                marginBottom: 12,
+              }}
+            >
+              v.26.06.02_1
+            </div>
+          )}
           <Menu
             theme="dark"
             mode="inline"
