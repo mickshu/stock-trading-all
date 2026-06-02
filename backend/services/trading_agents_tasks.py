@@ -42,6 +42,29 @@ def _safe_filename(s: str) -> str:
     return s[:64] or "stock"
 
 
+_TIMEOUT_HINTS = (
+    "read operation timed out",
+    "readtimeout",
+    "connecttimeout",
+    "timed out",
+    "request timed out",
+    "apitimeout",
+)
+
+
+def _friendly_error(e: BaseException) -> str:
+    """把底层 socket/httpx 报文翻译成给前端看的中文提示。"""
+    raw = str(e) or e.__class__.__name__
+    low = raw.lower()
+    if any(h in low for h in _TIMEOUT_HINTS):
+        return (
+            f"调用 LLM 超时（已自动重试仍失败）。建议：① 稍后重试；"
+            f"② 在「设置」里把「多智能体」段落的 base_url 切到响应更稳定的接入点；"
+            f"③ 把 ta_request_timeout 调大。原始错误：{raw}"
+        )
+    return raw
+
+
 def _decision_label(raw: str) -> str:
     u = (raw or "").upper()
     if "BUY" in u:
@@ -299,7 +322,7 @@ def _process(task_id: str) -> None:
             original_error=e,
         )
     except Exception as e:  # noqa: BLE001
-        error_msg = str(e)
+        error_msg = _friendly_error(e)
         logger.exception("TA task %s failed", task_id)
 
     finished = datetime.utcnow()
