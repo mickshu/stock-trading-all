@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import subprocess
+import sys
 import time
 
 from fastapi import FastAPI, HTTPException
@@ -94,8 +95,11 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 @app.api_route("/api/updatereload", methods=["GET", "POST"])
 async def update_and_reload():
-    """Git webhook: git pull + 重新部署（重启后端、构建前端）。"""
-    results = {}
+    """Git webhook: git pull + 重新打包（pip + npm build）+ 重启后端。
+
+    每一步互不阻塞、独立汇报，便于 production 半残环境（如 venv 缺 pip）下定位。
+    """
+    results: dict = {}
 
     # Step 1: git pull
     try:
@@ -104,21 +108,49 @@ async def update_and_reload():
             cwd=str(_PROJECT_ROOT),
             capture_output=True, text=True, timeout=120,
         )
-        results["git_pull"] = {"exit_code": r.returncode, "stdout": r.stdout.strip(), "stderr": r.stderr.strip()}
+        results["git_pull"] = {"exit_code": r.returncode, "stdout": r.stdout.strip(), "stderr": r.stderr.strip()[-500:]}
         if r.returncode != 0:
             return {"status": "git_pull_failed", "details": results}
     except Exception as e:
         return {"status": "git_pull_error", "error": str(e)}
 
-    # Step 2: 重新部署
-    # 2a: 重启后端 — 触发 uvicorn --reload
-    try:
-        os.utime(str(Path(__file__).resolve()), (time.time(), time.time()))
-        results["backend_restart"] = "ok"
-    except Exception as e:
-        results["backend_restart"] = f"error: {e}"
+    # Step 2: 后端依赖 pip install（best-effort：容忍 venv 缺 pip → ensurepip 自举）
+    req_file = _PROJECT_ROOT / "backend" / "requirements.txt"
+    if req_file.is_file():
+        py = sys.executable
+        try:
+            r = subprocess.run(
+                [py, "-m", "pip", "install", "-q", "-r", str(req_file)],
+                cwd=str(_PROJECT_ROOT),
+                capture_output=True, text=True, timeout=300,
+            )
+            if r.returncode != 0 and "No module named pip" in (r.stderr or ""):
+                # 自举 pip 后重试
+                boot = subprocess.run(
+                    [py, "-m", "ensurepip", "--upgrade"],
+                    capture_output=True, text=True, timeout=120,
+                )
+                results["pip_bootstrap"] = {
+                    "exit_code": boot.returncode,
+                    "stderr": (boot.stderr or "").strip()[-300:],
+                }
+                if boot.returncode == 0:
+                    r = subprocess.run(
+                        [py, "-m", "pip", "install", "-q", "-r", str(req_file)],
+                        cwd=str(_PROJECT_ROOT),
+                        capture_output=True, text=True, timeout=300,
+                    )
+            results["pip_install"] = {
+                "exit_code": r.returncode,
+                "stdout": (r.stdout or "").strip()[-300:],
+                "stderr": (r.stderr or "").strip()[-500:],
+            }
+        except Exception as e:
+            results["pip_install"] = {"error": str(e)}
+    else:
+        results["pip_install"] = {"skipped": "requirements.txt not found"}
 
-    # 2b: 构建前端
+    # Step 3: 前端构建
     try:
         r = subprocess.run(
             ["npm", "run", "build"],
@@ -127,11 +159,18 @@ async def update_and_reload():
         )
         results["frontend_build"] = {
             "exit_code": r.returncode,
-            "stdout": r.stdout.strip()[-500:],
-            "stderr": r.stderr.strip()[-500:],
+            "stdout": (r.stdout or "").strip()[-500:],
+            "stderr": (r.stderr or "").strip()[-500:],
         }
     except Exception as e:
         results["frontend_build"] = {"error": str(e)}
+
+    # Step 4: 触发后端重载（uvicorn --reload 模式下立即生效）
+    try:
+        os.utime(str(Path(__file__).resolve()), (time.time(), time.time()))
+        results["backend_restart"] = "ok"
+    except Exception as e:
+        results["backend_restart"] = f"error: {e}"
 
     return {"status": "done", "details": results}
 
