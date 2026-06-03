@@ -26,6 +26,12 @@ def _migrate_sqlite():
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN group_id INTEGER"))
         if cols and "tags" not in col_names:
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN tags VARCHAR(120) DEFAULT ''"))
+        ta_cols = conn.execute(text("PRAGMA table_info(ta_tasks)")).fetchall()
+        ta_col_names = {row[1] for row in ta_cols}
+        if ta_cols and "provider_override" not in ta_col_names:
+            conn.execute(text("ALTER TABLE ta_tasks ADD COLUMN provider_override VARCHAR(32) DEFAULT ''"))
+        if ta_cols and "model_override" not in ta_col_names:
+            conn.execute(text("ALTER TABLE ta_tasks ADD COLUMN model_override VARCHAR(64) DEFAULT ''"))
 
 
 def init_db():

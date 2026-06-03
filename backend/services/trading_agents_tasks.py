@@ -127,6 +127,8 @@ def _task_to_dict(t: TATask) -> dict[str, Any]:
         "trade_date": t.trade_date,
         "depth": t.depth,
         "online_tools": bool(t.online_tools),
+        "provider_override": getattr(t, "provider_override", "") or "",
+        "model_override": getattr(t, "model_override", "") or "",
         "status": t.status,
         "decision": t.decision or "",
         "decision_raw": t.decision_raw or "",
@@ -147,6 +149,8 @@ def create_task(
     trade_date: str,
     depth: int,
     online_tools: bool,
+    provider_override: str = "",
+    model_override: str = "",
 ) -> dict[str, Any]:
     task_id = str(uuid.uuid4())
     db = SessionLocal()
@@ -158,6 +162,8 @@ def create_task(
             trade_date=trade_date,
             depth=depth,
             online_tools=online_tools,
+            provider_override=(provider_override or "").strip(),
+            model_override=(model_override or "").strip(),
             status="pending",
         )
         db.add(t)
@@ -238,6 +244,8 @@ def _retry_after_install(
     depth: int,
     online_tools: bool,
     original_error: ModuleNotFoundError,
+    provider_override: str = "",
+    model_override: str = "",
 ) -> tuple[dict[str, Any] | None, str]:
     """ModuleNotFoundError 自愈：pip install + 清缓存 + 重试一次。"""
     pip_tail = ""
@@ -267,7 +275,12 @@ def _retry_after_install(
 
     try:
         result = run_single(
-            ticker=ticker, trade_date=trade_date, depth=depth, online_tools=online_tools
+            ticker=ticker,
+            trade_date=trade_date,
+            depth=depth,
+            online_tools=online_tools,
+            provider_override=provider_override,
+            model_override=model_override,
         )
         logger.info("TA task self-healed after installing %s", original_error.name)
         return result, ""
@@ -296,6 +309,8 @@ def _process(task_id: str) -> None:
         trade_date = t.trade_date
         depth = t.depth
         online_tools = bool(t.online_tools)
+        provider_override = getattr(t, "provider_override", "") or ""
+        model_override = getattr(t, "model_override", "") or ""
     finally:
         db.close()
 
@@ -305,7 +320,12 @@ def _process(task_id: str) -> None:
     try:
         importlib.invalidate_caches()
         result = run_single(
-            ticker=ticker, trade_date=trade_date, depth=depth, online_tools=online_tools
+            ticker=ticker,
+            trade_date=trade_date,
+            depth=depth,
+            online_tools=online_tools,
+            provider_override=provider_override,
+            model_override=model_override,
         )
     except ModuleNotFoundError as e:
         # 长跑的 uvicorn worker 上一次 import langchain_openai 失败后，sys.modules
@@ -320,6 +340,8 @@ def _process(task_id: str) -> None:
             depth=depth,
             online_tools=online_tools,
             original_error=e,
+            provider_override=provider_override,
+            model_override=model_override,
         )
     except Exception as e:  # noqa: BLE001
         error_msg = _friendly_error(e)

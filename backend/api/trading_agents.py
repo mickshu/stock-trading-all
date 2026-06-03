@@ -80,6 +80,8 @@ def create_task(req: CreateTaskRequest):
             trade_date=req.trade_date.strip(),
             depth=req.depth,
             online_tools=req.online_tools,
+            provider_override=(req.provider_override or "").strip(),
+            model_override=(req.model_override or "").strip(),
         )
     except Exception as e:
         logger.exception("create TA task failed")

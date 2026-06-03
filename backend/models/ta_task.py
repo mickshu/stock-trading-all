@@ -18,6 +18,9 @@ class TATask(Base):
     trade_date = Column(String(10), nullable=False)  # YYYY-MM-DD
     depth = Column(Integer, nullable=False, default=1)
     online_tools = Column(Boolean, nullable=False, default=True)
+    # 单任务级覆盖：填了就用，空字符串=沿用全局 AI 配置。
+    provider_override = Column(String(32), default="")
+    model_override = Column(String(64), default="")
 
     # pending | running | success | failed
     status = Column(String(16), nullable=False, default="pending", index=True)

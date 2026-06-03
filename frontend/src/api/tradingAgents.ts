@@ -9,6 +9,8 @@ export interface TARunRequest {
 
 export interface TACreateTaskRequest extends TARunRequest {
   stock_name?: string;
+  provider_override?: string;
+  model_override?: string;
 }
 
 export interface TAHealth {
@@ -62,6 +64,8 @@ export interface TATask {
   trade_date: string;
   depth: number;
   online_tools: boolean;
+  provider_override?: string;
+  model_override?: string;
   status: TATaskStatus;
   decision: string;
   decision_raw: string;

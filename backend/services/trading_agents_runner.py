@@ -16,15 +16,25 @@ from backend.config import settings as bs
 logger = logging.getLogger(__name__)
 
 
-def _build_ta_config(depth: int, online_tools: bool) -> dict[str, Any]:
-    """合并 AppSetting + 数据源设置 → tradingagents config dict。"""
+def _build_ta_config(
+    depth: int,
+    online_tools: bool,
+    *,
+    provider_override: str = "",
+    model_override: str = "",
+) -> dict[str, Any]:
+    """合并 AppSetting + 数据源设置 → tradingagents config dict。
+
+    provider_override / model_override 用于「发起分析」表单的单任务覆盖；
+    空字符串=沿用全局 AI 配置。
+    """
     from tradingagents.default_config import DEFAULT_CONFIG
 
     ai = get_ai_settings_dict()
     cfg: dict[str, Any] = dict(DEFAULT_CONFIG)
 
     from backend.services.ai_summary import LOCAL_AGENT_NAMES
-    provider = (ai.get("provider") or "openai").lower()
+    provider = ((provider_override or ai.get("provider") or "openai")).lower()
     # 本地 CLI 模式（hermes/claude/codex/gemini）不直接驱动 TradingAgents；
     # 这里复用 OpenAI-compat 路径，让用户在「多智能体」段落显式给 base_url+key。
     if provider in LOCAL_AGENT_NAMES or provider == "openai":
@@ -34,18 +44,28 @@ def _build_ta_config(depth: int, online_tools: bool) -> dict[str, Any]:
             or ai.get("openai_base_url")
             or "https://api.deepseek.com/v1"
         )
-        model = ai.get("ta_deep_think_llm") or ai.get("openai_model") or "deepseek-v4-pro"
+        model = (
+            model_override
+            or ai.get("ta_deep_think_llm")
+            or ai.get("openai_model")
+            or "deepseek-v4-pro"
+        )
         cfg["deep_think_llm"] = model
-        cfg["quick_think_llm"] = ai.get("ta_quick_think_llm") or model
+        cfg["quick_think_llm"] = model_override or ai.get("ta_quick_think_llm") or model
         key = ai.get("openai_api_key") or ""
         if key:
             os.environ["OPENAI_API_KEY"] = key
     elif provider == "anthropic":
         cfg["llm_provider"] = "anthropic"
         cfg["backend_url"] = ai.get("ta_backend_url") or "https://api.anthropic.com"
-        model = ai.get("ta_deep_think_llm") or ai.get("anthropic_model") or "claude-sonnet-4-6"
+        model = (
+            model_override
+            or ai.get("ta_deep_think_llm")
+            or ai.get("anthropic_model")
+            or "claude-sonnet-4-6"
+        )
         cfg["deep_think_llm"] = model
-        cfg["quick_think_llm"] = ai.get("ta_quick_think_llm") or model
+        cfg["quick_think_llm"] = model_override or ai.get("ta_quick_think_llm") or model
         key = ai.get("anthropic_api_key") or ""
         if key:
             os.environ["ANTHROPIC_API_KEY"] = key
@@ -74,9 +94,22 @@ def _summarize(report: str, *, fallback: str = "未生成") -> str:
     return (lines[-1][:160] + "...") if lines else "已生成"
 
 
-def run_single(ticker: str, trade_date: str, depth: int, online_tools: bool) -> dict[str, Any]:
+def run_single(
+    ticker: str,
+    trade_date: str,
+    depth: int,
+    online_tools: bool,
+    *,
+    provider_override: str = "",
+    model_override: str = "",
+) -> dict[str, Any]:
     """同步跑一次单股分析。返回结构化结果。"""
-    cfg = _build_ta_config(depth=depth, online_tools=online_tools)
+    cfg = _build_ta_config(
+        depth=depth,
+        online_tools=online_tools,
+        provider_override=provider_override,
+        model_override=model_override,
+    )
 
     from tradingagents.graph.trading_graph import TradingAgentsGraph
 

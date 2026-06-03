@@ -20,6 +20,7 @@ import {
   Popconfirm,
   Tooltip,
   Badge,
+  Select,
 } from 'antd';
 import {
   DeploymentUnitOutlined,
@@ -44,6 +45,19 @@ import {
   type TATask,
   type TATaskStatus,
 } from '../api/tradingAgents';
+import { probeAIAgents, type AIAgentInfo } from '../api/aiAgent';
+
+// 「模型」下拉常用选项；用户也可以直接在 Select 里输入自定义模型名。
+const MODEL_OPTIONS = [
+  'deepseek-v4-pro',
+  'deepseek-chat',
+  'deepseek-reasoner',
+  'gpt-4o',
+  'gpt-4o-mini',
+  'claude-opus-4-7',
+  'claude-sonnet-4-6',
+  'claude-haiku-4-5',
+];
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -52,6 +66,8 @@ interface FormValues {
   trade_date: Dayjs;
   depth: number;
   online_tools: boolean;
+  model_override?: string;
+  provider_override?: string;
 }
 
 function DecisionTag({ decision }: { decision: string }) {
@@ -109,7 +125,14 @@ export default function TradingAgentsPage() {
   const [viewTask, setViewTask] = useState<TATask | null>(null);
   const [viewMd, setViewMd] = useState<string>('');
   const [viewLoading, setViewLoading] = useState(false);
+  const [agents, setAgents] = useState<AIAgentInfo[]>([]);
   const stockNameRef = useRef<string>('');
+
+  useEffect(() => {
+    probeAIAgents()
+      .then(setAgents)
+      .catch(() => setAgents([]));
+  }, []);
 
   useEffect(() => {
     fetchTAHealth()
@@ -155,6 +178,8 @@ export default function TradingAgentsPage() {
         trade_date: values.trade_date.format('YYYY-MM-DD'),
         depth: values.depth,
         online_tools: values.online_tools,
+        model_override: (values.model_override || '').trim(),
+        provider_override: (values.provider_override || '').trim(),
       });
       message.success('已加入队列，可在「任务记录」查看进度');
       setActiveTab('list');
@@ -331,6 +356,8 @@ export default function TradingAgentsPage() {
                     trade_date: dayjs(),
                     depth: 1,
                     online_tools: true,
+                    model_override: '',
+                    provider_override: '',
                   }}
                   onFinish={onFinish}
                 >
@@ -353,6 +380,35 @@ export default function TradingAgentsPage() {
                   </Form.Item>
                   <Form.Item name="depth" label="辩论轮数" style={{ minWidth: 200 }}>
                     <Slider min={1} max={3} marks={{ 1: '快', 2: '中', 3: '深' }} />
+                  </Form.Item>
+                  <Form.Item
+                    name="model_override"
+                    label="模型"
+                    tooltip="覆盖「设置」里的深度/快速思考模型；留空=沿用全局"
+                  >
+                    <Select
+                      style={{ width: 200 }}
+                      allowClear
+                      showSearch
+                      placeholder="默认（按 AI 配置）"
+                      options={MODEL_OPTIONS.map((m) => ({ value: m, label: m }))}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="provider_override"
+                    label="CLI 分析工具"
+                    tooltip="选择本地已安装的 AI CLI（替代全局 provider）；留空=沿用全局"
+                  >
+                    <Select
+                      style={{ width: 180 }}
+                      allowClear
+                      placeholder="默认（按 AI 配置）"
+                      options={agents.map((a) => ({
+                        value: a.name,
+                        label: `${a.label}${a.version ? ` · ${a.version}` : ''}`,
+                      }))}
+                      notFoundContent={<span style={{ color: '#999' }}>未检测到本地 CLI</span>}
+                    />
                   </Form.Item>
                   <Form.Item name="online_tools" label="在线数据" valuePropName="checked">
                     <Switch />
