@@ -128,6 +128,10 @@ export default function TradingAgentsPage() {
   const [agents, setAgents] = useState<AIAgentInfo[]>([]);
   const stockNameRef = useRef<string>('');
 
+  // 模型 / CLI 二选一：watch 两个字段，一个被选中时禁用另一个。
+  const watchModel = Form.useWatch('model_override', form);
+  const watchProvider = Form.useWatch('provider_override', form);
+
   useEffect(() => {
     probeAIAgents()
       .then(setAgents)
@@ -384,30 +388,38 @@ export default function TradingAgentsPage() {
                   <Form.Item
                     name="model_override"
                     label="模型"
-                    tooltip="覆盖「设置」里的深度/快速思考模型；留空=沿用全局"
+                    tooltip="覆盖「设置」里的深度/快速思考模型；与「CLI 分析工具」二选一"
                   >
                     <Select
                       style={{ width: 200 }}
                       allowClear
                       showSearch
-                      placeholder="默认（按 AI 配置）"
+                      disabled={!!watchProvider}
+                      placeholder={watchProvider ? '已选 CLI（互斥）' : '默认（按 AI 配置）'}
                       options={MODEL_OPTIONS.map((m) => ({ value: m, label: m }))}
+                      onChange={(v) => {
+                        if (v) form.setFieldValue('provider_override', undefined);
+                      }}
                     />
                   </Form.Item>
                   <Form.Item
                     name="provider_override"
                     label="CLI 分析工具"
-                    tooltip="选择本地已安装的 AI CLI（替代全局 provider）；留空=沿用全局"
+                    tooltip="选择本地已安装的 AI CLI（替代全局 provider）；与「模型」二选一"
                   >
                     <Select
                       style={{ width: 180 }}
                       allowClear
-                      placeholder="默认（按 AI 配置）"
+                      disabled={!!watchModel}
+                      placeholder={watchModel ? '已选模型（互斥）' : '默认（按 AI 配置）'}
                       options={agents.map((a) => ({
                         value: a.name,
                         label: `${a.label}${a.version ? ` · ${a.version}` : ''}`,
                       }))}
                       notFoundContent={<span style={{ color: '#999' }}>未检测到本地 CLI</span>}
+                      onChange={(v) => {
+                        if (v) form.setFieldValue('model_override', undefined);
+                      }}
                     />
                   </Form.Item>
                   <Form.Item name="online_tools" label="在线数据" valuePropName="checked">
