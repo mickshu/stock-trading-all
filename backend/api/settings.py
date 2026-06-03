@@ -108,6 +108,8 @@ class AiSettingsIn(BaseModel):
     ta_quick_think_llm: str | None = None
     ta_backend_url: str | None = None
     ta_max_debate_rounds: int | None = None
+    ta_request_timeout: int | None = None
+    ta_max_retries: int | None = None
 
 
 @router.get("/ai")

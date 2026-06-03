@@ -49,6 +49,8 @@ export interface AiSettings {
   ta_quick_think_llm?: string;
   ta_backend_url?: string;
   ta_max_debate_rounds?: number;
+  ta_request_timeout?: number;
+  ta_max_retries?: number;
 }
 
 export async function fetchAiSettings(): Promise<AiSettings> {

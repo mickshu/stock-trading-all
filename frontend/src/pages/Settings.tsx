@@ -454,6 +454,20 @@ function AiSettingsTab() {
         >
           <InputNumber min={1} max={5} style={{ width: 120 }} />
         </Form.Item>
+        <Form.Item
+          name="ta_request_timeout"
+          label="单次 LLM 调用超时 (秒)"
+          extra="DeepSeek 等上游 read 慢时往大调（建议 180~600）。改大后单次失败要等更久，但整任务不容易被 timeout 拖死。"
+        >
+          <InputNumber min={30} max={1800} step={30} style={{ width: 120 }} />
+        </Form.Item>
+        <Form.Item
+          name="ta_max_retries"
+          label="LLM 失败自动重试次数"
+          extra="单次 HTTP 调用失败后自动重试几次。建议 3~5。"
+        >
+          <InputNumber min={0} max={10} style={{ width: 120 }} />
+        </Form.Item>
 
         <Form.Item>
           <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : undefined }}>
