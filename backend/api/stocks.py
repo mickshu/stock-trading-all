@@ -34,6 +34,8 @@ def _stock_dict(r: Watchlist) -> dict:
         "market": r.market,
         "group_id": r.group_id,
         "tags": _parse_tags(r.tags),
+        "target_price": r.target_price,
+        "alert_diff_pct": r.alert_diff_pct,
     }
 
 
@@ -242,6 +244,30 @@ def update_stock(stock_id: int, payload: dict = Body(...)):
             if not isinstance(tags, list) or not all(isinstance(t, str) for t in tags):
                 raise HTTPException(status_code=400, detail="tags 必须为字符串数组")
             stock.tags = _serialize_tags(tags)
+        if "target_price" in payload:
+            v = payload["target_price"]
+            if v is None or v == "":
+                stock.target_price = None
+            else:
+                try:
+                    fv = float(v)
+                except (TypeError, ValueError):
+                    raise HTTPException(status_code=400, detail="target_price 必须为数字")
+                if fv < 0:
+                    raise HTTPException(status_code=400, detail="target_price 不能为负")
+                stock.target_price = fv
+        if "alert_diff_pct" in payload:
+            v = payload["alert_diff_pct"]
+            if v is None or v == "":
+                stock.alert_diff_pct = None
+            else:
+                try:
+                    fv = float(v)
+                except (TypeError, ValueError):
+                    raise HTTPException(status_code=400, detail="alert_diff_pct 必须为数字")
+                if fv < 0:
+                    raise HTTPException(status_code=400, detail="alert_diff_pct 不能为负")
+                stock.alert_diff_pct = fv
         db.commit()
         db.refresh(stock)
         return _stock_dict(stock)

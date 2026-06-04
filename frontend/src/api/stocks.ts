@@ -84,6 +84,14 @@ export async function setStockTags(stockId: number, tags: SystemTag[]): Promise<
   return data;
 }
 
+export async function setStockTargets(
+  stockId: number,
+  payload: { target_price?: number | null; alert_diff_pct?: number | null },
+): Promise<StockInfo> {
+  const { data } = await api.patch<StockInfo>(`/stocks/${stockId}`, payload);
+  return data;
+}
+
 export interface DataSourceInfo {
   active: string;
   available: string[];

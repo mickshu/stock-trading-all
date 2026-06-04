@@ -60,6 +60,8 @@ export interface StockInfo {
   market: string;
   group_id?: number | null;
   tags?: string[];
+  target_price?: number | null;
+  alert_diff_pct?: number | null;
 }
 
 export interface WatchlistGroup {

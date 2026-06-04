@@ -12,6 +12,7 @@ import {
   Grid,
   Select,
   Input,
+  InputNumber,
   Tabs,
   Tooltip,
   Empty,
@@ -44,6 +45,7 @@ import {
   reorderGroups,
   setStockGroup,
   setStockTags,
+  setStockTargets,
 } from '../api/stocks';
 import { fetchQuotes, type QuoteData } from '../api/market';
 
@@ -66,6 +68,112 @@ function parseTagFilter(key: string): SystemTag | null {
   const t = key.slice(TAG_PREFIX.length, -2);
   if (t === 'holding' || t === 'watching') return t;
   return null;
+}
+
+interface TargetDiff {
+  diff: number;
+  diffPct: number;
+  alerted: boolean;
+}
+
+function computeDiff(
+  currentPrice: number | null | undefined,
+  target: number | null | undefined,
+  threshold: number | null | undefined,
+): TargetDiff | null {
+  if (currentPrice == null || !(currentPrice > 0)) return null;
+  if (target == null || !(target > 0)) return null;
+  const diff = currentPrice - target;
+  const diffPct = (diff / target) * 100;
+  const alerted = threshold != null && threshold >= 0 && Math.abs(diffPct) <= threshold;
+  return { diff, diffPct, alerted };
+}
+
+function EditableTargetCellInner({
+  initial,
+  precision,
+  placeholder,
+  min,
+  max,
+  onCommit,
+}: {
+  initial: number | null;
+  precision: number;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  onCommit: (next: number | null) => void;
+}) {
+  const [draft, setDraft] = useState<number | null>(initial);
+  return (
+    <InputNumber
+      autoFocus
+      size="small"
+      value={draft}
+      min={min}
+      max={max}
+      precision={precision}
+      controls={false}
+      style={{ width: '100%' }}
+      placeholder={placeholder}
+      onChange={(v) => setDraft(v == null ? null : Number(v))}
+      onBlur={() => onCommit(draft)}
+      onPressEnter={() => onCommit(draft)}
+    />
+  );
+}
+
+function EditableTargetCell({
+  value,
+  precision,
+  suffix,
+  placeholder,
+  min,
+  max,
+  onSave,
+}: {
+  value: number | null | undefined;
+  precision: number;
+  suffix?: string;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  onSave: (next: number | null) => Promise<void> | void;
+}) {
+  const [editing, setEditing] = useState(false);
+
+  if (editing) {
+    return (
+      <EditableTargetCellInner
+        initial={value ?? null}
+        precision={precision}
+        placeholder={placeholder}
+        min={min}
+        max={max}
+        onCommit={async (next) => {
+          setEditing(false);
+          if ((next ?? null) === (value ?? null)) return;
+          await onSave(next);
+        }}
+      />
+    );
+  }
+  const display =
+    value != null
+      ? `${value.toFixed(precision)}${suffix ?? ''}`
+      : placeholder ?? '—';
+  return (
+    <Typography.Link
+      onClick={() => setEditing(true)}
+      style={{
+        display: 'inline-block',
+        minWidth: 48,
+        color: value != null ? undefined : '#bfbfbf',
+      }}
+    >
+      {display}
+    </Typography.Link>
+  );
 }
 
 function StockTagBadges({ tags, size = 'small' }: { tags: string[] | undefined; size?: 'small' | 'mini' }) {
@@ -339,6 +447,23 @@ export default function Watchlist() {
     }
   };
 
+  const handleSaveTargets = async (
+    stock: StockInfo,
+    payload: { target_price?: number | null; alert_diff_pct?: number | null },
+  ) => {
+    if (stock.id == null) return;
+    setData((prev) =>
+      prev.map((s) => (s.id === stock.id ? { ...s, ...payload } : s)),
+    );
+    try {
+      await setStockTargets(stock.id, payload);
+    } catch (e) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      message.error(detail || '保存失败');
+      reloadStocks();
+    }
+  };
+
   const totalCount = ungroupedCount + groups.reduce((sum, g) => sum + (g.count ?? 0), 0);
 
   const systemTagCount = (key: SystemTag) =>
@@ -516,6 +641,66 @@ export default function Watchlist() {
                   主力 {mainNet != null ? `${mainNet > 0 ? '+' : ''}${formatMoney(mainNet)}` : '—'}
                 </Typography.Text>
               </div>
+              {(() => {
+                const diff = computeDiff(q?.price, record.target_price, record.alert_diff_pct);
+                const diffColor = diff
+                  ? diff.diffPct > 0
+                    ? '#cf1322'
+                    : diff.diffPct < 0
+                      ? '#3f8600'
+                      : undefined
+                  : undefined;
+                return (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 8,
+                      marginTop: 6,
+                      padding: '4px 6px',
+                      background: diff?.alerted ? '#fffbe6' : '#fafafa',
+                      borderRadius: 4,
+                      fontSize: 12,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Space size={2}>
+                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>目标</Typography.Text>
+                      <EditableTargetCell
+                        value={record.target_price}
+                        precision={2}
+                        placeholder="设置"
+                        min={0}
+                        onSave={(next) => handleSaveTargets(record, { target_price: next })}
+                      />
+                    </Space>
+                    <Space size={2}>
+                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>阈值</Typography.Text>
+                      <EditableTargetCell
+                        value={record.alert_diff_pct}
+                        precision={2}
+                        suffix="%"
+                        placeholder="设置"
+                        min={0}
+                        max={100}
+                        onSave={(next) => handleSaveTargets(record, { alert_diff_pct: next })}
+                      />
+                    </Space>
+                    <div style={{ marginLeft: 'auto' }}>
+                      {diff ? (
+                        <Typography.Text
+                          strong={diff.alerted}
+                          style={{ color: diffColor, fontSize: 12 }}
+                        >
+                          差 {`${diff.diffPct > 0 ? '+' : ''}${diff.diffPct.toFixed(2)}%`}
+                        </Typography.Text>
+                      ) : (
+                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>差 —</Typography.Text>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               <div style={{ marginTop: 6 }}>{renderTagToggleRow(record)}</div>
             </div>
           );
@@ -607,6 +792,74 @@ export default function Watchlist() {
       },
     },
     {
+      title: <Tooltip title="点击单元格设置目标价">目标价</Tooltip>,
+      key: 'target_price',
+      width: 100,
+      align: 'right',
+      render: (_, record) => (
+        <EditableTargetCell
+          value={record.target_price}
+          precision={2}
+          placeholder="设置"
+          min={0}
+          onSave={(next) => handleSaveTargets(record, { target_price: next })}
+        />
+      ),
+    },
+    {
+      title: (
+        <Tooltip title="当前价相对目标价的差值；当 |差值%| ≤ 阈值 时高亮提醒。点击阈值可编辑。">
+          差值提醒
+        </Tooltip>
+      ),
+      key: 'alert_diff_pct',
+      width: 160,
+      align: 'right',
+      render: (_, record) => {
+        const q = quotes[record.code];
+        const diff = computeDiff(q?.price, record.target_price, record.alert_diff_pct);
+        const diffColor = diff
+          ? diff.diffPct > 0
+            ? '#cf1322'
+            : diff.diffPct < 0
+              ? '#3f8600'
+              : undefined
+          : undefined;
+        return (
+          <Space direction="vertical" size={0} style={{ width: '100%' }} align="end">
+            {diff ? (
+              <Typography.Text
+                strong={diff.alerted}
+                style={{
+                  color: diffColor,
+                  background: diff.alerted ? '#fffbe6' : undefined,
+                  padding: diff.alerted ? '0 4px' : undefined,
+                  borderRadius: 4,
+                  fontSize: 12,
+                }}
+              >
+                {`${diff.diffPct > 0 ? '+' : ''}${diff.diffPct.toFixed(2)}% (${diff.diff > 0 ? '+' : ''}${diff.diff.toFixed(2)})`}
+              </Typography.Text>
+            ) : (
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>—</Typography.Text>
+            )}
+            <Space size={2} style={{ fontSize: 11 }}>
+              <Typography.Text type="secondary" style={{ fontSize: 11 }}>阈值</Typography.Text>
+              <EditableTargetCell
+                value={record.alert_diff_pct}
+                precision={2}
+                suffix="%"
+                placeholder="设置"
+                min={0}
+                max={100}
+                onSave={(next) => handleSaveTargets(record, { alert_diff_pct: next })}
+              />
+            </Space>
+          </Space>
+        );
+      },
+    },
+    {
       title: '分组 / 标签',
       key: 'group',
       width: 200,
@@ -665,7 +918,7 @@ export default function Watchlist() {
   };
 
   return (
-    <div>
+    <div style={{ minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
       <div
         style={{
           display: 'flex',
@@ -710,23 +963,29 @@ export default function Watchlist() {
           gap: 4,
           borderBottom: '1px solid #f0f0f0',
           marginBottom: isMobile ? 8 : 12,
+          minWidth: 0,
+          maxWidth: '100%',
         }}
       >
-        <Tabs
-          activeKey={String(filter)}
-          onChange={handleTabChange}
-          items={tabItems}
-          renderTabBar={renderTabBar}
-          style={{ flex: 1, marginBottom: -1 }}
-          size="small"
-        />
+        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+          <Tabs
+            activeKey={String(filter)}
+            onChange={handleTabChange}
+            items={tabItems}
+            renderTabBar={renderTabBar}
+            style={{ marginBottom: -1 }}
+            size="small"
+            moreIcon={null}
+            tabBarGutter={isMobile ? 8 : undefined}
+          />
+        </div>
         <Tooltip title="管理分组">
           <Button
             type="text"
             size="small"
             icon={<AppstoreOutlined />}
             onClick={() => setGroupMgrOpen(true)}
-            style={{ marginRight: 8 }}
+            style={{ marginRight: isMobile ? 0 : 8, flexShrink: 0 }}
           />
         </Tooltip>
       </div>
@@ -749,7 +1008,7 @@ export default function Watchlist() {
             loading={loading}
             size="middle"
             pagination={{ pageSize: 20 }}
-            scroll={{ x: 1040 }}
+            scroll={{ x: 1300 }}
             onChange={handleTableChange}
           />
         )
