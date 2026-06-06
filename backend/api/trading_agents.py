@@ -34,6 +34,8 @@ class AnalyzeRequest(BaseModel):
 
 class CreateTaskRequest(AnalyzeRequest):
     stock_name: str = Field("", max_length=120)
+    provider_override: str = Field("", max_length=32)
+    model_override: str = Field("", max_length=64)
 
 
 @router.get("/health")
