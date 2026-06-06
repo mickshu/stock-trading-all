@@ -17,6 +17,7 @@ import subprocess
 import sys
 import threading
 import uuid
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -37,6 +38,13 @@ _SHUTDOWN = threading.Event()
 
 # 优雅关闭：收到 SIGTERM/SIGINT 后，拒绝新任务入队 + 等待当前任务完成后退出。
 _SHUTDOWN_GRACE_SEC = 180  # 给正在跑的 LLM 调用最多 3 分钟收尾
+
+# 整体任务超时（秒）：防止单个任务因多次 LLM 重试无限运行。
+# 默认 30 分钟，覆盖绝大多数深度分析场景。
+_TASK_HARD_TIMEOUT_SEC = 30 * 60
+
+# 线程池用于给 run_single 加硬超时
+_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="ta-run")
 
 
 def _utcnow() -> datetime:
@@ -334,7 +342,10 @@ def _process(task_id: str) -> None:
     result: dict[str, Any] | None = None
     try:
         importlib.invalidate_caches()
-        result = run_single(
+        # 用线程池包裹 run_single，加整体任务硬超时，防止多次 LLM 重试
+        # 累加后任务无限运行（之前有任务跑了 40+ 分钟仍失败）。
+        future = _EXECUTOR.submit(
+            run_single,
             ticker=ticker,
             trade_date=trade_date,
             depth=depth,
@@ -342,6 +353,13 @@ def _process(task_id: str) -> None:
             provider_override=provider_override,
             model_override=model_override,
         )
+        result = future.result(timeout=_TASK_HARD_TIMEOUT_SEC)
+    except FuturesTimeoutError:
+        error_msg = (
+            f"任务整体超时（已运行超过 {_TASK_HARD_TIMEOUT_SEC // 60} 分钟），已强制终止。"
+            f"建议：① 减少辩论轮数；② 在「设置」里调大单次 LLM 超时或换更快的接入点。"
+        )
+        logger.warning("TA task %s exceeded hard timeout of %ss", task_id, _TASK_HARD_TIMEOUT_SEC)
     except ModuleNotFoundError as e:
         # 长跑的 uvicorn worker 上一次 import langchain_openai 失败后，sys.modules
         # 里残留了 tradingagents.* 的半成品模块。即便 redeploy 期间已经 pip install

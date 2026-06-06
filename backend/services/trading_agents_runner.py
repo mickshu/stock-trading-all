@@ -85,9 +85,10 @@ def _build_ta_config(
     cfg["data_source"] = bs.active_data_source or "akshare"
     cfg["data_source_fallback"] = ["yfinance"]
     # 单次 LLM HTTP 调用上限 + 失败自动重试。上游（deepseek 等）read 卡死时，
-    # 这里硬截断后让 langchain 重试，避免 16 分钟干等然后整任务失败。
-    cfg["request_timeout"] = float(ai.get("ta_request_timeout") or 180)
-    cfg["max_retries"] = int(ai.get("ta_max_retries") or 3)
+    # 这里硬截断后让 langchain 重试，避免长时间干等然后整任务失败。
+    # 默认 300s / 5 次重试，对慢上游更友好。
+    cfg["request_timeout"] = float(ai.get("ta_request_timeout") or 300)
+    cfg["max_retries"] = int(ai.get("ta_max_retries") or 5)
     return cfg
 
 

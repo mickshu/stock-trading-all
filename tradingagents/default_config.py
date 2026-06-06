@@ -23,6 +23,11 @@ DEFAULT_CONFIG = {
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
     "max_recur_limit": 100,
+    # LLM call timeout and retry settings
+    # 单次 HTTP 调用超时（秒），deepseek 等慢上游建议 300+
+    "request_timeout": 300,
+    # 单次调用失败后自动重试次数
+    "max_retries": 5,
     # Tool settings
     "online_tools": True,
 }

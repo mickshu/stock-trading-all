@@ -59,8 +59,8 @@ class TradingAgentsGraph:
 
         # Initialize LLMs
         # 给每次 HTTP 调用设硬超时 + 自动重试，避免上游 read 阻塞拖死整个分析。
-        request_timeout = float(self.config.get("request_timeout", 180))
-        max_retries = int(self.config.get("max_retries", 3))
+        request_timeout = float(self.config.get("request_timeout", 300))
+        max_retries = int(self.config.get("max_retries", 5))
         if self.config["llm_provider"].lower() == "openai" or self.config["llm_provider"] == "ollama" or self.config["llm_provider"] == "openrouter":
             self.deep_thinking_llm = ChatOpenAI(
                 model=self.config["deep_think_llm"],
