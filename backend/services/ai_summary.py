@@ -247,11 +247,18 @@ def _run_openai(
         }
         # thinking 模型（DeepSeek-R1 / Qwen3-thinking 等）会返回 reasoning_content，
         # 多轮工具回传时必须原样回传，否则 API 报 invalid_request_error。
+        # 优先从 model_dump()（兼容最新 SDK 字段名映射），再 fallback 到 getattr、
+        # model_extra、model_dump 的驼峰变体，覆盖不同 SDK 版本的字段名差异。
         raw = msg.model_dump() if hasattr(msg, "model_dump") else {}
-        for key in ("reasoning_content", "reasoning"):
-            val = raw.get(key) if isinstance(raw, dict) else None
+        for key in ("reasoning_content", "reasoning", "reasoningContent"):
+            val = None
+            if isinstance(raw, dict):
+                val = raw.get(key)
             if val is None:
                 val = getattr(msg, key, None)
+            if val is None and hasattr(msg, "model_extra"):
+                extra = msg.model_extra or {}
+                val = extra.get(key)
             if val:
                 assistant_msg[key] = val
         messages.append(assistant_msg)
@@ -363,6 +370,15 @@ def generate_daily_summary(
 def probe_llm(settings: dict) -> dict:
     """最小调用以验证 LLM 联通。返回 {ok, provider, model, sample, error?}。"""
     provider = (settings or {}).get("provider") or "openai"
+
+    # 本地 CLI 模式不发起 HTTP，仅核对 CLI 是否已安装（由 settings API 层提前校验）。
+    if provider in LOCAL_AGENT_NAMES:
+        from backend.services.ai_agent import get_agent as _get_agent, _resolve_binary as _which
+        spec = _get_agent(provider)
+        if spec is None or not _which(spec):
+            raise RuntimeError(f"本地 CLI {provider} 未安装或不在 PATH")
+        return {"ok": True, "provider": provider, "model": spec.label, "sample": ""}
+
     if provider == "anthropic":
         anthropic = _import_anthropic()
         api_key = (settings or {}).get("anthropic_api_key") or ""

@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import atexit
 import importlib
 import logging
 import queue
@@ -16,7 +17,7 @@ import subprocess
 import sys
 import threading
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -32,6 +33,15 @@ TA_REPORTS_SUBDIR = "trading-agents"
 _QUEUE: "queue.Queue[str]" = queue.Queue()
 _WORKER_THREAD: threading.Thread | None = None
 _WORKER_LOCK = threading.Lock()
+_SHUTDOWN = threading.Event()
+
+# 优雅关闭：收到 SIGTERM/SIGINT 后，拒绝新任务入队 + 等待当前任务完成后退出。
+_SHUTDOWN_GRACE_SEC = 180  # 给正在跑的 LLM 调用最多 3 分钟收尾
+
+
+def _utcnow() -> datetime:
+    """返回 naive UTC datetime，替代已弃用的 datetime.utcnow()。"""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 _SAFE_NAME_RE = re.compile(r"[\\/:*?\"<>|\s]+")
@@ -83,7 +93,7 @@ def _render_markdown(result: dict[str, Any], task: TATask) -> str:
         f"- 分析日期：{task.trade_date}\n"
         f"- 辩论轮数：{task.depth}\n"
         f"- 在线数据：{'是' if task.online_tools else '否'}\n"
-        f"- 生成时间：{(task.finished_at or datetime.utcnow()).isoformat(timespec='seconds')}\n\n"
+        f"- 生成时间：{(task.finished_at or _utcnow()).isoformat(timespec='seconds')}\n\n"
     )
     decision = result.get("decision", "")
     reports = result.get("reports", {}) or {}
@@ -211,7 +221,12 @@ def delete_task(task_id: str) -> bool:
             return False
         if t.report_filename:
             try:
-                (REPORTS_ROOT / t.report_filename).unlink(missing_ok=True)
+                path = (REPORTS_ROOT / t.report_filename).resolve()
+                # 防止路径穿越：确保解析后的绝对路径仍在 REPORTS_ROOT 下
+                if not str(path).startswith(str(REPORTS_ROOT.resolve())):
+                    logger.warning("refusing to delete file outside reports dir: %s", t.report_filename)
+                else:
+                    path.unlink(missing_ok=True)
             except Exception:
                 logger.warning("delete report file failed: %s", t.report_filename)
         db.delete(t)
@@ -303,7 +318,7 @@ def _process(task_id: str) -> None:
         if not t:
             return
         t.status = "running"
-        t.started_at = datetime.utcnow()
+        t.started_at = _utcnow()
         db.commit()
         ticker = t.ticker
         trade_date = t.trade_date
@@ -314,7 +329,7 @@ def _process(task_id: str) -> None:
     finally:
         db.close()
 
-    started = datetime.utcnow()
+    started = _utcnow()
     error_msg = ""
     result: dict[str, Any] | None = None
     try:
@@ -347,7 +362,7 @@ def _process(task_id: str) -> None:
         error_msg = _friendly_error(e)
         logger.exception("TA task %s failed", task_id)
 
-    finished = datetime.utcnow()
+    finished = _utcnow()
     duration = (finished - started).total_seconds()
 
     db = SessionLocal()
@@ -377,14 +392,22 @@ def _process(task_id: str) -> None:
 
 def _worker_loop() -> None:
     logger.info("TA worker thread started")
-    while True:
-        task_id = _QUEUE.get()
+    while not _SHUTDOWN.is_set():
+        try:
+            task_id = _QUEUE.get(timeout=2)
+        except queue.Empty:
+            continue
+        if _SHUTDOWN.is_set():
+            # 被唤醒后发现正在关闭，把未处理的任务放回队列
+            _QUEUE.put(task_id)
+            break
         try:
             _process(task_id)
         except Exception:
             logger.exception("TA worker fatal error on %s", task_id)
         finally:
             _QUEUE.task_done()
+    logger.info("TA worker thread stopped")
 
 
 def _ensure_worker() -> None:
@@ -393,9 +416,23 @@ def _ensure_worker() -> None:
         if _WORKER_THREAD and _WORKER_THREAD.is_alive():
             return
         _WORKER_THREAD = threading.Thread(
-            target=_worker_loop, name="ta-worker", daemon=True
+            target=_worker_loop, name="ta-worker", daemon=False
         )
         _WORKER_THREAD.start()
+
+
+def _shutdown_worker() -> None:
+    """atexit 回调：通知 worker 停止，等待当前任务收尾。"""
+    if not _WORKER_THREAD or not _WORKER_THREAD.is_alive():
+        return
+    logger.info("TA worker shutting down gracefully (grace=%ss)…", _SHUTDOWN_GRACE_SEC)
+    _SHUTDOWN.set()
+    _WORKER_THREAD.join(timeout=_SHUTDOWN_GRACE_SEC)
+    if _WORKER_THREAD.is_alive():
+        logger.warning("TA worker did not exit within grace period; abandoning")
+
+
+atexit.register(_shutdown_worker)
 
 
 def resume_pending_on_startup() -> int:

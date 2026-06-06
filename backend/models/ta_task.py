@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 
 from backend.database import Base
+
+
+def _utcnow() -> datetime:
+    """返回 naive UTC datetime，替代已弃用的 datetime.utcnow()。"""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class TATask(Base):
@@ -30,7 +35,7 @@ class TATask(Base):
     report_md = Column(Text, default="")  # 也存一份方便前端直接展示
     error = Column(Text, default="")
 
-    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    created_at = Column(DateTime, default=_utcnow, index=True)
     started_at = Column(DateTime)
     finished_at = Column(DateTime)
     duration_sec = Column(Float)

@@ -27,6 +27,10 @@ def _build_ta_config(
 
     provider_override / model_override 用于「发起分析」表单的单任务覆盖；
     空字符串=沿用全局 AI 配置。
+
+    注意：provider_override 为本地 CLI 名称（hermes/claude/codex/gemini）时，
+    表示「复用全局 LLM API 配置 + 走 OpenAI-compat 路径」，不会实际调用本地 CLI。
+    前端表单已做 model_override / provider_override 互斥；这里做兜底校验。
     """
     from tradingagents.default_config import DEFAULT_CONFIG
 
@@ -34,7 +38,10 @@ def _build_ta_config(
     cfg: dict[str, Any] = dict(DEFAULT_CONFIG)
 
     from backend.services.ai_summary import LOCAL_AGENT_NAMES
-    provider = ((provider_override or ai.get("provider") or "openai")).lower()
+    # 若前端绕过互斥同时传了二者，以 provider_override 为准并忽略 model_override
+    effective_provider = ((provider_override or ai.get("provider") or "openai")).lower()
+    effective_model = model_override.strip() if model_override and not provider_override else ""
+    provider = effective_provider
     # 本地 CLI 模式（hermes/claude/codex/gemini）不直接驱动 TradingAgents；
     # 这里复用 OpenAI-compat 路径，让用户在「多智能体」段落显式给 base_url+key。
     if provider in LOCAL_AGENT_NAMES or provider == "openai":
@@ -45,13 +52,13 @@ def _build_ta_config(
             or "https://api.deepseek.com/v1"
         )
         model = (
-            model_override
+            effective_model
             or ai.get("ta_deep_think_llm")
             or ai.get("openai_model")
             or "deepseek-v4-pro"
         )
         cfg["deep_think_llm"] = model
-        cfg["quick_think_llm"] = model_override or ai.get("ta_quick_think_llm") or model
+        cfg["quick_think_llm"] = effective_model or ai.get("ta_quick_think_llm") or model
         key = ai.get("openai_api_key") or ""
         if key:
             os.environ["OPENAI_API_KEY"] = key
@@ -59,13 +66,13 @@ def _build_ta_config(
         cfg["llm_provider"] = "anthropic"
         cfg["backend_url"] = ai.get("ta_backend_url") or "https://api.anthropic.com"
         model = (
-            model_override
+            effective_model
             or ai.get("ta_deep_think_llm")
             or ai.get("anthropic_model")
             or "claude-sonnet-4-6"
         )
         cfg["deep_think_llm"] = model
-        cfg["quick_think_llm"] = model_override or ai.get("ta_quick_think_llm") or model
+        cfg["quick_think_llm"] = effective_model or ai.get("ta_quick_think_llm") or model
         key = ai.get("anthropic_api_key") or ""
         if key:
             os.environ["ANTHROPIC_API_KEY"] = key
