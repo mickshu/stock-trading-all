@@ -468,6 +468,13 @@ function AiSettingsTab() {
         >
           <InputNumber min={0} max={10} style={{ width: 120 }} />
         </Form.Item>
+        <Form.Item
+          name="ta_task_timeout"
+          label="整体任务超时 (秒)"
+          extra="单个分析任务的最大运行时间。多智能体流程含 10+ 次 LLM 串行调用，deepseek 等慢上游建议 3600（60 分钟）以上。"
+        >
+          <InputNumber min={300} max={7200} step={300} style={{ width: 120 }} />
+        </Form.Item>
 
         <Form.Item>
           <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : undefined }}>

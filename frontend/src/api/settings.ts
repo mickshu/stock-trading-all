@@ -51,6 +51,7 @@ export interface AiSettings {
   ta_max_debate_rounds?: number;
   ta_request_timeout?: number;
   ta_max_retries?: number;
+  ta_task_timeout?: number;
 }
 
 export async function fetchAiSettings(): Promise<AiSettings> {

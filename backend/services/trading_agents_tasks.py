@@ -40,11 +40,22 @@ _SHUTDOWN = threading.Event()
 _SHUTDOWN_GRACE_SEC = 180  # 给正在跑的 LLM 调用最多 3 分钟收尾
 
 # 整体任务超时（秒）：防止单个任务因多次 LLM 重试无限运行。
-# 默认 30 分钟，覆盖绝大多数深度分析场景。
-_TASK_HARD_TIMEOUT_SEC = 30 * 60
+# 默认 60 分钟，可在「设置 → AI 配置 → 整体任务超时」调整。
+_TASK_HARD_TIMEOUT_DEFAULT_SEC = 60 * 60
 
 # 线程池用于给 run_single 加硬超时
 _EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="ta-run")
+
+
+def _get_task_timeout_sec() -> int:
+    """从 AI 配置读取整体任务超时（秒），未配置则用默认值。"""
+    try:
+        from backend.api.settings import get_ai_settings_dict
+        ai = get_ai_settings_dict()
+        val = int(ai.get("ta_task_timeout") or _TASK_HARD_TIMEOUT_DEFAULT_SEC)
+        return max(val, 300)  # 下限 5 分钟，防止误设过小
+    except Exception:
+        return _TASK_HARD_TIMEOUT_DEFAULT_SEC
 
 
 def _utcnow() -> datetime:
@@ -353,13 +364,15 @@ def _process(task_id: str) -> None:
             provider_override=provider_override,
             model_override=model_override,
         )
-        result = future.result(timeout=_TASK_HARD_TIMEOUT_SEC)
+        result = future.result(timeout=_get_task_timeout_sec())
     except FuturesTimeoutError:
+        timeout_min = _get_task_timeout_sec() // 60
         error_msg = (
-            f"任务整体超时（已运行超过 {_TASK_HARD_TIMEOUT_SEC // 60} 分钟），已强制终止。"
-            f"建议：① 减少辩论轮数；② 在「设置」里调大单次 LLM 超时或换更快的接入点。"
+            f"任务整体超时（已运行超过 {timeout_min} 分钟），已强制终止。"
+            f"建议：① 减少辩论轮数；② 在「设置」里调大单次 LLM 超时或换更快的接入点；"
+            f"③ 在「设置」里调大「整体任务超时」。"
         )
-        logger.warning("TA task %s exceeded hard timeout of %ss", task_id, _TASK_HARD_TIMEOUT_SEC)
+        logger.warning("TA task %s exceeded hard timeout", task_id)
     except ModuleNotFoundError as e:
         # 长跑的 uvicorn worker 上一次 import langchain_openai 失败后，sys.modules
         # 里残留了 tradingagents.* 的半成品模块。即便 redeploy 期间已经 pip install

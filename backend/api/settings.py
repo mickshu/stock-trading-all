@@ -61,6 +61,7 @@ DEFAULT_AI: dict[str, Any] = {
     "ta_quick_think_llm": "deepseek-v4-pro",
     "ta_backend_url": "https://api.deepseek.com/v1",
     "ta_max_debate_rounds": 1,
+    "ta_task_timeout": 3600,  # 整体任务超时（秒），默认 60 分钟
 }
 
 
@@ -110,6 +111,7 @@ class AiSettingsIn(BaseModel):
     ta_max_debate_rounds: int | None = None
     ta_request_timeout: int | None = None
     ta_max_retries: int | None = None
+    ta_task_timeout: int | None = None
 
 
 @router.get("/ai")
