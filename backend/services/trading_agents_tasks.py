@@ -158,6 +158,7 @@ def _task_to_dict(t: TATask) -> dict[str, Any]:
         "online_tools": bool(t.online_tools),
         "provider_override": getattr(t, "provider_override", "") or "",
         "model_override": getattr(t, "model_override", "") or "",
+        "analysis_tool": getattr(t, "analysis_tool", "trading") or "trading",
         "status": t.status,
         "decision": t.decision or "",
         "decision_raw": t.decision_raw or "",
@@ -180,6 +181,7 @@ def create_task(
     online_tools: bool,
     provider_override: str = "",
     model_override: str = "",
+    analysis_tool: str = "trading",
 ) -> dict[str, Any]:
     task_id = str(uuid.uuid4())
     db = SessionLocal()
@@ -193,6 +195,7 @@ def create_task(
             online_tools=online_tools,
             provider_override=(provider_override or "").strip(),
             model_override=(model_override or "").strip(),
+            analysis_tool=analysis_tool if analysis_tool in ("trading", "cli") else "trading",
             status="pending",
         )
         db.add(t)
@@ -330,7 +333,94 @@ def _retry_after_install(
         return None, str(e2)
 
 
+def _process_cli(task_id: str) -> None:
+    """CLI 模式：直接 subprocess 调用本地 AI CLI，跳过多智能体流程。"""
+    from backend.services.ai_agent import run_agent
+
+    db = SessionLocal()
+    try:
+        t = db.query(TATask).filter(TATask.id == task_id).first()
+        if not t:
+            return
+        t.status = "running"
+        t.started_at = _utcnow()
+        db.commit()
+        ticker = t.ticker
+        stock_name = t.stock_name or t.ticker
+        trade_date = t.trade_date
+        provider_override = getattr(t, "provider_override", "") or ""
+    finally:
+        db.close()
+
+    started = _utcnow()
+    error_msg = ""
+    cli_output = ""
+    prompt = f"深度分析{stock_name}公司"
+
+    try:
+        agent_result = run_agent(
+            provider_override,
+            prompt,
+            timeout=_get_task_timeout_sec(),
+        )
+        if agent_result["ok"]:
+            cli_output = agent_result["output"] or ""
+        else:
+            error_msg = agent_result.get("stderr") or f"CLI 退出码 {agent_result.get('exit_code')}"
+    except ValueError as e:
+        error_msg = str(e)
+        logger.warning("TA CLI task %s agent error: %s", task_id, e)
+    except Exception as e:  # noqa: BLE001
+        error_msg = _friendly_error(e)
+        logger.exception("TA CLI task %s failed", task_id)
+
+    finished = _utcnow()
+    duration = (finished - started).total_seconds()
+
+    db = SessionLocal()
+    try:
+        t = db.query(TATask).filter(TATask.id == task_id).first()
+        if not t:
+            return
+        t.finished_at = finished
+        t.duration_sec = duration
+        if error_msg or not cli_output.strip():
+            t.status = "failed"
+            t.error = error_msg or "CLI 未返回有效输出"
+        else:
+            t.status = "success"
+            t.decision_raw = ""
+            t.decision = ""
+            md = (
+                f"# CLI 深度分析报告 — {stock_name} ({ticker})\n\n"
+                f"- 分析日期：{trade_date}\n"
+                f"- 分析工具：{provider_override}\n"
+                f"- 生成时间：{finished.isoformat(timespec='seconds')}\n\n"
+                f"---\n\n{cli_output}"
+            )
+            t.report_md = md
+            try:
+                t.report_filename = _write_report(md, t)
+            except Exception:
+                logger.exception("write report failed for %s", task_id)
+        db.commit()
+    finally:
+        db.close()
+
+
 def _process(task_id: str) -> None:
+    db = SessionLocal()
+    try:
+        t = db.query(TATask).filter(TATask.id == task_id).first()
+        if not t:
+            return
+        analysis_tool = getattr(t, "analysis_tool", "trading") or "trading"
+    finally:
+        db.close()
+
+    if analysis_tool == "cli":
+        return _process_cli(task_id)
+
     db = SessionLocal()
     try:
         t = db.query(TATask).filter(TATask.id == task_id).first()
@@ -353,8 +443,6 @@ def _process(task_id: str) -> None:
     result: dict[str, Any] | None = None
     try:
         importlib.invalidate_caches()
-        # 用线程池包裹 run_single，加整体任务硬超时，防止多次 LLM 重试
-        # 累加后任务无限运行（之前有任务跑了 40+ 分钟仍失败）。
         future = _EXECUTOR.submit(
             run_single,
             ticker=ticker,
@@ -374,11 +462,6 @@ def _process(task_id: str) -> None:
         )
         logger.warning("TA task %s exceeded hard timeout", task_id)
     except ModuleNotFoundError as e:
-        # 长跑的 uvicorn worker 上一次 import langchain_openai 失败后，sys.modules
-        # 里残留了 tradingagents.* 的半成品模块。即便 redeploy 期间已经 pip install
-        # 过依赖，本进程内的下一次 from tradingagents.graph.trading_graph import ...
-        # 仍然会顺着旧的导入栈再次抛 ModuleNotFoundError。
-        # 这里 worker 自愈一次：自动 pip install + 清掉污染过的 sys.modules + 重试。
         logger.warning("TA task %s missing dep %s; self-healing", task_id, e.name)
         result, error_msg = _retry_after_install(
             ticker=ticker,

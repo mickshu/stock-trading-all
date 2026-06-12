@@ -36,6 +36,7 @@ class CreateTaskRequest(AnalyzeRequest):
     stock_name: str = Field("", max_length=120)
     provider_override: str = Field("", max_length=32)
     model_override: str = Field("", max_length=64)
+    analysis_tool: str = Field("trading", pattern=r"^(trading|cli)$")
 
 
 @router.get("/health")
@@ -84,6 +85,7 @@ def create_task(req: CreateTaskRequest):
             online_tools=req.online_tools,
             provider_override=(req.provider_override or "").strip(),
             model_override=(req.model_override or "").strip(),
+            analysis_tool=req.analysis_tool,
         )
     except Exception as e:
         logger.exception("create TA task failed")

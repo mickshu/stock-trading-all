@@ -11,6 +11,7 @@ export interface TACreateTaskRequest extends TARunRequest {
   stock_name?: string;
   provider_override?: string;
   model_override?: string;
+  analysis_tool?: 'trading' | 'cli';
 }
 
 export interface TAHealth {
@@ -66,6 +67,7 @@ export interface TATask {
   online_tools: boolean;
   provider_override?: string;
   model_override?: string;
+  analysis_tool: string;
   status: TATaskStatus;
   decision: string;
   decision_raw: string;

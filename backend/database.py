@@ -36,6 +36,8 @@ def _migrate_sqlite():
             conn.execute(text("ALTER TABLE ta_tasks ADD COLUMN provider_override VARCHAR(32) DEFAULT ''"))
         if ta_cols and "model_override" not in ta_col_names:
             conn.execute(text("ALTER TABLE ta_tasks ADD COLUMN model_override VARCHAR(64) DEFAULT ''"))
+        if ta_cols and "analysis_tool" not in ta_col_names:
+            conn.execute(text("ALTER TABLE ta_tasks ADD COLUMN analysis_tool VARCHAR(16) DEFAULT 'trading'"))
 
 
 def init_db():

@@ -26,6 +26,8 @@ class TATask(Base):
     # 单任务级覆盖：填了就用，空字符串=沿用全局 AI 配置。
     provider_override = Column(String(32), default="")
     model_override = Column(String(64), default="")
+    # "trading" (多智能体) | "cli" (本地 CLI subprocess)
+    analysis_tool = Column(String(16), nullable=False, default="trading")
 
     # pending | running | success | failed
     status = Column(String(16), nullable=False, default="pending", index=True)

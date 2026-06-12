@@ -176,6 +176,7 @@ export default function TradingAgentsPage() {
   const onFinish = async (values: FormValues) => {
     setSubmitting(true);
     try {
+      const providerVal = (values.provider_override || '').trim();
       const t = await createTATask({
         ticker: values.ticker.trim(),
         stock_name: stockNameRef.current || '',
@@ -183,7 +184,8 @@ export default function TradingAgentsPage() {
         depth: values.depth,
         online_tools: values.online_tools,
         model_override: (values.model_override || '').trim(),
-        provider_override: (values.provider_override || '').trim(),
+        provider_override: providerVal,
+        analysis_tool: providerVal ? 'cli' : 'trading',
       });
       message.success('已加入队列，可在「任务记录」查看进度');
       setActiveTab('list');
@@ -248,6 +250,17 @@ export default function TradingAgentsPage() {
       key: 'decision',
       width: 90,
       render: (d: string) => <DecisionTag decision={d} />,
+    },
+    {
+      title: '工具',
+      dataIndex: 'analysis_tool',
+      key: 'analysis_tool',
+      width: 80,
+      render: (v: string) => (
+        <Tag color={v === 'cli' ? 'purple' : 'cyan'}>
+          {v === 'cli' ? 'CLI' : 'Trading'}
+        </Tag>
+      ),
     },
     {
       title: '参数',
