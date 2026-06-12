@@ -34,6 +34,7 @@ import {
 import dayjs, { Dayjs } from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
 import MarkdownView from '../components/MarkdownView';
+import SpeechButton from '../components/SpeechButton';
 import StockSearchInput from '../components/StockSearchInput';
 import {
   fetchTAHealth,
@@ -302,6 +303,10 @@ export default function TradingAgentsPage() {
           >
             查看
           </Button>
+          <SpeechButton
+            disabled={t.status !== 'success'}
+            getText={() => getTATask(t.id, true).then((f) => f.report_md || '')}
+          />
           <Tooltip title={t.report_url || '尚未生成'}>
             <Button
               type="link"
@@ -520,13 +525,16 @@ export default function TradingAgentsPage() {
         width={900}
         title={
           viewTask && (
-            <Space size={8} wrap>
-              <FileMarkdownOutlined />
-              <span>
-                {viewTask.stock_name || viewTask.ticker} ({viewTask.ticker}) · {viewTask.trade_date}
-              </span>
-              <DecisionTag decision={viewTask.decision} />
-            </Space>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
+              <Space size={8} wrap>
+                <FileMarkdownOutlined />
+                <span>
+                  {viewTask.stock_name || viewTask.ticker} ({viewTask.ticker}) · {viewTask.trade_date}
+                </span>
+                <DecisionTag decision={viewTask.decision} />
+              </Space>
+              {viewMd && <SpeechButton text={viewMd} />}
+            </div>
           )
         }
         destroyOnHidden
