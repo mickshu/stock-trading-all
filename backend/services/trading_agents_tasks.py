@@ -209,12 +209,14 @@ def create_task(
     return data
 
 
-def list_tasks(limit: int = 50, status: str | None = None) -> list[dict[str, Any]]:
+def list_tasks(limit: int = 50, status: str | None = None, ticker: str | None = None) -> list[dict[str, Any]]:
     db = SessionLocal()
     try:
         q = db.query(TATask).order_by(TATask.created_at.desc())
         if status:
             q = q.filter(TATask.status == status)
+        if ticker:
+            q = q.filter(TATask.ticker == ticker)
         rows: Iterable[TATask] = q.limit(min(max(limit, 1), 200)).all()
         return [_task_to_dict(r) for r in rows]
     finally:

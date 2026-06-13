@@ -96,8 +96,9 @@ def create_task(req: CreateTaskRequest):
 def list_tasks(
     limit: int = Query(50, ge=1, le=200),
     status: str | None = Query(None),
+    ticker: str | None = Query(None),
 ):
-    return {"items": ta_tasks.list_tasks(limit=limit, status=status)}
+    return {"items": ta_tasks.list_tasks(limit=limit, status=status, ticker=ticker)}
 
 
 @router.get("/tasks/{task_id}")

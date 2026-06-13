@@ -27,6 +27,7 @@ import SignalPanel from '../components/SignalPanel';
 import SignalConfluence from '../components/SignalConfluence';
 import FundamentalsCard from '../components/FundamentalsCard';
 import AIAgentCard from '../components/AIAgentCard';
+import TradingAgentsPanel from '../components/TradingAgentsPanel';
 import { useAnalysisStore } from '../store/analysisStore';
 import { fetchQuote } from '../api/market';
 import type { Period } from '../types';
@@ -251,7 +252,12 @@ export default function StockDetail() {
                   <span>AI 分析</span>
                 </Space>
               ),
-              children: <AIAgentCard code={code} stockName={stockName} />,
+              children: (
+                <>
+                  <AIAgentCard code={code} stockName={stockName} />
+                  <TradingAgentsPanel code={code} stockName={stockName} />
+                </>
+              ),
             },
           ]}
         />

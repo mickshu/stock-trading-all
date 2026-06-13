@@ -98,9 +98,9 @@ export async function createTATask(payload: TACreateTaskRequest): Promise<TATask
   return data;
 }
 
-export async function listTATasks(limit = 100): Promise<TATask[]> {
+export async function listTATasks(limit = 100, ticker?: string): Promise<TATask[]> {
   const { data } = await api.get<{ items: TATask[] }>('/trading-agents/tasks', {
-    params: { limit },
+    params: { limit, ticker },
   });
   return data.items;
 }
