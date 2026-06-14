@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Table, Spin, Typography, Grid } from 'antd';
+import { Table, Spin, Typography, Grid } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { fetchFinancialHistory, type FinancialHistory } from '../api/market';
 
@@ -57,11 +57,7 @@ export default function FinancialHistoryTable({ code }: Props) {
   }, [code]);
 
   if (error) {
-    return (
-      <Card size="small" title="关键财务指标" style={{ marginBottom: isMobile ? 8 : 12 }}>
-        <Typography.Text type="danger">{error}</Typography.Text>
-      </Card>
-    );
+    return <Typography.Text type="danger">{error}</Typography.Text>;
   }
 
   const columns: ColumnsType<RowData> = [
@@ -120,18 +116,16 @@ export default function FinancialHistoryTable({ code }: Props) {
   }
 
   return (
-    <Card size="small" title="关键财务指标" style={{ marginBottom: isMobile ? 8 : 12 }}>
-      <Spin spinning={loading}>
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          pagination={false}
-          size="small"
-          bordered
-          scroll={{ x: 'max-content' }}
-          style={{ fontSize: isMobile ? 12 : 14 }}
-        />
-      </Spin>
-    </Card>
+    <Spin spinning={loading}>
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+        size="small"
+        bordered
+        scroll={{ x: 'max-content' }}
+        style={{ fontSize: isMobile ? 12 : 14 }}
+      />
+    </Spin>
   );
 }

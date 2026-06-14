@@ -19,6 +19,7 @@ import {
   ReloadOutlined,
   ThunderboltOutlined,
   ExperimentOutlined,
+  FundOutlined,
   ArrowLeftOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
@@ -40,7 +41,7 @@ const periodOptions: { label: string; value: Period }[] = [
   { label: '月线', value: 'monthly' },
 ];
 
-type AnalysisTabKey = 'signal' | 'ai';
+type AnalysisTabKey = 'signal' | 'ai' | 'financials';
 
 export default function StockDetail() {
   const { code } = useParams<{ code: string }>();
@@ -209,8 +210,6 @@ export default function StockDetail() {
 
       <FundamentalsCard code={code} />
 
-      <FinancialHistoryTable code={code} />
-
       <Card
         size="small"
         style={{ marginTop: 16, marginBottom: 16 }}
@@ -245,6 +244,16 @@ export default function StockDetail() {
                   style={{ padding: '12px 0' }}
                 />
               ),
+            },
+            {
+              key: 'financials',
+              label: (
+                <Space size={6}>
+                  <FundOutlined />
+                  <span>财务指标</span>
+                </Space>
+              ),
+              children: <FinancialHistoryTable code={code} />,
             },
             {
               key: 'ai',
