@@ -71,3 +71,22 @@ export async function fetchFundamentals(code: string): Promise<Fundamentals> {
   const { data } = await api.get<Fundamentals>('/market/fundamentals', { params: { code } });
   return data;
 }
+
+export interface FinancialIndicator {
+  name: string;
+  unit: string;
+  values: (number | null)[];
+}
+
+export interface FinancialHistory {
+  code: string;
+  years: string[];
+  indicators: FinancialIndicator[];
+}
+
+export async function fetchFinancialHistory(code: string, years?: number): Promise<FinancialHistory> {
+  const { data } = await api.get<FinancialHistory>('/market/financial-history', {
+    params: { code, years },
+  });
+  return data;
+}

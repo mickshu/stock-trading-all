@@ -26,6 +26,7 @@ import KlineChart from '../components/KlineChart';
 import SignalPanel from '../components/SignalPanel';
 import SignalConfluence from '../components/SignalConfluence';
 import FundamentalsCard from '../components/FundamentalsCard';
+import FinancialHistoryTable from '../components/FinancialHistoryTable';
 import TradingAgentsPanel from '../components/TradingAgentsPanel';
 import { useAnalysisStore } from '../store/analysisStore';
 import { fetchQuote } from '../api/market';
@@ -207,6 +208,8 @@ export default function StockDetail() {
       {error && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
 
       <FundamentalsCard code={code} />
+
+      <FinancialHistoryTable code={code} />
 
       <Card
         size="small"

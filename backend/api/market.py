@@ -110,3 +110,123 @@ def get_quotes(codes: str = Query(..., description="逗号分隔股票代码，�
 def get_fundamentals(code: str = Query(..., description="Stock code, e.g. 000001")):
     ds = get_data_source()
     return ds.get_fundamentals(code)
+
+
+@router.get("/financial-history")
+def get_financial_history(
+    code: str = Query(..., description="Stock code, e.g. 000001"),
+    years: int = Query(5, ge=1, le=20, description="Number of years"),
+):
+    import akshare as ak
+    import math
+
+    def _safe(v) -> float | None:
+        if v is None:
+            return None
+        try:
+            f = float(v)
+            return None if (math.isnan(f) or math.isinf(f)) else f
+        except (TypeError, ValueError):
+            return None
+
+    try:
+        df = ak.stock_financial_abstract(symbol=code)
+    except Exception:
+        raise HTTPException(status_code=503, detail="获取财务数据失败")
+    if df is None or df.empty:
+        raise HTTPException(status_code=404, detail="未找到财务数据")
+
+    date_cols = [c for c in df.columns if c not in ("选项", "指标")]
+    annual_cols = sorted([c for c in date_cols if c.endswith("1231")], reverse=True)[:years]
+    if not annual_cols:
+        raise HTTPException(status_code=404, detail="无年报数据")
+
+    year_labels = [c[:4] for c in annual_cols]
+
+    indicator_map: dict[str, dict] = {}
+    for _, row in df.iterrows():
+        indicator_map[row["指标"]] = row
+
+    def extract(name: str) -> list[float | None]:
+        row = indicator_map.get(name)
+        if row is None:
+            return [None] * len(annual_cols)
+        return [_safe(row.get(c)) for c in annual_cols]
+
+    yi = 1e8
+
+    revenue_raw = extract("营业总收入")
+    net_profit_raw = extract("归母净利润")
+
+    indicators = [
+        {
+            "name": "营业收入",
+            "unit": "亿元",
+            "values": [round(v / yi, 2) if v is not None else None for v in revenue_raw],
+        },
+        {
+            "name": "营收同比",
+            "unit": "%",
+            "values": [round(v, 2) if v is not None else None for v in extract("营业总收入增长率")],
+        },
+        {
+            "name": "归母净利润",
+            "unit": "亿元",
+            "values": [round(v / yi, 2) if v is not None else None for v in net_profit_raw],
+        },
+        {
+            "name": "净利润同比",
+            "unit": "%",
+            "values": [round(v, 2) if v is not None else None for v in extract("归属母公司净利润增长率")],
+        },
+        {
+            "name": "自由现金流/股",
+            "unit": "元",
+            "values": [round(v, 2) if v is not None else None for v in extract("每股企业自由现金流量")],
+        },
+        {
+            "name": "ROE",
+            "unit": "%",
+            "values": [round(v, 2) if v is not None else None for v in extract("净资产收益率(ROE)")],
+        },
+    ]
+
+    dividend_per_share: list[float | None] = [None] * len(annual_cols)
+    try:
+        div_df = ak.stock_history_dividend_detail(symbol=code, indicator="分红")
+        if div_df is not None and not div_df.empty and "派息" in div_df.columns:
+            for i, col in enumerate(annual_cols):
+                year = col[:4]
+                year_rows = div_df[div_df["公告日期"].astype(str).str.startswith(year)]
+                if not year_rows.empty:
+                    total = 0.0
+                    for _, r in year_rows.iterrows():
+                        v = _safe(r["派息"])
+                        if v is not None:
+                            total += v
+                    dividend_per_share[i] = round(total / 10, 4) if total > 0 else 0.0
+    except Exception:
+        pass
+
+    indicators.append({"name": "分红/股", "unit": "元", "values": dividend_per_share})
+    indicators.append({"name": "股息率", "unit": "%", "values": [None] * len(annual_cols)})
+    indicators.append({"name": "市盈率(PE)", "unit": "", "values": [None] * len(annual_cols)})
+
+    indicators.append({
+        "name": "权益乘数",
+        "unit": "",
+        "values": [round(v, 2) if v is not None else None for v in extract("权益乘数")],
+    })
+
+    equity_raw = extract("股东权益合计(净资产)")
+    bvps_raw = extract("每股净资产")
+    total_shares: list[float | None] = []
+    for eq, bv in zip(equity_raw, bvps_raw):
+        if eq is not None and bv is not None and bv > 0:
+            total_shares.append(round(eq / bv / yi, 2))
+        else:
+            total_shares.append(None)
+
+    indicators.append({"name": "总股本", "unit": "亿股", "values": total_shares})
+
+    return {"code": code, "years": year_labels, "indicators": indicators}
