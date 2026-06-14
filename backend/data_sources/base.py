@@ -44,6 +44,21 @@ class BaseDataSource(ABC):
         """
         return {"date": None, "inflow": [], "outflow": []}
 
+    def screen_stocks(
+        self,
+        sort_by: str = "amount",
+        sort_order: str = "desc",
+        page: int = 1,
+        page_size: int = 50,
+        codes: list[str] | None = None,
+    ) -> dict:
+        """批量拉取股票行情+指标数据用于条件选股。
+
+        返回 {"results": [标准化 dict], "total": int}。
+        子类应覆盖以实现高效批量获取。
+        """
+        return {"results": [], "total": 0}
+
     def get_fundamentals(self, code: str) -> dict:
         """关键财务/估值指标。默认返回占位结构，未实现则各字段为 None。"""
         return {

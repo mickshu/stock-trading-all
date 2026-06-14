@@ -744,6 +744,88 @@ class AkshareDataSource(BaseDataSource):
 
         return result
 
+    # ── 条件选股：批量行情+指标 ──────────────────────────────────────
+
+    _SCREEN_FIELD_MAP = {
+        "price": "f2",
+        "change_pct": "f3",
+        "amplitude": "f7",
+        "turnover": "f8",
+        "pe": "f9",
+        "volume_ratio": "f10",
+        "code": "f12",
+        "name": "f14",
+        "total_market_cap": "f20",
+        "float_market_cap": "f21",
+        "pb": "f23",
+        "amount": "f6",
+        "industry": "f100",
+    }
+    _SCREEN_FIELDS_STR = ",".join([
+        "f2", "f3", "f6", "f7", "f8", "f9", "f10",
+        "f12", "f14", "f20", "f21", "f23", "f100",
+    ])
+    _SCREEN_FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
+
+    def screen_stocks(
+        self,
+        sort_by: str = "amount",
+        sort_order: str = "desc",
+        page: int = 1,
+        page_size: int = 50,
+        codes: list[str] | None = None,
+    ) -> dict:
+        fid = self._SCREEN_FIELD_MAP.get(sort_by, "f6")
+        po = 1 if sort_order == "desc" else 0
+
+        if codes:
+            secids = ",".join(self._em_secid(c) for c in codes)
+            fields = self._SCREEN_FIELDS_STR
+            payload = self._em_get(
+                "/api/qt/ulist.np/get",
+                {"secids": secids, "fields": fields, "fltt": "2", "invt": "2"},
+                timeout=8,
+            )
+            if payload is None:
+                return {"results": [], "total": 0}
+            data = (payload or {}).get("data") or {}
+            diff = data.get("diff") or []
+            if isinstance(diff, dict):
+                diff = list(diff.values())
+            rows = [r for r in diff if isinstance(r, dict)]
+            total = len(rows)
+        else:
+            pz = max(page_size, 100)
+            rows = self._em_clist(self._SCREEN_FS, self._SCREEN_FIELDS_STR, pn=1, pz=5000, fid=fid, po=po)
+            total = len(rows)
+
+        results = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            code = str(row.get("f12") or "")
+            if not code:
+                continue
+            tmc = _to_float(row.get("f20"))
+            results.append({
+                "code": code,
+                "name": str(row.get("f14") or ""),
+                "price": _to_float(row.get("f2")),
+                "change_pct": _to_float(row.get("f3")),
+                "pe": _to_float(row.get("f9")),
+                "pb": _to_float(row.get("f23")),
+                "total_market_cap": tmc,
+                "total_market_cap_yi": round(tmc / 1e8, 2) if tmc else None,
+                "float_market_cap": _to_float(row.get("f21")),
+                "turnover": _to_float(row.get("f8")),
+                "volume_ratio": _to_float(row.get("f10")),
+                "amplitude": _to_float(row.get("f7")),
+                "amount": _to_float(row.get("f6")),
+                "industry": str(row.get("f100") or ""),
+            })
+
+        return {"results": results, "total": total}
+
     # 指数行情内存缓存：避免每次请求都打外网；TTL 默认 15 秒，足以覆盖刷新洪峰
     _INDEX_CACHE: dict = {"ts": 0.0, "data": []}
     _INDEX_CACHE_TTL = 15.0
