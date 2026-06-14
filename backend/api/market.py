@@ -141,7 +141,20 @@ def get_financial_history(
     if not annual_cols:
         raise HTTPException(status_code=404, detail="无年报数据")
 
-    year_labels = [c[:4] for c in annual_cols]
+    quarter_suffix_map = {"0331": "Q1", "0630": "Q2", "0930": "Q3"}
+    latest_quarter_col = None
+    for col in sorted(date_cols, reverse=True):
+        suffix = col[4:]
+        if suffix in quarter_suffix_map:
+            latest_quarter_col = col
+            break
+
+    if latest_quarter_col:
+        selected_cols = [latest_quarter_col] + annual_cols
+        year_labels = [f"{latest_quarter_col[:4]}{quarter_suffix_map[latest_quarter_col[4:]]}"] + [c[:4] for c in annual_cols]
+    else:
+        selected_cols = annual_cols
+        year_labels = [c[:4] for c in annual_cols]
 
     indicator_map: dict[str, dict] = {}
     for _, row in df.iterrows():
@@ -150,8 +163,8 @@ def get_financial_history(
     def extract(name: str) -> list[float | None]:
         row = indicator_map.get(name)
         if row is None:
-            return [None] * len(annual_cols)
-        return [_safe(row.get(c)) for c in annual_cols]
+            return [None] * len(selected_cols)
+        return [_safe(row.get(c)) for c in selected_cols]
 
     yi = 1e8
 
@@ -191,11 +204,13 @@ def get_financial_history(
         },
     ]
 
-    dividend_per_share: list[float | None] = [None] * len(annual_cols)
+    dividend_per_share: list[float | None] = [None] * len(selected_cols)
     try:
         div_df = ak.stock_history_dividend_detail(symbol=code, indicator="分红")
         if div_df is not None and not div_df.empty and "派息" in div_df.columns:
-            for i, col in enumerate(annual_cols):
+            for i, col in enumerate(selected_cols):
+                if not col.endswith("1231"):
+                    continue
                 year = col[:4]
                 year_rows = div_df[div_df["公告日期"].astype(str).str.startswith(year)]
                 if not year_rows.empty:
@@ -209,8 +224,8 @@ def get_financial_history(
         pass
 
     indicators.append({"name": "分红/股", "unit": "元", "values": dividend_per_share})
-    indicators.append({"name": "股息率", "unit": "%", "values": [None] * len(annual_cols)})
-    indicators.append({"name": "市盈率(PE)", "unit": "", "values": [None] * len(annual_cols)})
+    indicators.append({"name": "股息率", "unit": "%", "values": [None] * len(selected_cols)})
+    indicators.append({"name": "市盈率(PE)", "unit": "", "values": [None] * len(selected_cols)})
 
     indicators.append({
         "name": "权益乘数",
