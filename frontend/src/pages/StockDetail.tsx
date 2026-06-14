@@ -26,7 +26,6 @@ import KlineChart from '../components/KlineChart';
 import SignalPanel from '../components/SignalPanel';
 import SignalConfluence from '../components/SignalConfluence';
 import FundamentalsCard from '../components/FundamentalsCard';
-import AIAgentCard from '../components/AIAgentCard';
 import TradingAgentsPanel from '../components/TradingAgentsPanel';
 import { useAnalysisStore } from '../store/analysisStore';
 import { fetchQuote } from '../api/market';
@@ -253,10 +252,7 @@ export default function StockDetail() {
                 </Space>
               ),
               children: (
-                <>
-                  <AIAgentCard code={code} stockName={stockName} />
-                  <TradingAgentsPanel code={code} stockName={stockName} />
-                </>
+                <TradingAgentsPanel code={code} stockName={stockName} />
               ),
             },
           ]}
