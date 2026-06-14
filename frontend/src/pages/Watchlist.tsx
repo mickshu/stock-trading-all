@@ -240,7 +240,7 @@ export default function Watchlist() {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascend' | 'descend' | null>(null);
 
-  const [viewMode, setViewMode] = useState<'list' | 'news'>('news');
+  const [viewMode, setViewMode] = useState<'list' | 'news'>('list');
 
   const dragIndexRef = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
