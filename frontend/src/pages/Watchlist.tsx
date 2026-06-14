@@ -199,6 +199,12 @@ function StockTagBadges({ tags, size = 'small' }: { tags: string[] | undefined; 
   );
 }
 
+function eastMoneyUrl(code: string): string {
+  const c = code.replace(/\D/g, '');
+  const prefix = c.startsWith('6') ? 'sh' : c.startsWith('8') || c.startsWith('4') ? 'bj' : 'sz';
+  return `https://quote.eastmoney.com/${prefix}${c}.html`;
+}
+
 function formatVolume(v: number | null | undefined): string {
   if (v == null) return '—';
   if (v >= 1e8) return `${(v / 1e8).toFixed(2)}亿`;
@@ -609,7 +615,7 @@ export default function Watchlist() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                  <Typography.Text strong style={{ fontSize: 15 }}>{record.name}</Typography.Text>
+                  <Typography.Link href={eastMoneyUrl(record.code)} target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, fontWeight: 600 }}>{record.name}</Typography.Link>
                   <Typography.Text type="secondary" style={{ fontSize: 12 }}>{record.code}</Typography.Text>
                   <StockTagBadges tags={record.tags} size="mini" />
                 </div>
@@ -710,7 +716,17 @@ export default function Watchlist() {
   };
 
   const desktopColumns: ColumnsType<StockInfo> = [
-    { title: '代码', dataIndex: 'code', key: 'code', width: 90 },
+    {
+      title: '代码',
+      dataIndex: 'code',
+      key: 'code',
+      width: 90,
+      render: (code: string) => (
+        <Typography.Link href={eastMoneyUrl(code)} target="_blank" rel="noopener noreferrer">
+          {code}
+        </Typography.Link>
+      ),
+    },
     {
       title: '名称',
       key: 'name',
