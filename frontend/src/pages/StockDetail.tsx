@@ -228,21 +228,105 @@ export default function StockDetail() {
                   <span>信号分析</span>
                 </Space>
               ),
-              children: signals.length > 0 ? (
-                <SignalConfluence
-                  signals={signals}
-                  showMA={showMA}
-                  showMACD={showMACD}
-                  showKDJ={showKDJ}
-                  showRSI={showRSI}
-                  onSignalClick={handleSignalClick}
-                />
-              ) : (
-                <Empty
-                  description="暂无信号数据"
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  style={{ padding: '12px 0' }}
-                />
+              children: (
+                <>
+                  {signals.length > 0 ? (
+                    <SignalConfluence
+                      signals={signals}
+                      showMA={showMA}
+                      showMACD={showMACD}
+                      showKDJ={showKDJ}
+                      showRSI={showRSI}
+                      onSignalClick={handleSignalClick}
+                    />
+                  ) : (
+                    <Empty
+                      description="暂无信号数据"
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      style={{ padding: '12px 0' }}
+                    />
+                  )}
+
+                  <div ref={chartRef} style={{ scrollMarginTop: isMobile ? 132 : 0, marginTop: 16 }}>
+                    <Card
+                      size="small"
+                      title="K线图"
+                      styles={{ body: { padding: isMobile ? 8 : 12 } }}
+                      style={{ marginBottom: isMobile ? 8 : 0 }}
+                    >
+                      <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: isMobile ? '4px 12px' : '0 12px' }}>
+                        <Checkbox checked={showMA} onChange={(e) => setShowMA(e.target.checked)}>MA</Checkbox>
+                        <Checkbox checked={showMACD} onChange={(e) => setShowMACD(e.target.checked)}>MACD</Checkbox>
+                        <Checkbox checked={showKDJ} onChange={(e) => setShowKDJ(e.target.checked)}>KDJ</Checkbox>
+                        <Checkbox checked={showRSI} onChange={(e) => setShowRSI(e.target.checked)}>RSI</Checkbox>
+                        <Checkbox checked={showSignals} onChange={(e) => setShowSignals(e.target.checked)}>信号标注</Checkbox>
+                      </div>
+                      <Spin spinning={loading}>
+                        <KlineChart
+                          klineData={klineData}
+                          height={chartHeight}
+                          showMA={showMA}
+                          showMACD={showMACD}
+                          showKDJ={showKDJ}
+                          showRSI={showRSI}
+                          signals={signals}
+                          showSignals={showSignals}
+                          highlightPosition={highlightPosition}
+                        />
+                      </Spin>
+                    </Card>
+                  </div>
+
+                  {!isMobile && (
+                    <Card size="small" title="信号列表" style={{ marginTop: 16 }}>
+                      <div style={{ maxHeight: 520, overflowY: 'auto' }}>
+                        <SignalPanel
+                          signals={signals}
+                          onSignalClick={handleSignalClick}
+                          showMA={showMA}
+                          showMACD={showMACD}
+                          showKDJ={showKDJ}
+                          showRSI={showRSI}
+                        />
+                      </div>
+                    </Card>
+                  )}
+
+                  {isMobile && (
+                    <>
+                      <FloatButton
+                        icon={<UnorderedListOutlined />}
+                        description="信号"
+                        shape="square"
+                        type="primary"
+                        onClick={() => setSignalDrawerOpen(true)}
+                        style={{ right: 16, bottom: 72 }}
+                        aria-label="打开信号列表"
+                        badge={signals.length > 0 ? { count: signals.length, overflowCount: 99 } : undefined}
+                      />
+                      <Drawer
+                        title="信号列表"
+                        placement="bottom"
+                        height="80vh"
+                        open={signalDrawerOpen}
+                        onClose={() => setSignalDrawerOpen(false)}
+                        styles={{ body: { padding: 12 } }}
+                      >
+                        <SignalPanel
+                          signals={signals}
+                          onSignalClick={(pos) => {
+                            setSignalDrawerOpen(false);
+                            handleSignalClick(pos);
+                          }}
+                          showMA={showMA}
+                          showMACD={showMACD}
+                          showKDJ={showKDJ}
+                          showRSI={showRSI}
+                        />
+                      </Drawer>
+                    </>
+                  )}
+                </>
               ),
             },
             {
@@ -270,88 +354,6 @@ export default function StockDetail() {
           ]}
         />
       </Card>
-
-      <div ref={chartRef} style={{ scrollMarginTop: isMobile ? 132 : 0 }}>
-      <Card
-        size="small"
-        title="K线图"
-        styles={{ body: { padding: isMobile ? 8 : 12 } }}
-        style={{ marginBottom: isMobile ? 8 : 0 }}
-      >
-        <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: isMobile ? '4px 12px' : '0 12px' }}>
-          <Checkbox checked={showMA} onChange={(e) => setShowMA(e.target.checked)}>MA</Checkbox>
-          <Checkbox checked={showMACD} onChange={(e) => setShowMACD(e.target.checked)}>MACD</Checkbox>
-          <Checkbox checked={showKDJ} onChange={(e) => setShowKDJ(e.target.checked)}>KDJ</Checkbox>
-          <Checkbox checked={showRSI} onChange={(e) => setShowRSI(e.target.checked)}>RSI</Checkbox>
-          <Checkbox checked={showSignals} onChange={(e) => setShowSignals(e.target.checked)}>信号标注</Checkbox>
-        </div>
-        <Spin spinning={loading}>
-          <KlineChart
-            klineData={klineData}
-            height={chartHeight}
-            showMA={showMA}
-            showMACD={showMACD}
-            showKDJ={showKDJ}
-            showRSI={showRSI}
-            signals={signals}
-            showSignals={showSignals}
-            highlightPosition={highlightPosition}
-          />
-        </Spin>
-      </Card>
-      </div>
-
-      {/* Desktop: signal panel below chart */}
-      {!isMobile && (
-        <Card size="small" title="信号列表" style={{ marginTop: 16 }}>
-          <div style={{ maxHeight: 520, overflowY: 'auto' }}>
-            <SignalPanel
-              signals={signals}
-              onSignalClick={handleSignalClick}
-              showMA={showMA}
-              showMACD={showMACD}
-              showKDJ={showKDJ}
-              showRSI={showRSI}
-            />
-          </div>
-        </Card>
-      )}
-
-      {/* Mobile: floating action button + bottom drawer for signal panel */}
-      {isMobile && (
-        <>
-          <FloatButton
-            icon={<UnorderedListOutlined />}
-            description="信号"
-            shape="square"
-            type="primary"
-            onClick={() => setSignalDrawerOpen(true)}
-            style={{ right: 16, bottom: 72 }}
-            aria-label="打开信号列表"
-            badge={signals.length > 0 ? { count: signals.length, overflowCount: 99 } : undefined}
-          />
-          <Drawer
-            title="信号列表"
-            placement="bottom"
-            height="80vh"
-            open={signalDrawerOpen}
-            onClose={() => setSignalDrawerOpen(false)}
-            styles={{ body: { padding: 12 } }}
-          >
-            <SignalPanel
-              signals={signals}
-              onSignalClick={(pos) => {
-                setSignalDrawerOpen(false);
-                handleSignalClick(pos);
-              }}
-              showMA={showMA}
-              showMACD={showMACD}
-              showKDJ={showKDJ}
-              showRSI={showRSI}
-            />
-          </Drawer>
-        </>
-      )}
     </div>
   );
 }
