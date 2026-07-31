@@ -98,14 +98,19 @@ def condition_screen_stocks(
     amplitude_max: float | None = Query(None),
     amount_min: float | None = Query(None, description="成交额下限（亿元）"),
     amount_max: float | None = Query(None, description="成交额上限（亿元）"),
+    discount_rate_min: float | None = Query(None, description="ETF 折溢价率下限"),
+    discount_rate_max: float | None = Query(None, description="ETF 折溢价率上限"),
+    size_min: float | None = Query(None, description="ETF 规模下限（亿份）"),
+    size_max: float | None = Query(None, description="ETF 规模上限（亿份）"),
     sort_by: str = Query("amount"),
     sort_order: str = Query("desc"),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
-    scope: str = Query("all", description="all=全市场 / watchlist=仅自选股"),
+    scope: str = Query("all", description="all=全市场 / watchlist=仅自选股 / all_etf=全市场ETF"),
     group_id: int | None = Query(None),
     tag: str | None = Query(None),
 ):
+    security_type = "etf" if scope == "all_etf" else "stock"
     codes: list[str] | None = None
     if scope == "watchlist":
         db: Session = next(get_db())
@@ -130,6 +135,7 @@ def condition_screen_stocks(
         page=1,
         page_size=5000,
         codes=codes,
+        security_type=security_type,
     )
     items = raw.get("results", [])
 
@@ -137,7 +143,8 @@ def condition_screen_stocks(
         pe_min, pe_max, pb_min, pb_max, market_cap_min, market_cap_max,
         change_pct_min, change_pct_max, turnover_min, turnover_max,
         volume_ratio_min, volume_ratio_max, amplitude_min, amplitude_max,
-        amount_min, amount_max,
+        amount_min, amount_max, discount_rate_min, discount_rate_max,
+        size_min, size_max,
     ])
 
     if has_filter:
@@ -171,10 +178,19 @@ def condition_screen_stocks(
             if amt_lo is not None or amt_hi is not None:
                 if not _in_range(item.get("amount"), amt_lo, amt_hi):
                     continue
+            if discount_rate_min is not None or discount_rate_max is not None:
+                if not _in_range(item.get("discount_rate"), discount_rate_min, discount_rate_max):
+                    continue
+            if size_min is not None or size_max is not None:
+                size_yi = item.get("total_market_cap")
+                if size_yi is not None:
+                    size_yi = size_yi / 1e8
+                if not _in_range(size_yi, size_min, size_max):
+                    continue
             filtered.append(item)
         items = filtered
 
-    sort_key = sort_by if sort_by in items[0] if items else "amount"
+    sort_key = sort_by if (items and sort_by in items[0]) else "amount"
     reverse = sort_order == "desc"
     items.sort(key=lambda x: (x.get(sort_key) is None, x.get(sort_key) or 0), reverse=reverse)
 
