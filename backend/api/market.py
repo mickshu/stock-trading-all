@@ -245,3 +245,22 @@ def get_financial_history(
     indicators.append({"name": "总股本", "unit": "亿股", "values": total_shares})
 
     return {"code": code, "years": year_labels, "indicators": indicators}
+
+
+@router.get("/etf-list")
+def get_etf_list(
+    sort_by: str = Query("amount", description="排序字段：amount/change_pct/price/volume"),
+    sort_order: str = Query("desc"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+):
+    """ETF 全量列表，支持排序和分页。"""
+    ds = get_data_source()
+    raw = ds.screen_stocks(
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page,
+        page_size=page_size,
+        security_type="etf",
+    )
+    return raw
