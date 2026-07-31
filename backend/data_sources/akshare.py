@@ -31,6 +31,9 @@ class AkshareDataSource(BaseDataSource):
     _STOCK_INDEX_CACHE: dict = {"ts": 0.0, "rows": []}
     _STOCK_INDEX_TTL = 24 * 3600.0
 
+    _ETF_INDEX_CACHE: dict = {"ts": 0.0, "rows": []}
+    _ETF_INDEX_TTL = 24 * 3600.0
+
     def _stock_name_index(self) -> list[tuple[str, str]]:
         now = time.monotonic()
         cache = self._STOCK_INDEX_CACHE
@@ -55,16 +58,47 @@ class AkshareDataSource(BaseDataSource):
         cache["rows"] = rows
         return rows
 
+    def _etf_name_index(self) -> list[tuple[str, str]]:
+        """全量 ETF (code, name) 列表缓存，24h TTL。"""
+        import akshare as ak
+        now = time.monotonic()
+        cache = self._ETF_INDEX_CACHE
+        if cache["rows"] and now - cache["ts"] < self._ETF_INDEX_TTL:
+            return cache["rows"]
+        try:
+            df = ak.fund_etf_spot_em()
+        except Exception:
+            logger.exception("akshare fund_etf_spot_em failed")
+            return cache["rows"]
+        if df is None or df.empty:
+            return cache["rows"]
+        rows: list[tuple[str, str]] = [
+            (str(row["代码"]).zfill(6), str(row["名称"]))
+            for _, row in df.iterrows()
+        ]
+        cache["ts"] = now
+        cache["rows"] = rows
+        return rows
+
     def search_stocks(self, keyword: str) -> list[dict]:
         kw = (keyword or "").strip()
         if not kw:
             return []
+        results: list[dict] = []
         try:
+            # 搜索股票
             rows = self._stock_name_index()
-            if not rows:
-                return []
-            matched = rank_stock_matches(rows, kw, limit=20)
-            return [{"code": code, "name": name, "market": "A"} for code, name in matched]
+            if rows:
+                matched = rank_stock_matches(rows, kw, limit=20)
+                for code, name in matched:
+                    results.append({"code": code, "name": name, "market": "A", "security_type": "stock"})
+            # 搜索 ETF
+            etf_rows = self._etf_name_index()
+            if etf_rows:
+                etf_matched = rank_stock_matches(etf_rows, kw, limit=10)
+                for code, name in etf_matched:
+                    results.append({"code": code, "name": name, "market": "A", "security_type": "etf"})
+            return results
         except Exception:
             logger.exception("akshare search_stocks failed for keyword=%r", kw)
             return []
