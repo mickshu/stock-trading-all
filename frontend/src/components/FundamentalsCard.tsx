@@ -88,7 +88,7 @@ export default function FundamentalsCard({ code, isEtf }: Props) {
         {error ? (
           <Typography.Text type="danger">{error}</Typography.Text>
         ) : (
-          {isEtf ? (
+          isEtf ? (
             <Descriptions column={{ xs: 2, sm: 3, md: 4, lg: 6 }} size="small" colon={false}>
               <Descriptions.Item label="最新价">
                 <Typography.Text strong>
@@ -144,7 +144,7 @@ export default function FundamentalsCard({ code, isEtf }: Props) {
             {!isMobile && <Descriptions.Item label="流通股">{formatBigShares(data?.float_shares)}</Descriptions.Item>}
             {!isMobile && <Descriptions.Item label="上市日期">{data?.listing_date || '—'}</Descriptions.Item>}
           </Descriptions>
-          )}
+          )
         )}
       </Spin>
     </Card>
