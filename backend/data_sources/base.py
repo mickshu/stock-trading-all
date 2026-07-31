@@ -51,6 +51,7 @@ class BaseDataSource(ABC):
         page: int = 1,
         page_size: int = 50,
         codes: list[str] | None = None,
+        security_type: str = "stock",
     ) -> dict:
         """批量拉取股票行情+指标数据用于条件选股。
 

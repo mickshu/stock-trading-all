@@ -942,6 +942,7 @@ class AkshareDataSource(BaseDataSource):
         "f12", "f14", "f20", "f21", "f23", "f100",
     ])
     _SCREEN_FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
+    _ETF_SCREEN_FS = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
 
     def screen_stocks(
         self,
@@ -950,6 +951,7 @@ class AkshareDataSource(BaseDataSource):
         page: int = 1,
         page_size: int = 50,
         codes: list[str] | None = None,
+        security_type: str = "stock",
     ) -> dict:
         fid = self._SCREEN_FIELD_MAP.get(sort_by, "f6")
         po = 1 if sort_order == "desc" else 0
@@ -972,7 +974,8 @@ class AkshareDataSource(BaseDataSource):
             total = len(rows)
         else:
             pz = max(page_size, 100)
-            rows = self._em_clist(self._SCREEN_FS, self._SCREEN_FIELDS_STR, pn=1, pz=5000, fid=fid, po=po)
+            fs = self._ETF_SCREEN_FS if security_type == "etf" else self._SCREEN_FS
+            rows = self._em_clist(fs, self._SCREEN_FIELDS_STR, pn=1, pz=5000, fid=fid, po=po)
             total = len(rows)
 
         results = []
