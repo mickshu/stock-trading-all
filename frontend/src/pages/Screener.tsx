@@ -136,6 +136,11 @@ function ConditionScreenerTab() {
   const [amplitudeMax, setAmplitudeMax] = useState<number | null>(null);
   const [amountRange, setAmountRange] = useState('');
   const [scope, setScope] = useState<'all' | 'watchlist'>('all');
+  const [securityType, setSecurityType] = useState<'stock' | 'etf'>('stock');
+  const [discountRateMin, setDiscountRateMin] = useState<number | null>(null);
+  const [discountRateMax, setDiscountRateMax] = useState<number | null>(null);
+  const [sizeMin, setSizeMin] = useState<number | null>(null);
+  const [sizeMax, setSizeMax] = useState<number | null>(null);
   const [groupFilter, setGroupFilter] = useState<GroupFilterValue>('all');
 
   const [sortBy, setSortBy] = useState('amount');
@@ -162,6 +167,9 @@ function ConditionScreenerTab() {
           page_size: pageSize,
           scope,
         };
+        if (securityType === 'etf') {
+          params.scope = 'all_etf';
+        }
         if (peMin != null) params.pe_min = peMin;
         if (peMax != null) params.pe_max = peMax;
         if (pbMin != null) params.pb_min = pbMin;
@@ -178,6 +186,10 @@ function ConditionScreenerTab() {
         if (amplitudeMax != null) params.amplitude_max = amplitudeMax;
         if (amtMin != null) params.amount_min = amtMin;
         if (amtMax != null) params.amount_max = amtMax;
+        if (discountRateMin != null) params.discount_rate_min = discountRateMin;
+        if (discountRateMax != null) params.discount_rate_max = discountRateMax;
+        if (sizeMin != null) params.size_min = sizeMin;
+        if (sizeMax != null) params.size_max = sizeMax;
 
         if (scope === 'watchlist') {
           if (typeof groupFilter === 'number') {
@@ -203,6 +215,7 @@ function ConditionScreenerTab() {
       peMin, peMax, pbMin, pbMax, marketCapRange, changePctMin, changePctMax,
       turnoverMin, turnoverMax, volumeRatioMin, volumeRatioMax,
       amplitudeMin, amplitudeMax, amountRange, scope, groupFilter,
+      discountRateMin, discountRateMax, sizeMin, sizeMax, securityType,
       page, pageSize, sortBy, sortOrder,
     ],
   );
@@ -224,6 +237,11 @@ function ConditionScreenerTab() {
     setAmountRange('');
     setScope('all');
     setGroupFilter('all');
+    setDiscountRateMin(null);
+    setDiscountRateMax(null);
+    setSizeMin(null);
+    setSizeMax(null);
+    setSecurityType('stock');
     setSortBy('amount');
     setSortOrder('desc');
     setPage(1);
@@ -289,22 +307,31 @@ function ConditionScreenerTab() {
       title: 'PE',
       dataIndex: 'pe',
       width: 70,
-      sorter: true,
-      render: (v: number | null) => (v != null ? v.toFixed(2) : '-'),
+      sorter: securityType !== 'etf',
+      render: (v: number | null) => {
+        if (securityType === 'etf') return <Typography.Text type="secondary">—</Typography.Text>;
+        return v != null ? v.toFixed(2) : '-';
+      },
     },
     {
       title: 'PB',
       dataIndex: 'pb',
       width: 70,
-      sorter: true,
-      render: (v: number | null) => (v != null ? v.toFixed(2) : '-'),
+      sorter: securityType !== 'etf',
+      render: (v: number | null) => {
+        if (securityType === 'etf') return <Typography.Text type="secondary">—</Typography.Text>;
+        return v != null ? v.toFixed(2) : '-';
+      },
     },
     {
       title: '总市值',
       dataIndex: 'total_market_cap',
       width: 100,
-      sorter: true,
-      render: (v: number | null) => formatMarketCap(v),
+      sorter: securityType !== 'etf',
+      render: (v: number | null) => {
+        if (securityType === 'etf') return <Typography.Text type="secondary">—</Typography.Text>;
+        return formatMarketCap(v);
+      },
     },
     {
       title: '换手率',
@@ -348,38 +375,42 @@ function ConditionScreenerTab() {
   const filterBody = (
     <Space direction="vertical" size={isMobile ? 6 : 10} style={{ width: '100%' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? 8 : 16 }}>
-        <div>
-          <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-            市盈率(PE)
-          </Typography.Text>
-          <Space size={0}>
-            <InputNumber size="small" style={rangeInputStyle} placeholder="最小" value={peMin} onChange={setPeMin} />
-            {separator}
-            <InputNumber size="small" style={rangeInputStyle} placeholder="最大" value={peMax} onChange={setPeMax} />
-          </Space>
-        </div>
-        <div>
-          <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-            市净率(PB)
-          </Typography.Text>
-          <Space size={0}>
-            <InputNumber size="small" style={rangeInputStyle} placeholder="最小" value={pbMin} onChange={setPbMin} />
-            {separator}
-            <InputNumber size="small" style={rangeInputStyle} placeholder="最大" value={pbMax} onChange={setPbMax} />
-          </Space>
-        </div>
-        <div>
-          <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-            总市值
-          </Typography.Text>
-          <Select
-            size="small"
-            style={{ width: isMobile ? 120 : 140 }}
-            value={marketCapRange}
-            onChange={setMarketCapRange}
-            options={MARKET_CAP_OPTIONS}
-          />
-        </div>
+        {securityType === 'stock' && (
+          <>
+            <div>
+              <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                市盈率(PE)
+              </Typography.Text>
+              <Space size={0}>
+                <InputNumber size="small" style={rangeInputStyle} placeholder="最小" value={peMin} onChange={setPeMin} />
+                {separator}
+                <InputNumber size="small" style={rangeInputStyle} placeholder="最大" value={peMax} onChange={setPeMax} />
+              </Space>
+            </div>
+            <div>
+              <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                市净率(PB)
+              </Typography.Text>
+              <Space size={0}>
+                <InputNumber size="small" style={rangeInputStyle} placeholder="最小" value={pbMin} onChange={setPbMin} />
+                {separator}
+                <InputNumber size="small" style={rangeInputStyle} placeholder="最大" value={pbMax} onChange={setPbMax} />
+              </Space>
+            </div>
+            <div>
+              <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                总市值
+              </Typography.Text>
+              <Select
+                size="small"
+                style={{ width: isMobile ? 120 : 140 }}
+                value={marketCapRange}
+                onChange={setMarketCapRange}
+                options={MARKET_CAP_OPTIONS}
+              />
+            </div>
+          </>
+        )}
         <div>
           <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
             涨跌幅(%)
@@ -391,6 +422,30 @@ function ConditionScreenerTab() {
           </Space>
         </div>
       </div>
+      {securityType === 'etf' && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? 8 : 16 }}>
+          <div>
+            <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+              折溢价率(%)
+            </Typography.Text>
+            <Space size={0}>
+              <InputNumber size="small" style={rangeInputStyle} placeholder="最小" value={discountRateMin} onChange={setDiscountRateMin} />
+              {separator}
+              <InputNumber size="small" style={rangeInputStyle} placeholder="最大" value={discountRateMax} onChange={setDiscountRateMax} />
+            </Space>
+          </div>
+          <div>
+            <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+              规模（亿）
+            </Typography.Text>
+            <Space size={0}>
+              <InputNumber size="small" style={rangeInputStyle} placeholder="最小" value={sizeMin} onChange={setSizeMin} />
+              {separator}
+              <InputNumber size="small" style={rangeInputStyle} placeholder="最大" value={sizeMax} onChange={setSizeMax} />
+            </Space>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? 8 : 16 }}>
         <div>
           <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
@@ -442,15 +497,27 @@ function ConditionScreenerTab() {
           </Typography.Text>
           <Segmented
             size="small"
-            value={scope}
-            onChange={(v) => setScope(v as 'all' | 'watchlist')}
+            value={securityType === 'etf' ? 'all_etf' : scope}
+            onChange={(v) => {
+              if (v === 'all_etf') {
+                setSecurityType('etf');
+                setScope('all');
+              } else if (v === 'all') {
+                setSecurityType('stock');
+                setScope('all');
+              } else {
+                setSecurityType('stock');
+                setScope(v as 'all' | 'watchlist');
+              }
+            }}
             options={[
               { label: '全部A股', value: 'all' },
+              { label: '全部ETF', value: 'all_etf' },
               { label: '自选股', value: 'watchlist' },
             ]}
           />
         </div>
-        {scope === 'watchlist' && (
+        {securityType === 'stock' && scope === 'watchlist' && (
           <div>
             <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
               分组
@@ -494,7 +561,7 @@ function ConditionScreenerTab() {
       ) : (
         <>
           <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: isMobile ? 12 : undefined }}>
-            共筛选出 {total} 只股票
+            共筛选出 {total} 只{securityType === 'etf' ? 'ETF' : '股票'}
           </Typography.Text>
           <Table<ConditionScreenerResult>
             columns={columns}
