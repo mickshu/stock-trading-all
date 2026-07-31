@@ -53,11 +53,14 @@ export interface AnalysisResponse {
   signals: Signal[];
 }
 
+export type SecurityType = 'stock' | 'etf';
+
 export interface StockInfo {
   id?: number;
   code: string;
   name: string;
   market: string;
+  security_type?: SecurityType;
   group_id?: number | null;
   tags?: string[];
   target_price?: number | null;
