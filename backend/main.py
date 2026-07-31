@@ -56,6 +56,16 @@ def _safe_daily_summary_job():
         _scheduler_logger.exception("Daily summary scheduled job failed")
 
 
+def _safe_opportunity_scan_job():
+    try:
+        from backend.services.opportunity_scanner import run_opportunity_scan
+        result = run_opportunity_scan()
+        n = len(result.get("candidates") or [])
+        _scheduler_logger.info("Opportunity scan completed: %d candidates found", n)
+    except Exception:
+        _scheduler_logger.exception("Opportunity scan scheduled job failed")
+
+
 @app.on_event("startup")
 def on_startup():
     init_db()
@@ -79,6 +89,12 @@ def on_startup():
         _safe_daily_summary_job,
         CronTrigger(day_of_week="mon-fri", hour=15, minute=30),
         id="daily_summary",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        _safe_opportunity_scan_job,
+        CronTrigger(hour=2, minute=0),
+        id="opportunity_scan",
         replace_existing=True,
     )
     scheduler.start()

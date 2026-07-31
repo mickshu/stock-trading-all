@@ -2,6 +2,7 @@
 
 依赖 pypinyin；未安装时函数退化为空字符串，调用方仍能用代码/汉字子串匹配。
 """
+import re
 from functools import lru_cache
 from typing import Iterable
 
@@ -10,6 +11,9 @@ try:
     _PYPINYIN_AVAILABLE = True
 except ImportError:  # 兜底：未安装 pypinyin 时拼音相关结果为空
     _PYPINYIN_AVAILABLE = False
+
+# 新股/特殊处理前缀：C（次新股，上市第2-5日）、N（首日）、ST/*ST
+_TEMP_PREFIX_RE = re.compile(r'^([CN]|\*?ST)\s*')
 
 
 @lru_cache(maxsize=16384)
@@ -25,6 +29,13 @@ def name_pinyin(name: str) -> tuple[str, str]:
 
 def is_ascii_alpha(s: str) -> bool:
     return bool(s) and s.isascii() and s.isalpha()
+
+
+def _clean_name(name: str) -> str:
+    """去掉新股/特殊处理前缀（C、N、ST、*ST），返回干净的股票名用于匹配。"""
+    if not name:
+        return ""
+    return _TEMP_PREFIX_RE.sub("", name).strip()
 
 
 def rank_stock_matches(
@@ -50,22 +61,26 @@ def rank_stock_matches(
     for code, name in rows:
         if not code:
             continue
+        name_clean = _clean_name(name) if name else ""
         if code.startswith(kw):
             buckets[0].append((code, name))
             continue
-        if name and name.startswith(kw):
+        # 前缀匹配：同时匹配原始名称和去前缀后的名称
+        if (name and name.startswith(kw)) or (name_clean and name_clean.startswith(kw)):
             buckets[1].append((code, name))
             continue
-        full_py, init = name_pinyin(name) if name else ("", "")
+        # 拼音匹配用去前缀后的名称，避免 C/N/ST 前缀干扰
+        full_py, init = name_pinyin(name_clean) if name_clean else ("", "")
         if is_alpha and init and init.startswith(kw_low):
             buckets[2].append((code, name))
             continue
         if is_alpha and full_py and full_py.startswith(kw_low):
             buckets[3].append((code, name))
             continue
+        # 子串兜底：双向匹配 + 去前缀名称
         if (
             kw in code
-            or (name and kw in name)
+            or (name and (kw in name or name_clean in kw))
             or (is_alpha and ((init and kw_low in init) or (full_py and kw_low in full_py)))
         ):
             buckets[4].append((code, name))

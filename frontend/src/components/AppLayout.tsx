@@ -52,7 +52,7 @@ export default function AppLayout() {
                 marginBottom: 12,
               }}
             >
-              v.26.07.31_9
+              v.26.07.31_10
             </div>
           )}
           <Menu

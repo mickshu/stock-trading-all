@@ -1,0 +1,2109 @@
+
+  VITE v8.0.14  ready in 480 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://172.17.56.240:5173/
+9:15:08 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:15:19 AM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+9:15:19 AM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+9:15:19 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:20:42 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:33:50 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:36:31 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:45:35 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+6:40:56 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+6:40:59 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+6:51:24 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:20:05 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:29:57 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:30:04 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+10:42:44 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:13:26 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:23:26 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:59:06 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+6:29:30 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+7:03:09 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+7:44:52 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:22:39 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:35:57 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:43:13 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:55:51 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:58:18 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+11:01:15 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+11:01:38 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+11:10:15 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+11:35:49 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+11:45:15 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+3:58:49 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+4:03:31 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+4:26:57 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:18:19 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:54:45 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:08:29 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:11:52 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:11:54 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:12:01 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:23:57 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:28:18 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:28:21 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:28:49 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:38:46 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:40:22 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:47:30 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:47:39 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:49:41 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+2:56:16 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+3:01:16 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+6:06:26 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+6:08:08 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+6:08:08 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+6:11:44 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+6:11:44 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+8:22:28 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+8:22:31 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+2:05:44 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+2:06:06 PM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+2:06:06 PM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+2:06:06 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+2:06:11 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+6:57:40 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+7:00:09 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+8:06:03 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:36:36 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:43:24 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+7:47:28 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+7:47:34 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+7:52:25 AM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+7:52:25 AM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+7:52:26 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:22:17 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:22:53 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:38:21 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+11:26:21 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:39:53 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:47:29 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:56:10 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:51:44 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:53:20 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:53:51 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+11:17:35 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+3:56:35 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+4:10:55 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:36:16 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:48:09 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+7:35:45 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+The request id "/etc/passwd" is outside of Vite serving allow list.
+
+- /home/admin/stock-trading-all/frontend
+
+Refer to docs https://vite.dev/config/server-options.html#server-fs-allow for configurations and more details.
+
+9:15:02 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:24:53 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:25:05 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:25:06 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:37:33 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:37:36 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+4:34:31 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:58:40 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:58:42 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+5:26:52 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:27:11 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+5:28:41 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+5:28:45 PM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+5:43:05 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:43:06 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+5:50:08 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:50:10 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:20:56 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:21:30 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+10:28:27 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+12:41:03 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+1:24:48 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+2:59:38 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+4:14:49 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+5:03:44 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+6:21:36 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+7:51:55 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+8:19:23 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+12:45:41 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+12:46:31 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+4:39:01 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+5:10:58 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+7:02:16 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+7:05:13 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+7:05:45 PM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+7:05:45 PM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+9:28:07 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:43:55 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+8:57:32 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:03:53 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:03:56 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:18:08 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:21:46 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:22:09 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:22:24 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+9:41:06 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:42:27 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:43:10 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:43:12 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:44:46 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:53:10 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:53:58 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+1:51:12 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+8:15:26 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+8:15:37 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+8:17:20 PM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+8:33:36 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+8:33:39 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+12:12:28 AM [vite] Internal server error: "ESM integration proposal for Wasm" is not supported currently.
+        Use plugin-wasm or other community plugins to handle this.
+        Alternatively, you can use `.wasm?init` or `.wasm?url`.
+        See https://vitejs.dev/guide/features.html#webassembly for more details.
+  Plugin: builtin:vite-wasm-fallback
+      at async EnvironmentPluginContainer.load (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30231:19)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24485:21)
+The request id "/etc/passwd?inline" is outside of Vite serving allow list.
+The request id "/etc/passwd?inline" is outside of Vite serving allow list.
+The request id "/etc/passwd" is outside of Vite serving allow list.
+The request id "/etc/passwd?.svg" is outside of Vite serving allow list.
+The request id "/etc/passwd?.svg?.wasm?init" is outside of Vite serving allow list.
+The request id "/etc/passwd?.svg?.wasm?init" is outside of Vite serving allow list.
+The request id "/etc/passwd?.svg" is outside of Vite serving allow list.
+The request id "/etc/passwd??inline=1.wasm?init" is outside of Vite serving allow list.
+The request id "/etc/passwd" is outside of Vite serving allow list.
+The request id "/etc/passwd??inline=1.wasm?init" is outside of Vite serving allow list.
+The request id "/etc/passwd" is outside of Vite serving allow list.
+The request id "/proc/self/cwd/package.json" is outside of Vite serving allow list.
+The request id "/etc/passwd" is outside of Vite serving allow list.
+12:17:02 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /proc/self/environ:2:23
+  1  |  NoDefaultCurrentDirectoryInExePath=1 LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd...
+  2  |   eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+     |                         ^
+  3  |  } 
+12:17:02 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /proc/self/environ:2:23
+  1  |  NoDefaultCurrentDirectoryInExePath=1 LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd...
+  2  |   eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+     |                         ^
+  3  |  } 
+12:17:02 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /proc/self/mountinfo:1:76
+  1  |  22 100 0:21 / /sys rw,nosuid,nodev,noexec,relatime shared:2 - sysfs sysfs rw
+     |                                                                              ^
+  2  |  23 100 0:22 / /proc rw,nosuid,nodev,noexec,relatime shared:26 - proc proc rw
+  3  |  24 100 0:5 / /dev rw,nosuid shared:22 - devtmpfs devtmpfs rw,size=1803772k,nr_inodes=450943,mode=755
+12:17:02 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /proc/self/mountinfo:1:76
+  1  |  22 100 0:21 / /sys rw,nosuid,nodev,noexec,relatime shared:2 - sysfs sysfs rw
+     |                                                                              ^
+  2  |  23 100 0:22 / /proc rw,nosuid,nodev,noexec,relatime shared:26 - proc proc rw
+  3  |  24 100 0:5 / /dev rw,nosuid shared:22 - devtmpfs devtmpfs rw,size=1803772k,nr_inodes=450943,mode=755
+12:17:03 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/proc/1/environ'
+12:17:03 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/proc/1/environ'
+12:17:03 AM [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /proc/self/mountinfo:1:76
+  1  |  22 100 0:21 / /sys rw,nosuid,nodev,noexec,relatime shared:2 - sysfs sysfs rw
+     |                                                                              ^
+  2  |  23 100 0:22 / /proc rw,nosuid,nodev,noexec,relatime shared:26 - proc proc rw
+  3  |  24 100 0:5 / /dev rw,nosuid shared:22 - devtmpfs devtmpfs rw,size=1803772k,nr_inodes=450943,mode=755
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27692:10)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:03 AM [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /proc/self/environ:2:23
+  1  |  NoDefaultCurrentDirectoryInExePath=1 LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd...
+  2  |   eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+     |                         ^
+  3  |  } 
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27692:10)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:04 AM [vite] Internal server error: EACCES: permission denied, open '/proc/1/environ'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:06 AM [vite] Internal server error: EACCES: permission denied, open '/proc/1/environ'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:07 AM [vite] Internal server error: Failed to resolve import "/environ" from "__vite-browser-external:`);}});
+import '/environ';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/environ';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/environ';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/environ';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:07 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /home/admin/.bash_history:92:6
+  90 |  cd ../finnance/
+  91 |  ll
+  92 |  cd ../
+     |        ^
+  93 |  ll
+  94 |  ll 
+12:17:07 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /home/admin/.bash_history:92:6
+  90 |  cd ../finnance/
+  91 |  ll
+  92 |  cd ../
+     |        ^
+  93 |  ll
+  94 |  ll 
+12:17:08 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.zsh_history (resolved id: /home/admin/.zsh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.zsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:08 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.zsh_history (resolved id: /home/admin/.zsh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.zsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:08 AM [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /home/admin/.bash_history:92:6
+  90 |  cd ../finnance/
+  91 |  ll
+  92 |  cd ../
+     |        ^
+  93 |  ll
+  94 |  ll 
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27692:10)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:09 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ash_history (resolved id: /home/admin/.ash_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ash_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:09 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ash_history (resolved id: /home/admin/.ash_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ash_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:09 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.sh_history (resolved id: /home/admin/.sh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.sh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:09 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.sh_history (resolved id: /home/admin/.sh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.sh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:09 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.fish_history (resolved id: /home/admin/.fish_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:09 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.fish_history (resolved id: /home/admin/.fish_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:10 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.local/share/fish/fish_history (resolved id: /home/admin/.local/share/fish/fish_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.local/share/fish/fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:10 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.local/share/fish/fish_history (resolved id: /home/admin/.local/share/fish/fish_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.local/share/fish/fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:10 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ksh_history (resolved id: /home/admin/.ksh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:10 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ksh_history (resolved id: /home/admin/.ksh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:11 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mksh_history (resolved id: /home/admin/.mksh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:11 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mksh_history (resolved id: /home/admin/.mksh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:11 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.tcsh_history (resolved id: /home/admin/.tcsh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.tcsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:11 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.tcsh_history (resolved id: /home/admin/.tcsh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.tcsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:11 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.csh_history (resolved id: /home/admin/.csh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.csh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:11 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.csh_history (resolved id: /home/admin/.csh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.csh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.python_history (resolved id: /home/admin/.python_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.python_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.python_history (resolved id: /home/admin/.python_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.python_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.node_repl_history (resolved id: /home/admin/.node_repl_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.node_repl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.node_repl_history (resolved id: /home/admin/.node_repl_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.node_repl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ipython/profile_default/history.sqlite (resolved id: /home/admin/.ipython/profile_default/history.sqlite) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ipython/profile_default/history.sqlite';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ipython/profile_default/history.sqlite (resolved id: /home/admin/.ipython/profile_default/history.sqlite) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ipython/profile_default/history.sqlite';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ptpython/history (resolved id: /home/admin/.ptpython/history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ptpython/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:12 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ptpython/history (resolved id: /home/admin/.ptpython/history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ptpython/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:13 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ptpython_history (resolved id: /home/admin/.ptpython_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ptpython_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:13 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ptpython_history (resolved id: /home/admin/.ptpython_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ptpython_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:13 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.irb_history (resolved id: /home/admin/.irb_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.irb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:13 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.irb_history (resolved id: /home/admin/.irb_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.irb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:13 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pry_history (resolved id: /home/admin/.pry_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pry_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:13 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pry_history (resolved id: /home/admin/.pry_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pry_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:15 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.gem_history (resolved id: /home/admin/.gem_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.gem_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:15 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.gem_history (resolved id: /home/admin/.gem_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.gem_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:15 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.Rhistory (resolved id: /home/admin/.Rhistory) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.Rhistory';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:15 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.Rhistory (resolved id: /home/admin/.Rhistory) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.Rhistory';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:16 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.Rapp.history (resolved id: /home/admin/.Rapp.history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.Rapp.history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:16 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.Rapp.history (resolved id: /home/admin/.Rapp.history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.Rapp.history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:16 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.scala_history (resolved id: /home/admin/.scala_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.scala_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:16 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.scala_history (resolved id: /home/admin/.scala_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.scala_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:20 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.sbt_history (resolved id: /home/admin/.sbt_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.sbt_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:20 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.sbt_history (resolved id: /home/admin/.sbt_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.sbt_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:20 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.groovy_history (resolved id: /home/admin/.groovy_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.groovy_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:20 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.groovy_history (resolved id: /home/admin/.groovy_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.groovy_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:21 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.clj_history (resolved id: /home/admin/.clj_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.clj_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:21 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.clj_history (resolved id: /home/admin/.clj_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.clj_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:21 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ghci_history (resolved id: /home/admin/.ghci_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ghci_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:21 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.ghci_history (resolved id: /home/admin/.ghci_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.ghci_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:21 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.lldb/lldb-history (resolved id: /home/admin/.lldb/lldb-history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.lldb/lldb-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:21 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.lldb/lldb-history (resolved id: /home/admin/.lldb/lldb-history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.lldb/lldb-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:22 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.lldbhist (resolved id: /home/admin/.lldbhist) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.lldbhist';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:22 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.lldbhist (resolved id: /home/admin/.lldbhist) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.lldbhist';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:22 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.erl_history (resolved id: /home/admin/.erl_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.erl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:22 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.erl_history (resolved id: /home/admin/.erl_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.erl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:23 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.iex_history (resolved id: /home/admin/.iex_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.iex_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:23 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.iex_history (resolved id: /home/admin/.iex_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.iex_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:23 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.psql_history (resolved id: /home/admin/.psql_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.psql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:23 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.psql_history (resolved id: /home/admin/.psql_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.psql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:23 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pgcli_history (resolved id: /home/admin/.pgcli_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pgcli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:23 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pgcli_history (resolved id: /home/admin/.pgcli_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pgcli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:24 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mysql_history (resolved id: /home/admin/.mysql_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mysql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:24 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mysql_history (resolved id: /home/admin/.mysql_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mysql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mycli_history (resolved id: /home/admin/.mycli_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mycli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mycli_history (resolved id: /home/admin/.mycli_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mycli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mariadb_history (resolved id: /home/admin/.mariadb_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mariadb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mariadb_history (resolved id: /home/admin/.mariadb_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mariadb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.sqlite_history (resolved id: /home/admin/.sqlite_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.sqlite_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.sqlite_history (resolved id: /home/admin/.sqlite_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.sqlite_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.dbshell (resolved id: /home/admin/.dbshell) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.dbshell';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:25 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.dbshell (resolved id: /home/admin/.dbshell) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.dbshell';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:26 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.rediscli_history (resolved id: /home/admin/.rediscli_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.rediscli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:26 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.rediscli_history (resolved id: /home/admin/.rediscli_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.rediscli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:26 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mongo_history (resolved id: /home/admin/.mongo_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mongo_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:26 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mongo_history (resolved id: /home/admin/.mongo_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mongo_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:26 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mongosh/.mongodb/mongosh/history (resolved id: /home/admin/.mongosh/.mongodb/mongosh/history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mongosh/.mongodb/mongosh/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:26 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mongosh/.mongodb/mongosh/history (resolved id: /home/admin/.mongosh/.mongodb/mongosh/history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mongosh/.mongodb/mongosh/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:27 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mongodb/mongosh/history (resolved id: /home/admin/.mongodb/mongosh/history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mongodb/mongosh/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:27 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.mongodb/mongosh/history (resolved id: /home/admin/.mongodb/mongosh/history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.mongodb/mongosh/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:27 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.cqlsh_history (resolved id: /home/admin/.cqlsh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.cqlsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:27 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.cqlsh_history (resolved id: /home/admin/.cqlsh_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.cqlsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:27 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.influx_history (resolved id: /home/admin/.influx_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.influx_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:27 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.influx_history (resolved id: /home/admin/.influx_history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.influx_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:28 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.clickhouse-client-history (resolved id: /home/admin/.clickhouse-client-history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.clickhouse-client-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:28 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.clickhouse-client-history (resolved id: /home/admin/.clickhouse-client-history) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.clickhouse-client-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:28 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.lesshst (resolved id: /home/admin/.lesshst) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.lesshst';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:28 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.lesshst (resolved id: /home/admin/.lesshst) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.lesshst';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:28 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /home/admin/.viminfo:2:36
+  1  |  # This viminfo file was generated by Vim 8.0.
+  2  |  # You may edit it if you're careful!
+     |                                      ^
+  3  |  
+  4  |  # Viminfo version
+12:17:28 AM [vite] (client) Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /home/admin/.viminfo:2:36
+  1  |  # This viminfo file was generated by Vim 8.0.
+  2  |  # You may edit it if you're careful!
+     |                                      ^
+  3  |  
+  4  |  # Viminfo version
+12:17:29 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.wget-hsts (resolved id: /home/admin/.wget-hsts) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.wget-hsts';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:29 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.wget-hsts (resolved id: /home/admin/.wget-hsts) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.wget-hsts';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:29 AM [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: vite:import-analysis
+  File: /home/admin/.viminfo:2:36
+  1  |  # This viminfo file was generated by Vim 8.0.
+  2  |  # You may edit it if you're careful!
+     |                                      ^
+  3  |  
+  4  |  # Viminfo version
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27692:10)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:29 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pm2/dump.pm2 (resolved id: /home/admin/.pm2/dump.pm2) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pm2/dump.pm2';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:29 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pm2/dump.pm2 (resolved id: /home/admin/.pm2/dump.pm2) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pm2/dump.pm2';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:30 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pm2/pm2.log (resolved id: /home/admin/.pm2/pm2.log) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pm2/pm2.log';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:30 AM [vite] (client) Pre-transform error: Failed to load url /home/admin/.pm2/pm2.log (resolved id: /home/admin/.pm2/pm2.log) in __vite-browser-external:`);}});
+import '/@fs/home/admin/.pm2/pm2.log';
+var z=new Proxy({}, {get(_, key) {throw new Error(`. Does the file exist?
+12:17:30 AM [vite] Internal server error: Failed to resolve import "/.zsh_history" from "__vite-browser-external:`);}});
+import '/.zsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.zsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.zsh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.zsh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:30 AM [vite] Internal server error: Failed to resolve import "/.ash_history" from "__vite-browser-external:`);}});
+import '/.ash_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.ash_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.ash_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.ash_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:31 AM [vite] Internal server error: Failed to resolve import "/.fish_history" from "__vite-browser-external:`);}});
+import '/.fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.fish_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.fish_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:31 AM [vite] Internal server error: Failed to resolve import "/.sh_history" from "__vite-browser-external:`);}});
+import '/.sh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.sh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.sh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.sh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:32 AM [vite] Internal server error: Failed to resolve import "/.ksh_history" from "__vite-browser-external:`);}});
+import '/.ksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.ksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.ksh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.ksh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:33 AM [vite] Internal server error: Failed to resolve import "/fish_history" from "__vite-browser-external:`);}});
+import '/fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/fish_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/fish_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/fish_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:33 AM [vite] Internal server error: Failed to resolve import "/.mksh_history" from "__vite-browser-external:`);}});
+import '/.mksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.mksh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.mksh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.mksh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:33 AM [vite] Internal server error: Failed to resolve import "/.tcsh_history" from "__vite-browser-external:`);}});
+import '/.tcsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.tcsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.tcsh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.tcsh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:34 AM [vite] Internal server error: Failed to resolve import "/.csh_history" from "__vite-browser-external:`);}});
+import '/.csh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.csh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.csh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.csh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:34 AM [vite] Internal server error: Failed to resolve import "/.python_history" from "__vite-browser-external:`);}});
+import '/.python_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.python_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.python_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.python_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:35 AM [vite] Internal server error: Failed to resolve import "/.node_repl_history" from "__vite-browser-external:`);}});
+import '/.node_repl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.node_repl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.node_repl_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.node_repl_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:35 AM [vite] Internal server error: Failed to resolve import "/history.sqlite" from "__vite-browser-external:`);}});
+import '/history.sqlite';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/history.sqlite';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/history.sqlite';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/history.sqlite';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:35 AM [vite] Internal server error: Failed to resolve import "/history" from "__vite-browser-external:`);}});
+import '/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:36 AM [vite] Internal server error: Failed to resolve import "/.pry_history" from "__vite-browser-external:`);}});
+import '/.pry_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.pry_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.pry_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.pry_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:36 AM [vite] Internal server error: Failed to resolve import "/.irb_history" from "__vite-browser-external:`);}});
+import '/.irb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.irb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.irb_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.irb_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:36 AM [vite] Internal server error: Failed to resolve import "/.ptpython_history" from "__vite-browser-external:`);}});
+import '/.ptpython_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.ptpython_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.ptpython_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.ptpython_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:36 AM [vite] Internal server error: Failed to resolve import "/.gem_history" from "__vite-browser-external:`);}});
+import '/.gem_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.gem_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.gem_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.gem_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:37 AM [vite] Internal server error: Failed to resolve import "/.Rhistory" from "__vite-browser-external:`);}});
+import '/.Rhistory';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.Rhistory';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.Rhistory';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.Rhistory';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:37 AM [vite] Internal server error: Failed to resolve import "/.Rapp.history" from "__vite-browser-external:`);}});
+import '/.Rapp.history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.Rapp.history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.Rapp.history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.Rapp.history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:37 AM [vite] Internal server error: Failed to resolve import "/.scala_history" from "__vite-browser-external:`);}});
+import '/.scala_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.scala_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.scala_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.scala_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:38 AM [vite] Internal server error: Failed to resolve import "/.sbt_history" from "__vite-browser-external:`);}});
+import '/.sbt_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.sbt_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.sbt_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.sbt_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:38 AM [vite] Internal server error: Failed to resolve import "/.groovy_history" from "__vite-browser-external:`);}});
+import '/.groovy_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.groovy_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.groovy_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.groovy_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:39 AM [vite] Internal server error: Failed to resolve import "/.clj_history" from "__vite-browser-external:`);}});
+import '/.clj_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.clj_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.clj_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.clj_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:39 AM [vite] Internal server error: Failed to resolve import "/.lldbhist" from "__vite-browser-external:`);}});
+import '/.lldbhist';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.lldbhist';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.lldbhist';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.lldbhist';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:39 AM [vite] Internal server error: Failed to resolve import "/.ghci_history" from "__vite-browser-external:`);}});
+import '/.ghci_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.ghci_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.ghci_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.ghci_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:40 AM [vite] Internal server error: Failed to resolve import "/lldb-history" from "__vite-browser-external:`);}});
+import '/lldb-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/lldb-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/lldb-history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/lldb-history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:40 AM [vite] Internal server error: Failed to resolve import "/.erl_history" from "__vite-browser-external:`);}});
+import '/.erl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.erl_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.erl_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.erl_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:41 AM [vite] Internal server error: Failed to resolve import "/.iex_history" from "__vite-browser-external:`);}});
+import '/.iex_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.iex_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.iex_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.iex_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:41 AM [vite] Internal server error: Failed to resolve import "/.pgcli_history" from "__vite-browser-external:`);}});
+import '/.pgcli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.pgcli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.pgcli_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.pgcli_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:41 AM [vite] Internal server error: Failed to resolve import "/.psql_history" from "__vite-browser-external:`);}});
+import '/.psql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.psql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.psql_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.psql_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:42 AM [vite] Internal server error: Failed to resolve import "/.mysql_history" from "__vite-browser-external:`);}});
+import '/.mysql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.mysql_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.mysql_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.mysql_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:42 AM [vite] Internal server error: Failed to resolve import "/.mariadb_history" from "__vite-browser-external:`);}});
+import '/.mariadb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.mariadb_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.mariadb_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.mariadb_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:43 AM [vite] Internal server error: Failed to resolve import "/.sqlite_history" from "__vite-browser-external:`);}});
+import '/.sqlite_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.sqlite_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.sqlite_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.sqlite_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:43 AM [vite] Internal server error: Failed to resolve import "/.mycli_history" from "__vite-browser-external:`);}});
+import '/.mycli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.mycli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.mycli_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.mycli_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:43 AM [vite] Internal server error: Failed to resolve import "/.dbshell" from "__vite-browser-external:`);}});
+import '/.dbshell';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.dbshell';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.dbshell';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.dbshell';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:44 AM [vite] Internal server error: Failed to resolve import "/.rediscli_history" from "__vite-browser-external:`);}});
+import '/.rediscli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.rediscli_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.rediscli_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.rediscli_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:44 AM [vite] Internal server error: Failed to resolve import "/history" from "__vite-browser-external:`);}});
+import '/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:44 AM [vite] Internal server error: Failed to resolve import "/.mongo_history" from "__vite-browser-external:`);}});
+import '/.mongo_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.mongo_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.mongo_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.mongo_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:45 AM [vite] Internal server error: Failed to resolve import "/history" from "__vite-browser-external:`);}});
+import '/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:45 AM [vite] Internal server error: Failed to resolve import "/.cqlsh_history" from "__vite-browser-external:`);}});
+import '/.cqlsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.cqlsh_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.cqlsh_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.cqlsh_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:45 AM [vite] Internal server error: Failed to resolve import "/.clickhouse-client-history" from "__vite-browser-external:`);}});
+import '/.clickhouse-client-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.clickhouse-client-history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.clickhouse-client-history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.clickhouse-client-history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:46 AM [vite] Internal server error: Failed to resolve import "/.influx_history" from "__vite-browser-external:`);}});
+import '/.influx_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.influx_history';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.influx_history';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.influx_history';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:46 AM [vite] Internal server error: Failed to resolve import "/.lesshst" from "__vite-browser-external:`);}});
+import '/.lesshst';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.lesshst';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.lesshst';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.lesshst';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:46 AM [vite] Internal server error: Failed to resolve import "/pm2.log" from "__vite-browser-external:`);}});
+import '/pm2.log';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/pm2.log';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/pm2.log';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/pm2.log';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:46 AM [vite] Internal server error: Failed to resolve import "/.wget-hsts" from "__vite-browser-external:`);}});
+import '/.wget-hsts';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/.wget-hsts';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/.wget-hsts';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/.wget-hsts';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:47 AM [vite] Internal server error: Failed to resolve import "/dump.pm2" from "__vite-browser-external:`);}});
+import '/dump.pm2';
+var z=new Proxy({}, {get(_, key) {throw new Error(`". Does the file exist?
+  Plugin: vite:import-analysis
+  File: __vite-browser-external:`);}});
+import '/dump.pm2';
+var z=new Proxy({}, {get(_, key) {throw new Error(`:4:8
+  2  |    get(_, key) {
+  3  |      throw new Error(`Module "`);}});
+  4  |  import '/dump.pm2';
+     |          ^
+  5  |  var z=new Proxy({}, {get(_, key) {throw new Error(`" has been externalized for browser compatibility. Cannot access "...
+  6  |  import '/dump.pm2';
+      at TransformPluginContext._formatLog (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30488:39)
+      at TransformPluginContext.error (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30485:14)
+      at normalizeUrl (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27728:18)
+      at async file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27791:30
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:27759:4)
+      at async EnvironmentPluginContainer.transform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:30273:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24532:26)
+12:17:47 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.bash_history'
+12:17:47 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.bash_history'
+12:17:47 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.zsh_history'
+12:17:47 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.zsh_history'
+12:17:48 AM [vite] Internal server error: EACCES: permission denied, open '/root/.bash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:49 AM [vite] Internal server error: EACCES: permission denied, open '/root/.bash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:49 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ash_history'
+12:17:49 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ash_history'
+12:17:49 AM [vite] Internal server error: EACCES: permission denied, open '/root/.zsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:49 AM [vite] Internal server error: EACCES: permission denied, open '/root/.zsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:49 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.sh_history'
+12:17:49 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.sh_history'
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.zsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.fish_history'
+12:17:50 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.fish_history'
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.bash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.local/share/fish/fish_history'
+12:17:50 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.local/share/fish/fish_history'
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.zsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.sh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.bash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:50 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ksh_history'
+12:17:50 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ksh_history'
+12:17:50 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:51 AM [vite] Internal server error: EACCES: permission denied, open '/root/.fish_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:51 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.mksh_history'
+12:17:51 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.mksh_history'
+12:17:51 AM [vite] Internal server error: EACCES: permission denied, open '/root/.sh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:51 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.tcsh_history'
+12:17:51 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.tcsh_history'
+12:17:51 AM [vite] Internal server error: EACCES: permission denied, open '/root/.local/share/fish/fish_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:51 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ash_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:51 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.csh_history'
+12:17:51 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.csh_history'
+12:17:51 AM [vite] Internal server error: EACCES: permission denied, open '/root/.fish_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:51 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.fish_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.mksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.sh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.tcsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.local/share/fish/fish_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.python_history'
+12:17:52 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.python_history'
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.csh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:52 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.node_repl_history'
+12:17:52 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.node_repl_history'
+12:17:52 AM [vite] Internal server error: EACCES: permission denied, open '/root/.tcsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.mksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.tcsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.mksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.python_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.fish_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ipython/profile_default/history.sqlite'
+12:17:53 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ipython/profile_default/history.sqlite'
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.csh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.node_repl_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.tcsh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:53 AM [vite] Internal server error: EACCES: permission denied, open '/root/.sh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.mksh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.csh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.node_repl_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.ipython/profile_default/history.sqlite'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.node_repl_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.csh_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:54 AM [vite] Internal server error: EACCES: permission denied, open '/root/.python_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:55 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ptpython/history'
+12:17:55 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ptpython/history'
+12:17:55 AM [vite] Internal server error: EACCES: permission denied, open '/root/.python_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:56 AM [vite] Internal server error: EACCES: permission denied, open '/root/.node_repl_history'
+      at async open (node:internal/fs/promises:639:25)
+      at async Object.readFile (node:internal/fs/promises:1249:14)
+      at async loadAndTransform (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24490:12)
+      at async viteTransformMiddleware (file:///home/admin/stock-trading-all/frontend/node_modules/vite/dist/node/chunks/node.js:24326:20)
+12:17:56 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ptpython_history'
+12:17:56 AM [vite] (client) Pre-transform error: EACCES: permission denied, open '/root/.ptpython_history'
+9:27:19 AM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+9:27:20 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+9:27:28 AM [vite] (client) [Unhandled error] TypeError: Cannot read properties of undefined (reading 'trim')
+ > handleChange src/components/StockSearchInput.tsx:85:14
+    83 |      onChange?.(next);
+    84 |      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    85 |      if (!next.trim()) {
+       |                ^
+    86 |        applyResults([]);
+    87 |        setSearching(false);
+ > triggerChange node_modules/.vite/deps/antd.js?v=a77a945d:21657:3
+ > onDisplayValuesChange node_modules/.vite/deps/antd.js?v=a77a945d:21706:2
+ > onClearMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19771:2
+ > onMouseDown node_modules/.vite/deps/antd.js?v=a77a945d:19528:22
+ > executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:8
+ > runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:871:29
+ > processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:18
+ > node_modules/react-dom/cjs/react-dom-client.development.js:19767:8
+ > batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:39
+
+9:28:46 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+10:19:11 AM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+10:21:06 AM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+12:19:19 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+2:28:01 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+2:29:09 PM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+2:29:09 PM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+2:40:26 PM [vite] (client) hmr update /src/pages/Watchlist.tsx, /src/pages/Screener.tsx
+2:40:26 PM [vite] (client) page reload src/types/index.ts.tmp.647477.ca5b685b8b6a
+2:40:56 PM [vite] (client) hmr update /src/pages/Dashboard.tsx, /src/pages/Watchlist.tsx, /src/pages/StockDetail.tsx, /src/components/FinancialHistoryTable.tsx, /src/components/FundamentalsCard.tsx
+2:41:01 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:41:11 PM [vite] (client) hmr update /src/pages/Watchlist.tsx, /src/components/StockSearchInput.tsx, /src/pages/Screener.tsx, /src/pages/Settings.tsx
+2:41:47 PM [vite] (client) hmr update /src/components/StockSearchInput.tsx
+2:41:48 PM [vite] (client) hmr update /src/pages/Watchlist.tsx
+2:41:49 PM [vite] (client) hmr update /src/pages/Watchlist.tsx
+2:41:50 PM [vite] (client) hmr update /src/pages/Watchlist.tsx
+2:42:19 PM [vite] (client) hmr update /src/pages/StockDetail.tsx
+2:42:25 PM [vite] (client) hmr update /src/pages/StockDetail.tsx
+2:42:29 PM [vite] (client) hmr update /src/pages/StockDetail.tsx
+2:42:34 PM [vite] (client) hmr update /src/pages/StockDetail.tsx
+2:42:37 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:42:42 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:42:48 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:43:03 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:43:52 PM [vite] (client) hmr update /src/components/AppLayout.tsx
+2:44:28 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:31 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:32 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:33 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:35 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:37 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:45 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:48 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:44:49 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:46:15 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:46:42 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:47:55 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+2:56:24 PM [vite] (client) hmr update /src/components/StockSearchInput.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/StockDetail.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/Watchlist.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/Watchlist.tsx, /src/pages/Screener.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/Dashboard.tsx, /src/pages/Watchlist.tsx, /src/pages/StockDetail.tsx, /src/components/FinancialHistoryTable.tsx, /src/components/FundamentalsCard.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:56:24 PM [vite] (client) hmr update /src/pages/Watchlist.tsx, /src/components/StockSearchInput.tsx, /src/pages/Screener.tsx, /src/pages/Settings.tsx
+2:56:24 PM [vite] (client) hmr update /src/components/AppLayout.tsx
+2:56:24 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/Dashboard.tsx, /src/pages/Watchlist.tsx, /src/pages/StockDetail.tsx, /src/components/FinancialHistoryTable.tsx, /src/components/FundamentalsCard.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/Watchlist.tsx, /src/components/StockSearchInput.tsx, /src/pages/Screener.tsx, /src/pages/Settings.tsx
+2:56:25 PM [vite] (client) hmr update /src/components/AppLayout.tsx
+2:56:25 PM [vite] (client) hmr update /src/components/FundamentalsCard.tsx
+2:56:25 PM [vite] (client) hmr update /src/components/StockSearchInput.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/Screener.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/StockDetail.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/Watchlist.tsx
+2:56:25 PM [vite] (client) hmr update /src/pages/Watchlist.tsx, /src/pages/Screener.tsx
+2:56:32 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+2:56:38 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+2:58:30 PM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+2:58:30 PM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+2:58:30 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+2:59:07 PM [vite] (client) [console.error] Warning: [antd: FloatButton] `description` is deprecated. Please use `content` instead.
+2:59:07 PM [vite] (client) [console.error] Warning: [antd: Drawer] `height` is deprecated. Please use `size` instead.
+2:59:07 PM [vite] (client) [console.error] Warning: [antd: Alert] `message` is deprecated. Please use `title` instead.
+2:59:19 PM [vite] (client) [console.error] Warning: [antd: Space] `direction` is deprecated. Please use `orientation` instead.
+2:59:30 PM [vite] (client) [console.error] Warning: [antd: List] The `List` component is deprecated. And will be removed in next major version.
+3:25:28 PM [vite] (client) hmr update /src/pages/Dashboard.tsx
+3:25:32 PM [vite] (client) hmr update /src/pages/Dashboard.tsx
+3:25:37 PM [vite] (client) hmr update /src/components/AppLayout.tsx

@@ -4,6 +4,7 @@ import { ArrowUpOutlined, ArrowDownOutlined, ReloadOutlined } from '@ant-design/
 import type { IndexData } from '../types';
 import { fetchIndices } from '../api/market';
 import FundFlowTabsCard from '../components/FundFlowTabsCard';
+import OpportunityCard from '../components/OpportunityCard';
 import DailySummaryCard from '../components/DailySummaryCard';
 
 const { useBreakpoint } = Grid;
@@ -92,6 +93,7 @@ export default function Dashboard() {
       )}
 
       <FundFlowTabsCard />
+      <OpportunityCard />
       <DailySummaryCard />
     </div>
   );

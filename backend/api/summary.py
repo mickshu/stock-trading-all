@@ -95,3 +95,20 @@ def get_daily(force: bool = Query(False)):
 @router.post("/daily/refresh")
 def refresh_daily():
     return _generate_and_cache(force=True)
+
+
+@router.get("/opportunities")
+def get_opportunities():
+    """获取最近一次「关注机会」扫描结果。"""
+    from backend.services.opportunity_scanner import get_latest_opportunities
+    result = get_latest_opportunities()
+    if result is None:
+        return {"date": None, "candidates": [], "ai_evaluation": "", "generated_at": None}
+    return result
+
+
+@router.post("/opportunities/scan")
+def trigger_opportunity_scan():
+    """手动触发一次机会扫描。"""
+    from backend.services.opportunity_scanner import run_opportunity_scan
+    return run_opportunity_scan()
