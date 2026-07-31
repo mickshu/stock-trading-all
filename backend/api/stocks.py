@@ -32,6 +32,7 @@ def _stock_dict(r: Watchlist) -> dict:
         "code": r.code,
         "name": r.name,
         "market": r.market,
+        "security_type": getattr(r, "security_type", "stock") or "stock",
         "group_id": r.group_id,
         "tags": _parse_tags(r.tags),
         "target_price": r.target_price,
@@ -195,6 +196,7 @@ def add_stock(
     code: str = Query(...),
     name: str = Query(""),
     market: str = Query("A"),
+    security_type: str = Query("stock"),
     group_id: int | None = Query(None),
     tags: str = Query("", description="逗号分隔的系统标签，如 watching 或 holding,watching"),
 ):
@@ -210,7 +212,7 @@ def add_stock(
             if not g:
                 raise HTTPException(status_code=400, detail="目标分组不存在")
         initial_tags = _serialize_tags(_parse_tags(tags))
-        stock = Watchlist(code=code, name=name, market=market, group_id=group_id, tags=initial_tags)
+        stock = Watchlist(code=code, name=name, market=market, security_type=security_type, group_id=group_id, tags=initial_tags)
         db.add(stock)
         db.commit()
         db.refresh(stock)
