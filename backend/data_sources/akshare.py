@@ -121,7 +121,59 @@ class AkshareDataSource(BaseDataSource):
             return daily
         return self._resample_ohlcv(daily, rule)
 
+    def _get_etf_kline(self, code: str, period: str, start_date: str, end_date: str) -> pd.DataFrame:
+        """ETF K 线：日/周/月线通过 fund_etf_hist_em，分钟线通过 fund_etf_hist_min_em。"""
+        import akshare as ak
+        freq = PERIOD_MAP.get(period, "daily")
+
+        if period in ("daily", "weekly", "monthly"):
+            try:
+                df = ak.fund_etf_hist_em(
+                    symbol=code,
+                    period=freq,
+                    start_date=start_date.replace("-", ""),
+                    end_date=end_date.replace("-", ""),
+                    adjust="qfq",
+                )
+                if df is None or df.empty:
+                    return pd.DataFrame(columns=["date", "open", "high", "low", "close", "volume"])
+                df = df.rename(columns={
+                    "日期": "date", "开盘": "open", "最高": "high",
+                    "最低": "low", "收盘": "close", "成交量": "volume",
+                })
+                cols = ["date", "open", "high", "low", "close", "volume"]
+                df["date"] = pd.to_datetime(df["date"]).dt.date
+                return df[[c for c in cols if c in df.columns]]
+            except Exception:
+                logger.exception("ETF kline failed for code=%s period=%s", code, period)
+                return pd.DataFrame(columns=["date", "open", "high", "low", "close", "volume"])
+
+        # 分钟线
+        try:
+            minute_period = {"60min": "60", "30min": "30", "15min": "15"}.get(period, "5")
+            df = ak.fund_etf_hist_min_em(
+                symbol=code,
+                period=minute_period,
+                start_date=f"{start_date} 09:30:00",
+                end_date=f"{end_date} 15:00:00",
+                adjust="qfq",
+            )
+            if df is None or df.empty:
+                return pd.DataFrame(columns=["date", "open", "high", "low", "close", "volume"])
+            df = df.rename(columns={
+                "日期": "date", "开盘": "open", "最高": "high",
+                "最低": "low", "收盘": "close", "成交量": "volume",
+            })
+            cols = ["date", "open", "high", "low", "close", "volume"]
+            df["date"] = pd.to_datetime(df["date"])
+            return df[[c for c in cols if c in df.columns]]
+        except Exception:
+            logger.exception("ETF minute kline failed for code=%s period=%s", code, period)
+            return pd.DataFrame(columns=["date", "open", "high", "low", "close", "volume"])
+
     def get_kline(self, code: str, period: str, start_date: str, end_date: str) -> pd.DataFrame:
+        if self._is_etf(code):
+            return self._get_etf_kline(code, period, start_date, end_date)
         try:
             freq = PERIOD_MAP.get(period, "daily")
             # akshare 要求 YYYYMMDD 格式，调用方传入的是 ISO YYYY-MM-DD
