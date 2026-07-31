@@ -69,6 +69,21 @@ def _safe_opportunity_scan_job():
 @app.on_event("startup")
 def on_startup():
     init_db()
+    # 后台预加载 ETF 索引缓存，避免首次搜索阻塞
+    try:
+        import threading
+        def _warm_etf_cache():
+            try:
+                from backend.data_sources.factory import get_data_source
+                ds = get_data_source()
+                if hasattr(ds, '_etf_name_index'):
+                    ds._etf_name_index()
+                    _scheduler_logger.info("ETF index cache warmed")
+            except Exception:
+                _scheduler_logger.exception("ETF cache warm failed")
+        threading.Thread(target=_warm_etf_cache, daemon=True).start()
+    except Exception:
+        pass
     try:
         from backend.services import trading_agents_tasks as _ta_tasks
         n = _ta_tasks.resume_pending_on_startup()

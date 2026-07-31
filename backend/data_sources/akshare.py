@@ -92,12 +92,14 @@ class AkshareDataSource(BaseDataSource):
                 matched = rank_stock_matches(rows, kw, limit=20)
                 for code, name in matched:
                     results.append({"code": code, "name": name, "market": "A", "security_type": "stock"})
-            # 搜索 ETF
-            etf_rows = self._etf_name_index()
-            if etf_rows:
-                etf_matched = rank_stock_matches(etf_rows, kw, limit=10)
-                for code, name in etf_matched:
-                    results.append({"code": code, "name": name, "market": "A", "security_type": "etf"})
+            # 搜索 ETF（仅在缓存已命中时搜索，避免首次调用阻塞）
+            etf_cache = self._ETF_INDEX_CACHE
+            if etf_cache["rows"] and (time.monotonic() - etf_cache["ts"]) < self._ETF_INDEX_TTL:
+                etf_rows = etf_cache["rows"]
+                if etf_rows:
+                    etf_matched = rank_stock_matches(etf_rows, kw, limit=10)
+                    for code, name in etf_matched:
+                        results.append({"code": code, "name": name, "market": "A", "security_type": "etf"})
             return results
         except Exception:
             logger.exception("akshare search_stocks failed for keyword=%r", kw)
