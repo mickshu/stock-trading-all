@@ -30,6 +30,8 @@ def _migrate_sqlite():
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN target_price FLOAT"))
         if cols and "alert_diff_pct" not in col_names:
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN alert_diff_pct FLOAT"))
+        if cols and "security_type" not in col_names:
+            conn.execute(text("ALTER TABLE watchlist ADD COLUMN security_type VARCHAR(10) DEFAULT 'stock'"))
         ta_cols = conn.execute(text("PRAGMA table_info(ta_tasks)")).fetchall()
         ta_col_names = {row[1] for row in ta_cols}
         if ta_cols and "provider_override" not in ta_col_names:

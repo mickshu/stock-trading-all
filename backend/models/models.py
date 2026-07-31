@@ -38,6 +38,7 @@ class Watchlist(Base):
     market = Column(String(10), default="A")
     group_id = Column(Integer, nullable=True)
     tags = Column(String(120), default="")
+    security_type = Column(String(10), default="stock")
     target_price = Column(Float, nullable=True)
     alert_diff_pct = Column(Float, nullable=True)
     added_at = Column(DateTime, default=datetime.utcnow)
