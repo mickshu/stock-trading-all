@@ -43,11 +43,16 @@ const periodOptions: { label: string; value: Period }[] = [
 
 type AnalysisTabKey = 'signal' | 'ai' | 'financials';
 
+function isEtfCode(code: string): boolean {
+  return /^(51|56|58|159|16|18)/.test(code);
+}
+
 export default function StockDetail() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
+  const isEtf = isEtfCode(code || '');
   const [stockName, setStockName] = useState('');
   const [price, setPrice] = useState<number | null>(null);
   const [changePct, setChangePct] = useState<number | null>(null);
@@ -65,12 +70,13 @@ export default function StockDetail() {
   useEffect(() => {
     const prev = document.title;
     if (code) {
-      document.title = stockName ? `${code} ${stockName} · 股票分析` : `${code} · 股票分析`;
+      const label = isEtf ? 'ETF分析' : '股票分析';
+      document.title = stockName ? `${code} ${stockName} · ${label}` : `${code} · ${label}`;
     }
     return () => {
       document.title = prev;
     };
-  }, [code, stockName]);
+  }, [code, stockName, isEtf]);
   const {
     klineData,
     signals,
@@ -208,7 +214,7 @@ export default function StockDetail() {
 
       {error && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
 
-      <FundamentalsCard code={code} />
+      <FundamentalsCard code={code} isEtf={isEtf} />
 
       <Card
         size="small"
@@ -329,8 +335,8 @@ export default function StockDetail() {
                 </>
               ),
             },
-            {
-              key: 'financials',
+            ...(isEtf ? [] : [{
+              key: 'financials' as AnalysisTabKey,
               label: (
                 <Space size={6}>
                   <FundOutlined />
@@ -338,7 +344,7 @@ export default function StockDetail() {
                 </Space>
               ),
               children: <FinancialHistoryTable code={code} />,
-            },
+            }]),
             {
               key: 'ai',
               label: (

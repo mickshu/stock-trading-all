@@ -6,6 +6,7 @@ const { useBreakpoint } = Grid;
 
 interface Props {
   code: string;
+  isEtf?: boolean;
 }
 
 function formatBigYuan(v: number | null | undefined): string {
@@ -36,7 +37,7 @@ function formatPct(v: number | null | undefined): string {
   return `${v.toFixed(2)}%`;
 }
 
-export default function FundamentalsCard({ code }: Props) {
+export default function FundamentalsCard({ code, isEtf }: Props) {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
   const [data, setData] = useState<Fundamentals | null>(null);
@@ -67,8 +68,9 @@ export default function FundamentalsCard({ code }: Props) {
 
   const titleNode = (
     <Space size={8}>
-      <span>关键指标</span>
-      {data?.industry && <Tag color="blue">{data.industry}</Tag>}
+      <span>{isEtf ? 'ETF 指标' : '关键指标'}</span>
+      {!isEtf && data?.industry ? <Tag color="blue">{data.industry}</Tag> : null}
+      {isEtf && <Tag color="orange">ETF</Tag>}
       {!isMobile && data?.as_of && (
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
           数据日期 {data.as_of}
@@ -86,11 +88,31 @@ export default function FundamentalsCard({ code }: Props) {
         {error ? (
           <Typography.Text type="danger">{error}</Typography.Text>
         ) : (
-          <Descriptions
-            column={{ xs: 2, sm: 3, md: 4, lg: 6 }}
-            size="small"
-            colon={false}
-          >
+          {isEtf ? (
+            <Descriptions column={{ xs: 2, sm: 3, md: 4, lg: 6 }} size="small" colon={false}>
+              <Descriptions.Item label="最新价">
+                <Typography.Text strong>
+                  {data?.price != null ? data.price.toFixed(3) : '—'}
+                </Typography.Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="涨跌幅">
+                <Typography.Text strong style={{ color: changeColor }}>
+                  {formatPct(change)}
+                </Typography.Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="IOPV">
+                {(data as any)?.iopv != null ? (data as any).iopv.toFixed(3) : '—'}
+              </Descriptions.Item>
+              <Descriptions.Item label="折溢价率">
+                {formatPct((data as any)?.discount_rate)}
+              </Descriptions.Item>
+              {!isMobile && <Descriptions.Item label="最新份额">{formatBigYuan((data as any)?.total_size)}</Descriptions.Item>}
+              {!isMobile && <Descriptions.Item label="总规模">{formatBigYuan(data?.total_market_cap)}</Descriptions.Item>}
+              {!isMobile && <Descriptions.Item label="跟踪指数">{(data as any)?.tracking_index || '—'}</Descriptions.Item>}
+              {!isMobile && <Descriptions.Item label="上市日期">{data?.listing_date || '—'}</Descriptions.Item>}
+            </Descriptions>
+          ) : (
+            <Descriptions column={{ xs: 2, sm: 3, md: 4, lg: 6 }} size="small" colon={false}>
             <Descriptions.Item label="最新价">
               <Typography.Text strong>
                 {data?.price != null ? data.price.toFixed(2) : '—'}
@@ -122,6 +144,7 @@ export default function FundamentalsCard({ code }: Props) {
             {!isMobile && <Descriptions.Item label="流通股">{formatBigShares(data?.float_shares)}</Descriptions.Item>}
             {!isMobile && <Descriptions.Item label="上市日期">{data?.listing_date || '—'}</Descriptions.Item>}
           </Descriptions>
+          )}
         )}
       </Spin>
     </Card>
