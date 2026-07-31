@@ -632,7 +632,92 @@ class AkshareDataSource(BaseDataSource):
             self._FUND_FLOW_CACHE["sectors"] = {"ts": now, "data": result}
         return result
 
+    def _get_etf_fundamentals(self, code: str) -> dict:
+        """ETF 基本面：IOPV、折溢价率、份额、跟踪指数等。"""
+        import akshare as ak
+        result: dict = {
+            "code": code,
+            "name": "",
+            "price": None,
+            "change_pct": None,
+            "iopv": None,
+            "discount_rate": None,
+            "total_size": None,
+            "total_market_cap": None,
+            "tracking_index": "",
+            "management_fee": None,
+            "listing_date": "",
+            "as_of": date.today().isoformat(),
+            # Include stock fields as None for API compatibility
+            "pe": None,
+            "pe_ttm": None,
+            "pb": None,
+            "ps_ttm": None,
+            "dv_ttm": None,
+            "float_market_cap": None,
+            "total_shares": None,
+            "float_shares": None,
+            "industry": "",
+        }
+
+        # 行情数据：腾讯接口兜底
+        qt = self._tencent_quote(code)
+        if qt:
+            result["name"] = qt[1] or ""
+            price = _to_float(qt[3])
+            if price is not None and price > 0:
+                result["price"] = price
+            cp = _to_float(qt[32]) if len(qt) > 32 else None
+            if cp is not None:
+                result["change_pct"] = cp
+            ts = qt[30] if len(qt) > 30 else ""
+            if ts and len(ts) >= 8 and ts[:8].isdigit():
+                result["as_of"] = f"{ts[0:4]}-{ts[4:6]}-{ts[6:8]}"
+
+        # EM 单股补价格
+        em = self._em_single_quote(code)
+        if em:
+            if not result["name"]:
+                result["name"] = str(em.get("f58") or "")
+            if result["price"] is None:
+                price = _to_float(em.get("f43"))
+                if price is not None and price > 0:
+                    result["price"] = price
+            if result["change_pct"] is None:
+                cp = _to_float(em.get("f170"))
+                if cp is not None:
+                    result["change_pct"] = cp
+            tmc = _to_float(em.get("f116"))
+            if tmc is not None:
+                result["total_market_cap"] = tmc
+
+        # ETF 专用字段：从 fund_etf_spot_em 全量表按代码查找
+        try:
+            df = ak.fund_etf_spot_em()
+            if df is not None and not df.empty and "代码" in df.columns:
+                row = df[df["代码"] == code]
+                if not row.empty:
+                    r = row.iloc[0]
+                    if not result["name"]:
+                        result["name"] = str(r.get("名称") or "")
+                    result["iopv"] = _to_float(r.get("IOPV实时估值"))
+                    result["discount_rate"] = _to_float(r.get("基金折价率"))
+                    result["total_size"] = _to_float(r.get("最新份额"))
+                    if result["total_size"] is not None and result["iopv"] is not None:
+                        result["total_market_cap"] = result["total_size"] * result["iopv"]
+        except Exception:
+            logger.exception("ETF spot fetch failed for %s", code)
+
+        # 名称兜底
+        if not result["name"]:
+            quote = self.get_realtime_quote(code)
+            result["name"] = quote.get("name", "")
+
+        return result
+
     def get_fundamentals(self, code: str) -> dict:
+        if self._is_etf(code):
+            return self._get_etf_fundamentals(code)
         """合并多源行情/估值/股本数据。akshare 的 stock_individual_info_em / stock_zh_a_spot_em
         端点对外网偶发 RemoteDisconnected，stock_a_indicator_lg 已被 akshare 移除，故主路径改用
         EastMoney push2 stock/get 直连：
