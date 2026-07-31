@@ -76,6 +76,11 @@ export interface ConditionScreenerParams {
   amplitude_max?: number;
   amount_min?: number;
   amount_max?: number;
+  discount_rate_min?: number;
+  discount_rate_max?: number;
+  size_min?: number;
+  size_max?: number;
+  security_type?: string;
   sort_by?: string;
   sort_order?: string;
   page?: number;

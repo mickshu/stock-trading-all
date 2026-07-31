@@ -26,8 +26,9 @@ export async function addStock(
   market = 'A',
   groupId?: number | null,
   tags?: SystemTag[],
+  securityType: string = 'stock',
 ): Promise<StockInfo> {
-  const params: Record<string, string | number | undefined> = { code, name, market };
+  const params: Record<string, string | number | undefined> = { code, name, market, security_type: securityType };
   if (groupId != null) params.group_id = groupId;
   if (tags && tags.length > 0) params.tags = tags.join(',');
   const { data } = await api.post<StockInfo>('/stocks', null, { params });

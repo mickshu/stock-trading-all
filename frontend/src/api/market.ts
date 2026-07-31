@@ -84,6 +84,16 @@ export interface FinancialHistory {
   indicators: FinancialIndicator[];
 }
 
+export async function fetchEtfList(params: {
+  sort_by?: string;
+  sort_order?: string;
+  page?: number;
+  page_size?: number;
+}): Promise<{ results: any[]; total: number }> {
+  const { data } = await api.get('/market/etf-list', { params });
+  return data;
+}
+
 export async function fetchFinancialHistory(code: string, years?: number): Promise<FinancialHistory> {
   const { data } = await api.get<FinancialHistory>('/market/financial-history', {
     params: { code, years },
