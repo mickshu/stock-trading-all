@@ -71,10 +71,15 @@ class AkshareDataSource(BaseDataSource):
 
     @staticmethod
     def _exchange_prefix(code: str) -> str:
-        """推断交易所前缀：60xxxx/68xxxx → sh，00xxxx/30xxxx → sz"""
-        if code.startswith(("60", "68")):
+        """推断交易所前缀：5/60/68xxxx → sh，0/3/15/16/18xxxx → sz"""
+        if code.startswith(("5", "60", "68")):
             return "sh"
         return "sz"
+
+    @staticmethod
+    def _is_etf(code: str) -> bool:
+        """检测代码是否为 A 股 ETF（含 LOF）。"""
+        return code.startswith(("51", "56", "58", "159", "16", "18"))
 
     def _get_kline_daily_fallback(self, code: str, start_date: str, end_date: str) -> pd.DataFrame:
         """使用 stock_zh_a_daily 作为日线数据的后备接口"""
@@ -161,8 +166,8 @@ class AkshareDataSource(BaseDataSource):
 
     @staticmethod
     def _em_secid(code: str) -> str:
-        """6 位 A 股代码 → 东方财富 push2 secid（0=深，1=沪/科创）。"""
-        return f"{'1' if code.startswith(('60', '68', '11', '13')) else '0'}.{code}"
+        """6 位代码 → 东方财富 push2 secid（1=沪，0=深）。"""
+        return f"{'1' if code.startswith(('5', '60', '68', '11', '13')) else '0'}.{code}"
 
     # 东方财富 push2 主备 host：实时主机偶尔限流封 IP，延时镜像作为兜底。
     _EM_HOSTS: tuple = ("push2.eastmoney.com", "push2delay.eastmoney.com")
@@ -197,8 +202,8 @@ class AkshareDataSource(BaseDataSource):
 
     @staticmethod
     def _tencent_symbol(code: str) -> str:
-        """6 位 A 股代码 → 腾讯股票接口 symbol（sh/sz 前缀）。"""
-        return f"{'sh' if code.startswith(('60', '68')) else 'sz'}{code}"
+        """6 位代码 → 腾讯股票接口 symbol（sh/sz 前缀）。"""
+        return f"{'sh' if code.startswith(('5', '60', '68')) else 'sz'}{code}"
 
     # 上交所/深交所基础信息表内存缓存：上市日期、所属行业；TTL 24h 已足够
     _LISTING_CACHE: dict = {"ts": 0.0, "sh": {}, "sz": {}}
