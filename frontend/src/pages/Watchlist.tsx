@@ -346,7 +346,7 @@ export default function Watchlist() {
 
   const handleAdd = async (stock: StockInfo) => {
     try {
-      await addStock(stock.code, stock.name, stock.market || 'A', addTargetGroup, ['watching']);
+      await addStock(stock.code, stock.name, stock.market || 'A', addTargetGroup, ['watching'], stock.security_type || 'stock');
       message.success(`已添加 ${stock.name}（已标记为关注）`);
       setModalOpen(false);
       setKeyword('');
@@ -618,6 +618,9 @@ export default function Watchlist() {
                   <Typography.Link href={eastMoneyUrl(record.code)} target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, fontWeight: 600 }}>{record.name}</Typography.Link>
                   <Typography.Text type="secondary" style={{ fontSize: 12 }}>{record.code}</Typography.Text>
                   <StockTagBadges tags={record.tags} size="mini" />
+                  {record.security_type === 'etf' && (
+                    <Tag color="orange" style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px' }}>ETF</Tag>
+                  )}
                 </div>
                 <Space size={4}>
                   <Button type="link" size="small" onClick={() => navigate(`/stock/${record.code}`)}>
@@ -735,6 +738,9 @@ export default function Watchlist() {
         <Space size={4}>
           <span>{record.name}</span>
           <StockTagBadges tags={record.tags} size="mini" />
+          {record.security_type === 'etf' && (
+            <Tag color="orange" style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', marginInlineEnd: 0 }}>ETF</Tag>
+          )}
         </Space>
       ),
     },

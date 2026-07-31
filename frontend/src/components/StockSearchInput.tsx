@@ -125,6 +125,9 @@ export default function StockSearchInput({
           <Space size={6}>
             <Tag style={{ marginRight: 0 }}>{s.code}</Tag>
             <span>{s.name}</span>
+            {s.security_type === 'etf' && (
+              <Tag color="orange" style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px' }}>ETF</Tag>
+            )}
             {s.market && (
               <Typography.Text type="secondary" style={{ fontSize: 12 }}>
                 [{s.market}]
