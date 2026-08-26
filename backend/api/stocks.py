@@ -1,3 +1,5 @@
+import math
+
 from fastapi import APIRouter, Query, HTTPException, Body
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -283,6 +285,8 @@ def update_stock(stock_id: int, payload: dict = Body(...)):
                         fv = float(v)
                     except (TypeError, ValueError):
                         raise HTTPException(status_code=400, detail=f"{field} 必须为数字")
+                    if not math.isfinite(fv):
+                        raise HTTPException(status_code=400, detail=f"{field} 必须为有效数字")
                     if fv < 0:
                         raise HTTPException(status_code=400, detail=f"{field} 不能为负")
                     setattr(stock, field, fv)
