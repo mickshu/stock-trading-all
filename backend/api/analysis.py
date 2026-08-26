@@ -72,13 +72,29 @@ def _sanitize_records(df: pd.DataFrame) -> list[dict]:
 
 
 def _refresh_daily_kline_if_stale(db: Session, code: str, start: str, end: str) -> None:
-    """日 K 超过 8 小时未更新则从数据源补齐新交易日（利弗莫尔策略对最新一日敏感）。"""
-    stmt = select(KlineCache.fetched_at).where(
+    """日 K 超过 8 小时未更新则从数据源补齐新交易日（利弗莫尔策略对最新一日敏感）。
+
+    收盘后（UTC≥07:00，即北京时间 15:00 后）若当日 K 仍为盘中快照
+    （fetched_at 早于当日 UTC 07:00），强制刷新获取最终收盘 bar，
+    避免用盘中快照误判「收盘突破确认」。
+    """
+    stmt = select(KlineCache.trade_date, KlineCache.fetched_at).where(
         and_(KlineCache.code == code, KlineCache.period == "daily")
-    ).order_by(KlineCache.fetched_at.desc()).limit(1)
-    last_fetch = db.execute(stmt).scalar()
-    if last_fetch is not None and datetime.utcnow() - last_fetch < timedelta(hours=8):
-        return
+    ).order_by(KlineCache.trade_date.desc()).limit(1)
+    row = db.execute(stmt).first()
+    if row is not None:
+        trade_date, last_fetch = row
+        now = datetime.utcnow()
+        fresh = last_fetch is not None and now - last_fetch < timedelta(hours=8)
+        partial_today = (
+            str(trade_date) == date.today().isoformat()
+            and now.hour >= 7
+            and last_fetch is not None
+            and last_fetch.date() == now.date()
+            and last_fetch.hour < 7
+        )
+        if fresh and not partial_today:
+            return
     ds = get_data_source()
     try:
         df = ds.get_kline(code, "daily", start, end)
