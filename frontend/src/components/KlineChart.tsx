@@ -41,6 +41,7 @@ interface Props {
   signals?: Signal[];
   showSignals?: boolean;
   highlightPosition?: number | null;
+  markLines?: { price: number | null; name: string; color?: string }[];
 }
 
 interface GridSpec {
@@ -84,6 +85,7 @@ export default function KlineChart({
   signals = [],
   showSignals = true,
   highlightPosition = null,
+  markLines = [],
 }: Props) {
   const chartRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<echarts.ECharts | null>(null);
@@ -139,21 +141,34 @@ export default function KlineChart({
       splitNumber: 3,
     }));
 
-    const series: Record<string, unknown>[] = [
-      {
-        type: 'candlestick',
-        name: 'K线',
-        data: ohlc,
-        xAxisIndex: 0,
-        yAxisIndex: 0,
-        itemStyle: {
-          color: '#ef5350',
-          color0: '#26a69a',
-          borderColor: '#ef5350',
-          borderColor0: '#26a69a',
-        },
+    const candlestick: Record<string, unknown> = {
+      type: 'candlestick',
+      name: 'K线',
+      data: ohlc,
+      xAxisIndex: 0,
+      yAxisIndex: 0,
+      itemStyle: {
+        color: '#ef5350',
+        color0: '#26a69a',
+        borderColor: '#ef5350',
+        borderColor0: '#26a69a',
       },
-    ];
+    };
+    const validMarkLines = markLines.filter((m) => m.price != null && m.price > 0);
+    if (validMarkLines.length > 0) {
+      candlestick.markLine = {
+        symbol: 'none',
+        silent: true,
+        label: { position: 'insideEndTop', formatter: '{b}', fontSize: 10, color: '#666' },
+        lineStyle: { type: 'dashed', width: 1 },
+        data: validMarkLines.map((m) => ({
+          yAxis: m.price,
+          name: m.name,
+          lineStyle: m.color ? { color: m.color } : undefined,
+        })),
+      };
+    }
+    const series: Record<string, unknown>[] = [candlestick];
 
     if (showMA) {
       const maColors = ['#f5a623', '#4a90d9', '#7ed321', '#9b59b6'];
@@ -415,7 +430,7 @@ export default function KlineChart({
       },
       true,
     );
-  }, [klineData, showMA, showMACD, showKDJ, showRSI, signals, showSignals, highlightPosition]);
+  }, [klineData, showMA, showMACD, showKDJ, showRSI, signals, showSignals, highlightPosition, markLines]);
 
   useEffect(() => {
     instanceRef.current?.resize();
