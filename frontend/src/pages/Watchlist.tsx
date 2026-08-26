@@ -19,6 +19,7 @@ import {
 } from 'antd';
 import StockSearchInput from '../components/StockSearchInput';
 import WatchlistNewsCard from '../components/WatchlistNewsCard';
+import LivermoreModal from '../components/LivermoreModal';
 import {
   PlusOutlined,
   EditOutlined,
@@ -250,6 +251,7 @@ export default function Watchlist() {
 
   const dragIndexRef = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [livermoreStock, setLivermoreStock] = useState<StockInfo | null>(null);
   const tabDragIndexRef = useRef<number | null>(null);
 
   const persistGroupOrder = async (next: WatchlistGroup[]) => {
@@ -623,6 +625,11 @@ export default function Watchlist() {
                   )}
                 </div>
                 <Space size={4}>
+                  {filter === tagFilterKey('holding') && (
+                    <Button type="link" size="small" onClick={() => setLivermoreStock(record)}>
+                      利弗莫尔
+                    </Button>
+                  )}
                   <Button type="link" size="small" onClick={() => navigate(`/stock/${record.code}`)}>
                     分析
                   </Button>
@@ -910,6 +917,11 @@ export default function Watchlist() {
       width: 120,
       render: (_, record) => (
         <Space>
+          {filter === tagFilterKey('holding') && (
+            <Button type="link" size="small" onClick={() => setLivermoreStock(record)}>
+              利弗莫尔
+            </Button>
+          )}
           <Button type="link" size="small" onClick={() => navigate(`/stock/${record.code}`)}>
             分析
           </Button>
@@ -1204,6 +1216,12 @@ export default function Watchlist() {
           </div>
         )}
       </Modal>
+
+      <LivermoreModal
+        stock={livermoreStock}
+        open={livermoreStock != null}
+        onClose={() => setLivermoreStock(null)}
+      />
     </div>
   );
 }
