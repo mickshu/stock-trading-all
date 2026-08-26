@@ -1072,6 +1072,8 @@ git commit -m "feat(frontend): 利弗莫尔买入法浮层组件（状态/关键
 
 > **质量审查修正记录**（已随实现提交，代码以此为准）：① load 加单调序号 ref 防竞态（切换股票/快速重算时旧响应覆盖新数据）；② useEffect 依赖 `[open, stock?.code, load]`（按 code 而非对象身份）；③ `destroyOnClose` → `destroyOnHidden`（antd v6 弃用）；④ 错误 Alert 与数据共存渲染（保存后重算失败不再清空视图）；⑤ extractError 防御数组型 detail（422 返回数组防 React 崩溃）；⑥ 重新计算/重试按钮加 loading/disabled。
 
+> **最终审查修正记录**（部署前已修）：收盘后（UTC≥07:00）当日 K 若仍为盘中快照（fetched_at 早于当日 07:00 UTC），`_refresh_daily_kline_if_stale` 强制刷新取最终收盘 bar，避免收盘后数小时内用盘中快照误判「突破确认·买入」。
+
 ---
 
 ### Task 7: Watchlist 入口按钮
