@@ -37,6 +37,9 @@ def _stock_dict(r: Watchlist) -> dict:
         "tags": _parse_tags(r.tags),
         "target_price": r.target_price,
         "alert_diff_pct": r.alert_diff_pct,
+        "cost": getattr(r, "cost", None),
+        "shares": getattr(r, "shares", None),
+        "planned_capital": getattr(r, "planned_capital", None),
     }
 
 
@@ -270,6 +273,19 @@ def update_stock(stock_id: int, payload: dict = Body(...)):
                 if fv < 0:
                     raise HTTPException(status_code=400, detail="alert_diff_pct 不能为负")
                 stock.alert_diff_pct = fv
+        for field in ("cost", "shares", "planned_capital"):
+            if field in payload:
+                v = payload[field]
+                if v is None or v == "":
+                    setattr(stock, field, None)
+                else:
+                    try:
+                        fv = float(v)
+                    except (TypeError, ValueError):
+                        raise HTTPException(status_code=400, detail=f"{field} 必须为数字")
+                    if fv < 0:
+                        raise HTTPException(status_code=400, detail=f"{field} 不能为负")
+                    setattr(stock, field, fv)
         db.commit()
         db.refresh(stock)
         return _stock_dict(stock)

@@ -40,6 +40,9 @@ class Watchlist(Base):
     tags = Column(String(120), default="")
     security_type = Column(String(10), default="stock")
     target_price = Column(Float, nullable=True)
+    cost = Column(Float, nullable=True)
+    shares = Column(Float, nullable=True)
+    planned_capital = Column(Float, nullable=True)
     alert_diff_pct = Column(Float, nullable=True)
     added_at = Column(DateTime, default=datetime.utcnow)
 

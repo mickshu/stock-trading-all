@@ -30,6 +30,12 @@ def _migrate_sqlite():
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN target_price FLOAT"))
         if cols and "alert_diff_pct" not in col_names:
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN alert_diff_pct FLOAT"))
+        if cols and "cost" not in col_names:
+            conn.execute(text("ALTER TABLE watchlist ADD COLUMN cost FLOAT"))
+        if cols and "shares" not in col_names:
+            conn.execute(text("ALTER TABLE watchlist ADD COLUMN shares FLOAT"))
+        if cols and "planned_capital" not in col_names:
+            conn.execute(text("ALTER TABLE watchlist ADD COLUMN planned_capital FLOAT"))
         if cols and "security_type" not in col_names:
             conn.execute(text("ALTER TABLE watchlist ADD COLUMN security_type VARCHAR(10) DEFAULT 'stock'"))
         opp = conn.execute(text(
