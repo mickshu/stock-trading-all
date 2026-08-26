@@ -45,7 +45,7 @@ STATE_LABELS: dict[str, str] = {
 }
 
 
-def validate_params(params: dict[str, Any] | None) -> dict[str, float]:
+def validate_params(params: dict[str, Any] | None) -> dict[str, float | int]:
     """校验并合并默认参数；非法时抛 ValueError。"""
     merged = dict(DEFAULT_PARAMS)
     for k, v in (params or {}).items():
@@ -105,7 +105,7 @@ def _build_advice(
 
 
 def compute_livermore(
-    df: pd.DataFrame,
+    df: pd.DataFrame | None,
     params: dict[str, Any] | None = None,
     holding: dict[str, Any] | None = None,
     current_price: float | None = None,
@@ -125,6 +125,9 @@ def compute_livermore(
     pivot = float(hist.tail(int(p["high_n"]))["high"].max())
     box_top = float(hist.tail(int(p["box_n"]))["high"].max())
     stop_loss = pivot * (1 - p["stop_pct"] / 100)
+
+    if not (pd.notna(pivot) and pivot > 0 and pd.notna(box_top) and pd.notna(stop_loss)):
+        raise ValueError("K线数据不足，无法计算关键点")
 
     last = df.iloc[-1]
     last_close = float(last["close"])
@@ -159,9 +162,17 @@ def compute_livermore(
             "label": "首仓" if i == 0 else f"第{i}级加仓",
         })
 
-    cost = holding.get("cost")
-    shares = holding.get("shares")
-    planned = holding.get("planned_capital")
+    def _to_num(v: Any) -> float | None:
+        if v is None or v == "":
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    cost = _to_num(holding.get("cost"))
+    shares = _to_num(holding.get("shares"))
+    planned = _to_num(holding.get("planned_capital"))
     invested = cost * shares if cost is not None and shares is not None else None
     position_pct = (invested / planned * 100) if invested is not None and planned else None
 

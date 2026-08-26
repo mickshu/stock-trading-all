@@ -140,3 +140,22 @@ def test_livermore_param_validation():
     except ValueError:
         return
     raise AssertionError("expected ValueError when box_n >= high_n")
+
+
+def test_livermore_insufficient_data():
+    for bad in (pd.DataFrame(), _livermore_df(1)):
+        try:
+            compute_livermore(bad)
+        except ValueError:
+            continue
+        raise AssertionError("expected ValueError for <2 rows")
+
+
+def test_livermore_param_bounds():
+    df = _livermore_df(60)
+    for bad in ({"high_n": 300}, {"stop_pct": 50}, {"levels": 0}, {"box_n": 0}):
+        try:
+            compute_livermore(df, bad)
+        except ValueError:
+            continue
+        raise AssertionError(f"expected ValueError for {bad}")
