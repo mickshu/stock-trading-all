@@ -533,7 +533,7 @@ def get_livermore(
         # 北京时间 15:00 收盘（UTC 07:00）前，当日 K 为未完成快照，
         # 剔除以免其盘中 close 被误判为「收盘突破确认」；现价判断由实时行情承担
         last_row = df.iloc[-1]
-        if str(last_row["date"]) == date.today().isoformat() and datetime.utcnow().time() < datetime.time(7, 0):
+        if str(last_row["date"]) == date.today().isoformat() and datetime.utcnow().hour < 7:
             df = df.iloc[:-1]
         if len(df) < 30:
             raise HTTPException(status_code=422, detail="K线数据不足（少于 30 个交易日），无法计算关键点")
