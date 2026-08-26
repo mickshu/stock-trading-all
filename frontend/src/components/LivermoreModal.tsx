@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert, Button, Collapse, InputNumber, Modal, Space, Spin, Table, Tag, Typography, message,
 } from 'antd';
@@ -36,7 +36,7 @@ const PARAM_FIELDS: { key: keyof LivermoreQuery; label: string; min: number; max
 
 function extractError(e: unknown): string {
   const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-  return detail || '请求失败，请稍后重试';
+  return typeof detail === 'string' ? detail : '请求失败，请稍后重试';
 }
 
 function PriceCard({ label, value, tone }: { label: string; value: number | null; tone?: 'danger' }) {
@@ -75,20 +75,25 @@ export default function LivermoreModal({
   }>({ cost: null, shares: null, planned_capital: null });
   const [savingHolding, setSavingHolding] = useState(false);
 
+  const loadSeq = useRef(0);
   const load = useCallback(
     async (query: LivermoreQuery) => {
-      if (!stock) return;
+      const code = stock?.code;
+      if (!code) return;
+      const seq = ++loadSeq.current;
       setLoading(true);
       setError(null);
       try {
-        setData(await fetchLivermore(stock.code, query));
+        const res = await fetchLivermore(code, query);
+        if (seq !== loadSeq.current) return;
+        setData(res);
       } catch (e) {
-        setError(extractError(e));
+        if (seq === loadSeq.current) setError(extractError(e));
       } finally {
-        setLoading(false);
+        if (seq === loadSeq.current) setLoading(false);
       }
     },
-    [stock],
+    [stock?.code],
   );
 
   useEffect(() => {
@@ -101,7 +106,7 @@ export default function LivermoreModal({
     });
     setParams(DEFAULT_QUERY);
     void load(DEFAULT_QUERY);
-  }, [open, stock, load]);
+  }, [open, stock?.code, load]); // eslint-disable-line react-hooks/exhaustive-deps -- 依赖用 code 而非整个 stock，避免父组件重渲染重置参数
 
   const handleSaveHolding = async () => {
     if (stock?.id == null) return;
@@ -134,18 +139,20 @@ export default function LivermoreModal({
       onCancel={onClose}
       footer={null}
       width={720}
-      destroyOnClose
+      destroyOnHidden
       title={`利弗莫尔买入法 · ${stock?.name ?? ''} ${stock?.code ?? ''}`}
     >
       <Spin spinning={loading}>
-        {error ? (
+        {error && (
           <Alert
             type="error"
             message="计算失败"
             description={error}
-            action={<Button size="small" onClick={() => void load(params)}>重试</Button>}
+            style={{ marginBottom: 12 }}
+            action={<Button size="small" disabled={loading} onClick={() => void load(params)}>重试</Button>}
           />
-        ) : data ? (
+        )}
+        {data ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div
               style={{
@@ -252,7 +259,7 @@ export default function LivermoreModal({
                           />
                         </Space>
                       ))}
-                      <Button size="small" type="primary" onClick={() => void load(params)}>
+                      <Button size="small" type="primary" loading={loading} onClick={() => void load(params)}>
                         重新计算
                       </Button>
                     </Space>
