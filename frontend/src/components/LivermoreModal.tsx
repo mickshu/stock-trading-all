@@ -59,10 +59,12 @@ export default function LivermoreModal({
   stock,
   open,
   onClose,
+  onSaved,
 }: {
   stock: StockInfo | null;
   open: boolean;
   onClose: () => void;
+  onSaved?: (updated: StockInfo) => void;
 }) {
   const [data, setData] = useState<LivermoreResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -104,6 +106,7 @@ export default function LivermoreModal({
       shares: stock.shares ?? null,
       planned_capital: stock.planned_capital ?? null,
     });
+    setData(null);
     setParams(DEFAULT_QUERY);
     void load(DEFAULT_QUERY);
   }, [open, stock?.code, load]); // eslint-disable-line react-hooks/exhaustive-deps -- 依赖用 code 而非整个 stock，避免父组件重渲染重置参数
@@ -112,7 +115,8 @@ export default function LivermoreModal({
     if (stock?.id == null) return;
     setSavingHolding(true);
     try {
-      await setStockHolding(stock.id, holdingDraft);
+      const updated = await setStockHolding(stock.id, holdingDraft);
+      onSaved?.(updated);
       message.success('持仓信息已保存');
       await load(params);
     } catch {

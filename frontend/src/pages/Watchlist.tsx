@@ -914,7 +914,7 @@ export default function Watchlist() {
     {
       title: '操作',
       key: 'actions',
-      width: 120,
+      width: 180,
       render: (_, record) => (
         <Space>
           {filter === tagFilterKey('holding') && (
@@ -1221,6 +1221,9 @@ export default function Watchlist() {
         stock={livermoreStock}
         open={livermoreStock != null}
         onClose={() => setLivermoreStock(null)}
+        onSaved={(updated) =>
+          setData((rows) => rows.map((r) => (r.id != null && r.id === updated.id ? updated : r)))
+        }
       />
     </div>
   );
