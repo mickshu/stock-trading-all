@@ -65,6 +65,9 @@ export interface StockInfo {
   tags?: string[];
   target_price?: number | null;
   alert_diff_pct?: number | null;
+  cost?: number | null;
+  shares?: number | null;
+  planned_capital?: number | null;
 }
 
 export interface WatchlistGroup {
@@ -95,3 +98,46 @@ export interface IndexData {
 }
 
 export type Period = 'daily' | 'weekly' | 'monthly' | '60min' | '30min' | '15min';
+
+export interface LivermoreLadderLevel {
+  level: number;
+  cum_pct: number;
+  add_pct: number;
+  price: number | null;
+  label: string;
+  amount: number | null;
+}
+
+export interface LivermoreResponse {
+  code: string;
+  name: string;
+  params: {
+    high_n: number;
+    box_n: number;
+    stop_pct: number;
+    first_pct: number;
+    add_step_pct: number;
+    add_pct: number;
+    levels: number;
+  };
+  last_date: string;
+  last_close: number | null;
+  current_price: number | null;
+  pivot: number | null;
+  box_top: number | null;
+  stop_loss: number | null;
+  state: 'confirmed' | 'intraday' | 'approaching' | 'watching';
+  state_label: string;
+  stop_breached: boolean;
+  distance_pct: number | null;
+  ladder: LivermoreLadderLevel[];
+  holding: {
+    cost: number | null;
+    shares: number | null;
+    planned_capital: number | null;
+    invested: number | null;
+    position_pct: number | null;
+  };
+  advice: string;
+  kline: (KlineData & Partial<IndicatorData>)[];
+}

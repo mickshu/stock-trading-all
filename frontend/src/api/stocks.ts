@@ -93,6 +93,14 @@ export async function setStockTargets(
   return data;
 }
 
+export async function setStockHolding(
+  stockId: number,
+  payload: { cost?: number | null; shares?: number | null; planned_capital?: number | null },
+): Promise<StockInfo> {
+  const { data } = await api.patch<StockInfo>(`/stocks/${stockId}`, payload);
+  return data;
+}
+
 export interface DataSourceInfo {
   active: string;
   available: string[];
