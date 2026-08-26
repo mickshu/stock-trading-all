@@ -1,15 +1,20 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+import logging
 import math
+import time
 from fastapi import APIRouter, Query, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
 import pandas as pd
 
 from backend.database import get_db
-from backend.models.models import KlineCache
+from backend.models.models import KlineCache, Watchlist
 from backend.data_sources.factory import get_data_source
 from backend.services.indicator import compute_indicators, list_indicators
 from backend.services.signal import SignalEngine, get_signal_catalog
+from backend.services.livermore import DEFAULT_PARAMS, compute_livermore, validate_params
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/analysis", tags=["analysis"])
 
@@ -64,6 +69,38 @@ def _sanitize_records(df: pd.DataFrame) -> list[dict]:
             elif isinstance(v, date):
                 r[k] = str(v)
     return records
+
+
+def _refresh_daily_kline_if_stale(db: Session, code: str, start: str, end: str) -> None:
+    """日 K 超过 8 小时未更新则从数据源补齐新交易日（利弗莫尔策略对最新一日敏感）。"""
+    stmt = select(KlineCache.fetched_at).where(
+        and_(KlineCache.code == code, KlineCache.period == "daily")
+    ).order_by(KlineCache.fetched_at.desc()).limit(1)
+    last_fetch = db.execute(stmt).scalar()
+    if last_fetch is not None and datetime.utcnow() - last_fetch < timedelta(hours=8):
+        return
+    ds = get_data_source()
+    try:
+        df = ds.get_kline(code, "daily", start, end)
+    except Exception:
+        logger.exception("refresh daily kline failed for %s", code)
+        return
+    if df.empty:
+        return
+    for _, row in df.iterrows():
+        existing = db.execute(
+            select(KlineCache).where(
+                and_(KlineCache.code == code, KlineCache.period == "daily",
+                     KlineCache.trade_date == row["date"])
+            )
+        ).scalar()
+        if existing is None:
+            db.add(KlineCache(
+                code=code, period="daily", trade_date=row["date"],
+                open=row["open"], high=row["high"], low=row["low"],
+                close=row["close"], volume=row["volume"],
+            ))
+    db.commit()
 
 
 @router.get("/indicators")
@@ -152,3 +189,71 @@ def get_available():
 def get_catalog():
     """返回支持的信号类型字典：名称、分类、多空方向、解释、误导说明。"""
     return {"signals": get_signal_catalog()}
+
+
+_LIVERMORE_CACHE: dict[tuple, tuple[float, dict]] = {}
+_LIVERMORE_CACHE_TTL = 300  # 秒
+
+
+@router.get("/livermore")
+def get_livermore(
+    code: str = Query(...),
+    high_n: int = Query(int(DEFAULT_PARAMS["high_n"])),
+    box_n: int = Query(int(DEFAULT_PARAMS["box_n"])),
+    stop_pct: float = Query(DEFAULT_PARAMS["stop_pct"]),
+    first_pct: float = Query(DEFAULT_PARAMS["first_pct"]),
+    add_step_pct: float = Query(DEFAULT_PARAMS["add_step_pct"]),
+    add_pct: float = Query(DEFAULT_PARAMS["add_pct"]),
+    levels: int = Query(int(DEFAULT_PARAMS["levels"])),
+):
+    """利弗莫尔买入法策略：关键点/突破状态/止损位/金字塔加仓建议。"""
+    raw_params = {
+        "high_n": high_n, "box_n": box_n, "stop_pct": stop_pct,
+        "first_pct": first_pct, "add_step_pct": add_step_pct,
+        "add_pct": add_pct, "levels": levels,
+    }
+    try:
+        params = validate_params(raw_params)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    db: Session = next(get_db())
+    try:
+        stock = db.execute(select(Watchlist).where(Watchlist.code == code)).scalars().first()
+        holding = {
+            "cost": stock.cost if stock else None,
+            "shares": stock.shares if stock else None,
+            "planned_capital": stock.planned_capital if stock else None,
+        }
+        cache_key = (
+            code, params["high_n"], params["box_n"], params["stop_pct"],
+            params["first_pct"], params["add_step_pct"], params["add_pct"], params["levels"],
+            holding["cost"], holding["shares"], holding["planned_capital"],
+        )
+        hit = _LIVERMORE_CACHE.get(cache_key)
+        if hit is not None and time.time() - hit[0] < _LIVERMORE_CACHE_TTL:
+            return hit[1]
+
+        start = (date.today() - timedelta(days=400)).isoformat()
+        end = date.today().isoformat()
+        _refresh_daily_kline_if_stale(db, code, start, end)
+        df = _load_kline_df(db, code, "daily", start, end)
+        if len(df) < 30:
+            raise HTTPException(status_code=422, detail="K线数据不足（少于 30 个交易日），无法计算关键点")
+
+        current_price = None
+        try:
+            quote = get_data_source().get_realtime_quote(code)
+            if isinstance(quote, dict) and quote.get("price"):
+                current_price = float(quote["price"])
+        except Exception:
+            logger.exception("quote fetch failed for %s", code)
+
+        result = compute_livermore(df, params, holding, current_price)
+        result["code"] = code
+        result["name"] = (stock.name if stock else "") or ""
+        result["kline"] = _sanitize_records(df.tail(90))
+        _LIVERMORE_CACHE[cache_key] = (time.time(), result)
+        return result
+    finally:
+        db.close()
