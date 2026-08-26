@@ -49,20 +49,22 @@ def test_livermore_pivot_and_box():
     assert result["box_top"] == 15.0
     assert result["stop_loss"] == 19.0
     assert result["state"] == "watching"
+    assert result["stop_breached"] is True   # 现价 13.8 ≤ 止损 19.0
 
 
 def test_livermore_states():
     df = _livermore_df(80)
-    df.iloc[-61, df.columns.get_loc("high")] = 15.0   # 主关键点 15
-    df.iloc[-21, df.columns.get_loc("high")] = 12.0   # 平台位 12
+    df.iloc[-61, df.columns.get_loc("high")] = 15.0   # 主关键点 15，止损 14.25
+    df.iloc[-21, df.columns.get_loc("high")] = 14.5   # 平台位 14.5（窗口自然最高 14.3 < 14.5）
     base = df.copy()
     b = base.copy()
     b.iloc[-1, b.columns.get_loc("close")] = 15.5
     assert compute_livermore(b)["state"] == "confirmed"
     assert compute_livermore(base, current_price=15.5)["state"] == "intraday"
-    assert compute_livermore(base, current_price=13.0)["state"] == "approaching"
-    assert compute_livermore(base, current_price=11.0)["state"] == "watching"
-    assert compute_livermore(base, current_price=14.0)["state"] == "stop_loss"
+    assert compute_livermore(base, current_price=14.7)["state"] == "approaching"
+    assert compute_livermore(base, current_price=13.0)["state"] == "watching"
+    assert compute_livermore(base, current_price=14.0)["stop_breached"] is True
+    assert compute_livermore(base, current_price=15.5)["stop_breached"] is False
 
 
 def test_livermore_ladder():
@@ -82,10 +84,12 @@ def test_livermore_holding_advice():
     result = compute_livermore(
         df,
         holding={"cost": 13.0, "shares": 1000, "planned_capital": 50000},
+        current_price=19.4,
     )
     assert result["holding"]["invested"] == 13000.0
     assert result["holding"]["position_pct"] == 26.0
     assert result["ladder"][0]["amount"] == 15000.0
+    assert result["stop_breached"] is False
     assert "首仓" in result["advice"]
 
 
@@ -111,8 +115,9 @@ Expected: FAIL，`ModuleNotFoundError: No module named 'backend.services.livermo
 口径（与设计文档一致）：
 - 主关键点 = 近 high_n 个交易日（不含最后一日）最高价
 - 平台位 = 近 box_n 个交易日（不含最后一日）箱体上沿
-- 突破判定：收盘价 > 主关键点 → 突破确认；现价盘中 > 主关键点 → 盘中突破；
-  现价站上平台位 → 接近关键点；否则观望；现价 < 止损位 → 跌破止损
+- 突破判定（四级状态）：收盘价 > 主关键点 → 突破确认；现价盘中 > 主关键点 → 盘中突破；
+  现价站上平台位 → 接近关键点；其余 → 观望
+- 现价 ≤ 止损位 → stop_breached=True（跌破止损警告，附加于四级状态之上）
 - 止损位 = 主关键点 × (1 - stop_pct/100)
 - 金字塔加仓：首仓 first_pct%，之后每涨 add_step_pct% 加 add_pct%，最多 levels 级，
   累计不超过 90%（留 10% 机动）
@@ -150,7 +155,6 @@ STATE_LABELS: dict[str, str] = {
     "intraday": "盘中突破",
     "approaching": "接近关键点",
     "watching": "观望",
-    "stop_loss": "跌破止损 · 离场",
 }
 
 
@@ -181,13 +185,14 @@ def _build_advice(
     ladder: list[dict[str, Any]],
     position_pct: float | None,
     p: dict[str, float],
+    stop_breached: bool,
 ) -> str:
     """按状态与仓位生成一句话操作建议。"""
     if not ladder:
         return "参数下加仓档位为空，请调整参数。"
-    entry = ladder[0]["price"]
-    if state == "stop_loss":
+    if stop_breached:
         return "现价已跌破止损位，按利弗莫尔法则应离场观望，等待价格重新突破关键点再入场。"
+    entry = ladder[0]["price"]
     if position_pct is None:
         if state == "confirmed":
             return (f"收盘已突破关键点 {entry}，触发买入：建议以首仓 {int(p['first_pct'])}% "
@@ -239,9 +244,7 @@ def compute_livermore(
     last_date = str(last["date"])
     cur = float(current_price) if current_price is not None else last_close
 
-    if cur <= stop_loss:
-        state = "stop_loss"
-    elif last_close > pivot:
+    if last_close > pivot:
         state = "confirmed"
     elif cur > pivot:
         state = "intraday"
@@ -249,6 +252,7 @@ def compute_livermore(
         state = "approaching"
     else:
         state = "watching"
+    stop_breached = cur <= stop_loss
 
     distance_pct = (cur - pivot) / pivot * 100 if pivot > 0 else None
 
@@ -274,7 +278,7 @@ def compute_livermore(
     invested = cost * shares if cost is not None and shares is not None else None
     position_pct = (invested / planned * 100) if invested is not None and planned else None
 
-    advice = _build_advice(state, cur, ladder, position_pct, p)
+    advice = _build_advice(state, cur, ladder, position_pct, p, stop_breached)
     for lv in ladder:
         lv["amount"] = _round(planned * lv["add_pct"] / 100) if planned else None
 
@@ -288,6 +292,7 @@ def compute_livermore(
         "stop_loss": _round(stop_loss),
         "state": state,
         "state_label": STATE_LABELS[state],
+        "stop_breached": stop_breached,
         "distance_pct": _round(distance_pct),
         "ladder": ladder,
         "holding": {
@@ -304,14 +309,32 @@ def compute_livermore(
 - [ ] **Step 4: 运行测试确认通过**
 
 Run: `cd /home/admin/stock-trading-all && .venv/bin/python -m pytest backend/test_services.py -v -k livermore`
-Expected: 5 passed（`test_livermore_*`），其余旧测试不受影响
+Expected: 5 passed
+
+- [ ] **Step 4.5: 修复既有坏导入 `detect_cross`（全量测试 collect 依赖它）** — `backend/test_services.py` 第 4 行导入了 `signal.py` 中不存在的 `detect_cross`，导致整个测试文件无法 collect（既有缺陷）。在 `backend/services/signal.py` 的 `_cross_down` 函数之后追加：
+
+```python
+def detect_cross(df: pd.DataFrame, col_a: str, col_b: str) -> pd.Series:
+    """返回 1（a 上穿 b）/-1（a 下穿 b）/0 的信号序列。"""
+    diff = df[col_a] - df[col_b]
+    prev = diff.shift(1)
+    cross = pd.Series(0, index=df.index, dtype=int)
+    up = diff > 0
+    down = diff < 0
+    cross[up] = (prev[up] <= 0).astype(int)
+    cross[down] = -(prev[down] >= 0).astype(int)
+    return cross
+```
+
+Run: `cd /home/admin/stock-trading-all && .venv/bin/python -m pytest backend/test_services.py -v`
+Expected: 全部 passed（含旧测试 `test_detect_cross_basic` 与 5 个 `test_livermore_*`）
 
 - [ ] **Step 5: 提交**
 
 ```bash
 cd /home/admin/stock-trading-all
-git add backend/services/livermore.py backend/test_services.py
-git commit -m "feat: 利弗莫尔买入法纯函数服务（关键点/突破状态/止损/金字塔加仓）"
+git add backend/services/livermore.py backend/test_services.py backend/services/signal.py
+git commit -m "feat: 利弗莫尔买入法纯函数服务（关键点/突破状态/止损/金字塔加仓）+ 修复 detect_cross 缺失"
 ```
 
 ---
@@ -592,8 +615,9 @@ export interface LivermoreResponse {
   pivot: number | null;
   box_top: number | null;
   stop_loss: number | null;
-  state: 'confirmed' | 'intraday' | 'approaching' | 'watching' | 'stop_loss';
+  state: 'confirmed' | 'intraday' | 'approaching' | 'watching';
   state_label: string;
+  stop_breached: boolean;
   distance_pct: number | null;
   ladder: LivermoreLadderLevel[];
   holding: {
@@ -766,7 +790,6 @@ const STATE_COLORS: Record<LivermoreResponse['state'], string> = {
   intraday: 'orange',
   approaching: 'gold',
   watching: 'default',
-  stop_loss: 'volcano',
 };
 
 const PARAM_FIELDS: { key: keyof LivermoreQuery; label: string; min: number; max: number }[] = [
@@ -914,7 +937,7 @@ export default function LivermoreModal({
             </div>
 
             <Alert
-              type={data.state === 'stop_loss' ? 'error' : data.state === 'confirmed' ? 'success' : 'info'}
+              type={data.stop_breached ? 'error' : data.state === 'confirmed' ? 'success' : 'info'}
               message={data.advice}
               showIcon
             />
