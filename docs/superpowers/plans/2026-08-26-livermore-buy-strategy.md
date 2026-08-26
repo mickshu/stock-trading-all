@@ -1134,6 +1134,8 @@ git add frontend/src/pages/Watchlist.tsx
 git commit -m "feat(frontend): 持仓列表每行新增「利弗莫尔」按钮弹出策略浮层（桌面+移动端）"
 ```
 
+> **质量审查修正记录**（已随实现提交，代码以此为准）：① LivermoreModal 增加 `onSaved` 回调，保存持仓后回写 Watchlist 行数据（修复重开浮层时草稿从旧快照初始化、用户数据看似丢失）；② 重开/切换股票时 `setData(null)` 清旧分析内容（防标题 B 显示 A 的数据）；③ 桌面操作列 width 120→180（三按钮放不下）。
+
 ---
 
 ### Task 8: 版本水印 + 全量验证
