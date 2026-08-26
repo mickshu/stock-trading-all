@@ -192,6 +192,18 @@ def _cross_down(a_now, b_now, a_prev, b_prev) -> bool:
     )
 
 
+def detect_cross(df: pd.DataFrame, col_a: str, col_b: str) -> pd.Series:
+    """返回 1（a 上穿 b）/-1（a 下穿 b）/0 的信号序列。"""
+    diff = df[col_a] - df[col_b]
+    prev = diff.shift(1)
+    cross = pd.Series(0, index=df.index, dtype=int)
+    up = diff > 0
+    down = diff < 0
+    cross[up] = (prev[up] <= 0).astype(int)
+    cross[down] = -(prev[down] >= 0).astype(int)
+    return cross
+
+
 def _enrich(sig_type: str, description: str, df: pd.DataFrame, i: int) -> dict:
     meta = SIGNAL_CATALOG[sig_type]
     return {
